@@ -291,17 +291,12 @@ function createStudentRow(student) {
         }
     }
 
-    const loginCount = student.loginCount || 0;
-
     row.innerHTML = `
         <td><div class="student-name">${student.name}</div></td>
         <td><div class="student-email">${student.email}</div></td>
-        <td><span class="badge badge-grade">${student.grade}학년</span></td>
-        <td>${student.class}반</td>
-        <td>${student.number}번</td>
-        <td>${createdDate}</td>
-        <td style="font-weight: 500; color: var(--primary-teal);">${lastLoginStr}</td>
-        <td style="font-weight: bold; text-align: center;">${loginCount}회</td>
+        <td>${joinDate}</td>
+        <td>${lastLoginStr}</td>
+        <td><span class="badge" style="background: #e3f2fd; color: #1565c0;">${student.loginCount || 0}회</span></td>
         <td>
             <div class="action-buttons">
                 <button class="action-btn btn-edit" onclick="editStudent('${student.id}')">정보 수정</button>
@@ -411,7 +406,7 @@ function createStatsRow(stat) {
         '-';
 
     row.innerHTML = `
-        < td > <strong>${stat.userName}</strong></td >
+        <td><strong>${stat.userName}</strong></td>
         <td>${stat.appName}</td>
         <td><span class="badge badge-grade">${stat.appCategory}</span></td>
         <td><strong>${stat.count}회</strong></td>

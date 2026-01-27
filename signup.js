@@ -92,11 +92,45 @@ signupForm.addEventListener('submit', async (e) => {
         hideLoading();
         console.error('Signup error:', error);
 
+        // Handle "Email already in use" - Check if it's a "Soft Deleted" user
+        if (error.code === 'auth/email-already-in-use') {
+            try {
+                // Try to sign in with the internal password
+                const internalPassword = "fixed_student_pw_1234";
+                const fullEmail = emailInput.includes('@') ? emailInput : `${emailInput}@ingyu-ai-world.com`;
+
+                await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
+                const currentUser = auth.currentUser;
+
+                if (currentUser) {
+                    // User exists in Auth but possibly deleted in Firestore
+                    // Re-create the Firestore document (Account Recovery)
+                    await db.collection('users').doc(currentUser.uid).set({
+                        email: fullEmail,
+                        name,
+                        role: 'student',
+                        simplePassword: password,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    await auth.signOut();
+                    alert('계정이 복구되었습니다! 로그인해 주세요.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (recoveryError) {
+                console.error('Account recovery failed:', recoveryError);
+                // If recovery fails, fall through to show the standard error
+            }
+
+            showError(signupError, '이미 사용 중인 아이디입니다.');
+            return;
+        }
+
         let errorMessage = '회원가입에 실패했습니다.';
 
-        if (error.code === 'auth/email-already-in-use') {
-            errorMessage = '이미 사용 중인 이메일입니다.';
-        } else if (error.code === 'auth/invalid-email') {
+        if (error.code === 'auth/invalid-email') {
             errorMessage = '올바른 이메일 형식이 아닙니다.';
         } else if (error.code === 'auth/weak-password') {
             errorMessage = '비밀번호가 너무 약합니다. (최소 6자)';

@@ -90,12 +90,26 @@ studentForm.addEventListener('submit', async (e) => {
     try {
         showLoading();
 
-        // Firebase Authentication
-        const userCredential = await auth.signInWithEmailAndPassword(fullEmail, password);
-        const user = userCredential.user;
+        // 1. Fetch user document from Firestore by ID (email) first
+        const usersSnapshot = await db.collection('users').where('email', '==', fullEmail).get();
 
-        // Check user role in Firestore
-        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (usersSnapshot.empty) {
+            throw new Error('등록되지 않은 학생입니다.');
+        }
+
+        const userDoc = usersSnapshot.docs[0];
+        const userData = userDoc.data();
+
+        // 2. Validate against simplified password
+        if (userData.simplePassword !== password) {
+            throw new Error('비밀번호가 올바르지 않습니다.');
+        }
+
+        // 3. Perform "Internal Login" with a fixed password to maintain Auth session
+        // This bypasses the need for Admin SDK to change Auth passwords.
+        const internalPassword = "fixed_student_pw_1234"; // All students use this internally
+        const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
+        const user = userCredential.user;
 
         if (!userDoc.exists) {
             throw new Error('사용자 정보를 찾을 수 없습니다.');

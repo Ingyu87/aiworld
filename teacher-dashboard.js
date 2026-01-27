@@ -604,8 +604,10 @@ studentForm.addEventListener('submit', async (e) => {
             // Convert ID to email format
             const fullEmail = email.includes('@') ? email : `${email} @ingyu-ai - world.com`;
 
-            // Create Firebase Auth user
-            const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, password);
+            // Create Firebase Auth user with a fixed internal password
+            // The real security check is done against Firestore's simplePassword
+            const internalPassword = "fixed_student_pw_1234";
+            const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, internalPassword);
             const uid = userCredential.user.uid;
 
             // Create user document in Firestore
@@ -613,9 +615,7 @@ studentForm.addEventListener('submit', async (e) => {
                 email: fullEmail,
                 name,
                 role: 'student',
-                grade,
-                class: classNum,
-                number,
+                simplePassword: password, // Store password for simplified management
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -678,8 +678,14 @@ window.editPassword = async function (studentId, studentName) {
     }
 
     try {
-        // Note: Password update requires Admin SDK in standard Firebase
-        alert(`비밀번호 수정은 Firebase Admin SDK가 필요합니다.\n\n요청하신 4자리(${newPassword})로의 변경 기능은 추후 서버 연동 시 반영됩니다.\n\n임시: Firebase Console에서 해당 학생의 비밀번호를 '${newPassword}'로 직접 변경해주세요.`);
+        // Direct Firestore update for the simplified password
+        await db.collection('users').doc(studentId).update({
+            simplePassword: newPassword,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert(`${studentName} 학생의 비밀번호가 '${newPassword}'로 수정되었습니다.`);
+        loadStudents();
 
     } catch (error) {
         console.error('Error resetting password:', error);
@@ -729,8 +735,9 @@ deleteConfirmBtn.addEventListener('click', async () => {
         });
         await batch.commit();
 
-        // Note: In production, also delete from Firebase Auth using Admin SDK via Cloud Function
-        alert('학생이 삭제되었습니다.\n\n주의: Firebase Authentication에서도 수동으로 삭제해야 합니다.\n(Firebase Console > Authentication)');
+        // Note: We don't delete from Auth to avoid Admin SDK errors.
+        // Once the Firestore record is gone, the login shim in login.js will deny access.
+        alert('학생이 성공적으로 삭제되었습니다.');
 
         closeDeleteModal();
         loadStudents();

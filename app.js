@@ -42,28 +42,28 @@ const apps = [
         category: "수학",
         description: "AI 원리로 통계를 재밌게 배워요!",
         icon: "📊",
-        url: "https://data-possibility.vercel.app/"
+        url: "https://data-analyze-psi.vercel.app/"
     },
     {
         title: "소수의 덧셈 뺄셈",
         category: "수학",
         description: "소수의 덧셈과 뺄셈을 연습해요!",
         icon: "🔢",
-        url: "https://decimal-math.vercel.app/"
+        url: "https://decimal-3d-app.vercel.app/"
     },
     {
         title: "질문으로 독서하기",
         category: "국어",
         description: "AI에게 질문하며 책을 깊이 읽어요!",
         icon: "📖",
-        url: "https://gemini.google.com/share/760a00589a1c"
+        url: "https://4-2-4-app.vercel.app/"
     },
     {
         title: "우리말 탐구 보고서",
         category: "국어",
         description: "AI와 함께 우리말을 탐구해요!",
         icon: "🔍",
-        url: "https://gemini.google.com/share/0306771b96a8"
+        url: "https://hanguel-app.vercel.app/"
     },
     {
         title: "배움 나침반",
@@ -218,11 +218,21 @@ auth.onAuthStateChanged(async (user) => {
 
         // 3. Check AI Agreement (Student only)
         if (currentUser.role === 'student') {
-            await checkAIAgreement();
+            const agreed = await checkAIAgreement();
+            if (agreed) {
+                renderApps("전체");
+            } else {
+                // Do NOT render apps yet. Wait for agreement.
+                // Optionally hide any loading state if present
+                console.log('Waiting for AI Safety Agreement...');
+                document.getElementById('app-grid').innerHTML = ''; // Keep empty
+                document.getElementById('section-title').textContent = 'AI 안전 수칙 동의 필요';
+                document.getElementById('app-count').textContent = '';
+            }
+        } else {
+            // Teacher or others
+            renderApps("전체");
         }
-
-        // 4. Render apps
-        renderApps("전체");
 
     } catch (error) {
         console.error('Login error:', error);
@@ -485,12 +495,13 @@ const aiSafetyModal = document.getElementById('ai-safety-modal');
 const aiAgreeBtn = document.getElementById('ai-agree-btn');
 
 // Check if user has agreed to AI safety guidelines
+// Check if user has agreed to AI safety guidelines
 async function checkAIAgreement() {
-    if (!currentUser) return;
+    if (!currentUser) return false;
 
     // 학생만 동의 필요 (교사는 제외)
     if (currentUser.role === 'teacher') {
-        return;
+        return true;
     }
 
     try {
@@ -499,9 +510,13 @@ async function checkAIAgreement() {
         if (!agreementDoc.exists || !agreementDoc.data().agreedToAISafety) {
             // Show AI safety modal
             showAISafetyModal();
+            return false;
         }
+
+        return true;
     } catch (error) {
         console.error('Error checking AI agreement:', error);
+        return false; // Default to false on error to be safe
     }
 }
 
@@ -535,6 +550,10 @@ if (aiAgreeBtn) {
 
             console.log('AI safety agreement recorded');
             hideAISafetyModal();
+
+            // Render apps after agreement
+            renderApps("전체");
+
         } catch (error) {
             console.error('Error saving AI agreement:', error);
             alert('동의를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');

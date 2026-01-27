@@ -42,28 +42,28 @@ const apps = [
         category: "수학",
         description: "AI 원리로 통계를 재밌게 배워요!",
         icon: "📊",
-        url: "https://data-possibility.vercel.app/"
+        url: "https://data-analyze-psi.vercel.app/"
     },
     {
         title: "소수의 덧셈 뺄셈",
         category: "수학",
         description: "소수의 덧셈과 뺄셈을 연습해요!",
         icon: "🔢",
-        url: "https://decimal-math.vercel.app/"
+        url: "https://decimal-3d-app.vercel.app/"
     },
     {
         title: "질문으로 독서하기",
         category: "국어",
         description: "AI에게 질문하며 책을 깊이 읽어요!",
         icon: "📖",
-        url: "https://gemini.google.com/share/760a00589a1c"
+        url: "https://4-2-4-app.vercel.app/"
     },
     {
         title: "우리말 탐구 보고서",
         category: "국어",
         description: "AI와 함께 우리말을 탐구해요!",
         icon: "🔍",
-        url: "https://gemini.google.com/share/0306771b96a8"
+        url: "https://hanguel-app.vercel.app/"
     },
     {
         title: "배움 나침반",

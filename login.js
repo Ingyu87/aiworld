@@ -106,6 +106,11 @@ studentForm.addEventListener('submit', async (e) => {
         const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
         const user = userCredential.user;
 
+        // 4. Update last login timestamp
+        await db.collection('users').doc(userDoc.id).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         // Success - redirect to main page
         console.log('Student login successful:', userData);
         window.location.href = 'index.html';

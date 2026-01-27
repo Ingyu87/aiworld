@@ -12,6 +12,23 @@ let checkinData = {
     aiAdvice: null
 };
 
+function getApiBaseUrl() {
+    if (window.API_BASE_URL) {
+        return window.API_BASE_URL.replace(/\/$/, '');
+    }
+    if (window.location.protocol === 'file:') {
+        return null;
+    }
+    return '';
+}
+
+function buildApiUrl(path) {
+    const base = getApiBaseUrl();
+    if (base === null) return null;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${base}${normalizedPath}`;
+}
+
 // 인증 체크
 auth.onAuthStateChanged(async (user) => {
     if (!user) {
@@ -290,7 +307,14 @@ async function generateAdvice() {
     containerEl.style.display = 'none';
 
     try {
-        const response = await fetch('/api/generate-advice', {
+        const apiUrl = buildApiUrl('/api/generate-advice');
+        if (!apiUrl) {
+            alert('로컬 파일로 실행 중이라 AI 조언 API를 사용할 수 없습니다. 서버에서 실행해주세요.');
+            goToStep(3);
+            return;
+        }
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -302,6 +326,17 @@ async function generateAdvice() {
                 reason: checkinData.reason
             })
         });
+
+        if (!response.ok) {
+            let errorDetail = '';
+            try {
+                const errorData = await response.json();
+                errorDetail = errorData.error ? ` (${errorData.error})` : '';
+            } catch (parseError) {
+                errorDetail = '';
+            }
+            throw new Error(`AI 조언 서버 응답 실패: ${response.status}${errorDetail}`);
+        }
 
         const data = await response.json();
 

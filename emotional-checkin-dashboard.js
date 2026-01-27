@@ -4,6 +4,23 @@
 let emotionData = [];
 let currentPeriod = 'week';
 
+function getApiBaseUrl() {
+    if (window.API_BASE_URL) {
+        return window.API_BASE_URL.replace(/\/$/, '');
+    }
+    if (window.location.protocol === 'file:') {
+        return null;
+    }
+    return '';
+}
+
+function buildApiUrl(path) {
+    const base = getApiBaseUrl();
+    if (base === null) return null;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${base}${normalizedPath}`;
+}
+
 // 감정 출석부 탭 초기화
 async function initEmotionsTab() {
     console.log('Initializing emotions tab...');
@@ -211,6 +228,16 @@ function updateWordCloud() {
     const canvas = document.getElementById('wordCloud');
     const ctx = canvas.getContext('2d');
 
+    const displayWidth = canvas.clientWidth || canvas.width || 600;
+    const displayHeight = canvas.clientHeight || canvas.height || 260;
+
+    if (canvas.width !== displayWidth) {
+        canvas.width = displayWidth;
+    }
+    if (canvas.height !== displayHeight) {
+        canvas.height = displayHeight;
+    }
+
     // 캔버스 초기화
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -240,11 +267,15 @@ function updateWordCloud() {
     // 간단한 워드 클라우드 (랜덤 배치)
     const maxCount = sortedWords[0][1];
     const colors = ['#FF6B9D', '#4ECDC4', '#FFE66D', '#A8E6CF', '#95B8FC', '#C3B1E1', '#FFB84D'];
+    const minFontSize = 12;
+    const maxFontSize = 32;
+    const paddingX = 32;
+    const paddingY = 24;
 
     sortedWords.forEach(([word, count], index) => {
-        const fontSize = 16 + (count / maxCount) * 40;
-        const x = Math.random() * (canvas.width - 100) + 50;
-        const y = Math.random() * (canvas.height - 50) + 25;
+        const fontSize = Math.round(minFontSize + (count / maxCount) * (maxFontSize - minFontSize));
+        const x = Math.random() * (canvas.width - paddingX * 2) + paddingX;
+        const y = Math.random() * (canvas.height - paddingY * 2) + paddingY;
         const color = colors[index % colors.length];
 
         ctx.font = `${fontSize}px Noto Sans KR`;
@@ -317,6 +348,13 @@ async function generateAIAnalysis() {
     content.style.display = 'none';
 
     try {
+        const apiUrl = buildApiUrl('/api/analyze-class-emotions');
+        if (!apiUrl) {
+            content.innerHTML = '<p style="text-align: center;">로컬 파일로 실행 중이라 AI 분석 API를 사용할 수 없습니다. 서버에서 실행해주세요.</p>';
+            content.style.display = 'block';
+            return;
+        }
+
         // 감정 데이터 집계
         const emotionCounts = {};
         emotionData.forEach(d => {
@@ -327,7 +365,7 @@ async function generateAIAnalysis() {
         const checkinRate = Math.round((new Set(emotionData.map(d => d.userId)).size / totalStudents) * 100);
 
         // AI API 호출
-        const response = await fetch('/api/analyze-class-emotions', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -340,6 +378,17 @@ async function generateAIAnalysis() {
             })
         });
 
+        if (!response.ok) {
+            let errorDetail = '';
+            try {
+                const errorData = await response.json();
+                errorDetail = errorData.error ? ` (${errorData.error})` : '';
+            } catch (parseError) {
+                errorDetail = '';
+            }
+            throw new Error(`AI 분석 서버 응답 실패: ${response.status}${errorDetail}`);
+        }
+
         const data = await response.json();
 
         if (data.success && data.analysis) {
@@ -350,7 +399,7 @@ async function generateAIAnalysis() {
 
     } catch (error) {
         console.error('Error generating AI analysis:', error);
-        content.innerHTML = '<p style="text-align: center;">AI 분석을 불러오는 데 실패했습니다.</p>';
+        content.innerHTML = `<p style="text-align: center;">AI 분석을 불러오는 데 실패했습니다.<br><small>${error.message}</small></p>`;
         content.style.display = 'block';
     } finally {
         loading.style.display = 'none';

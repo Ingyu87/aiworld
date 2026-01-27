@@ -35,22 +35,30 @@ signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideError(signupError);
 
-    const name = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const grade = parseInt(document.getElementById('signup-grade').value);
-    const classNum = parseInt(document.getElementById('signup-class').value);
-    const number = parseInt(document.getElementById('signup-number').value);
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    const emailInput = document.getElementById('signup-email').value.trim();
+    const name = emailInput; // Use ID as name
+    const grade = 1;
+    const classNum = 1;
+    const number = 1;
+    let password = document.getElementById('signup-password').value;
+    let confirmPassword = document.getElementById('signup-confirm-password').value;
 
     // Validation
-    if (!name || !email || !grade || !classNum || !number || !password) {
+    if (!emailInput || !password || !confirmPassword) {
         showError(signupError, '모든 항목을 입력해주세요.');
         return;
     }
 
+    // Auto-pad 4-digit password
+    if (password.length >= 4 && password.length < 6) {
+        password += '00';
+    }
+    if (confirmPassword.length >= 4 && confirmPassword.length < 6) {
+        confirmPassword += '00';
+    }
+
     if (password.length < 6) {
-        showError(signupError, '비밀번호는 최소 6자 이상이어야 합니다.');
+        showError(signupError, '비밀번호는 최소 4자(내부 6자) 이상이어야 합니다.');
         return;
     }
 
@@ -62,13 +70,16 @@ signupForm.addEventListener('submit', async (e) => {
     try {
         showLoading();
 
+        // Convert ID to email format
+        const fullEmail = emailInput.includes('@') ? emailInput : `${emailInput}@ingyu-ai-world.com`;
+
         // Create Firebase Authentication user
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, password);
         const uid = userCredential.user.uid;
 
         // Create user document in Firestore
         await db.collection('users').doc(uid).set({
-            email,
+            email: fullEmail,
             name,
             role: 'student',
             grade,
@@ -79,7 +90,7 @@ signupForm.addEventListener('submit', async (e) => {
         });
 
         // Success - redirect to main page
-        alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+        alert('회원가입이 완료되었습니다! 로그인해 주세요.');
         window.location.href = 'login.html';
 
     } catch (error) {

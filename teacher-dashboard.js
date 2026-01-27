@@ -411,7 +411,6 @@ function filterStats() {
             row.style.display = 'none';
         }
     });
-});
 }
 
 // ===========================

@@ -118,9 +118,9 @@ studentForm.addEventListener('submit', async (e) => {
             // Continue anyway - don't block login
         }
 
-        // Success - redirect to emotional check-in page
+        // Success - redirect to main page (AI safety modal will show first)
         console.log('Student login successful:', userData);
-        window.location.href = 'emotional-checkin.html';
+        window.location.href = 'index.html';
 
     } catch (error) {
         hideLoading();

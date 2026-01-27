@@ -533,6 +533,7 @@ function hideAISafetyModal() {
     }
 }
 
+
 // Handle agreement button click
 if (aiAgreeBtn) {
     aiAgreeBtn.addEventListener('click', async () => {
@@ -546,14 +547,14 @@ if (aiAgreeBtn) {
                 lastAgreedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true }).catch(err => console.error("Agreement log error:", err));
 
-            // Proceed immediately
+            // Redirect to emotional check-in page
             hideAISafetyModal();
-            renderApps("전체");
+            window.location.href = 'emotional-checkin.html';
 
         } catch (error) {
             console.error('Agreement error:', error);
             hideAISafetyModal();
-            renderApps("전체");
+            window.location.href = 'emotional-checkin.html';
         }
     });
 }

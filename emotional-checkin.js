@@ -102,15 +102,15 @@ function initializeCheckin() {
         const length = reasonInput.value.trim().length;
         charCount.textContent = length;
 
-        // 최소 10자 이상 입력해야 다음 버튼 활성화
-        reasonNextBtn.disabled = length < 10;
+        // 최소 5자 이상 입력해야 다음 버튼 활성화
+        reasonNextBtn.disabled = length < 5;
     });
 
     // Step 3: 다음 버튼
     reasonNextBtn.addEventListener('click', () => {
         const reason = reasonInput.value.trim();
-        if (reason.length < 10) {
-            alert('이유를 최소 10자 이상 작성해주세요.');
+        if (reason.length < 5) {
+            alert('이유를 최소 5자 이상 작성해주세요.');
             return;
         }
         goToStep(4);

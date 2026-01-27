@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>감정 출석부 - Ingyu's AI World</title>
+    <link rel="stylesheet" href="emotional-checkin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Step 1: 감정 선택 -->
+        <div class="step-container active" id="step-1">
+            <div class="header">
+                <div class="header-emoji">🤗</div>
+                <h1>오늘 기분이 어때요?</h1>
+                <p class="subtitle">솔직하게 표현해도 괜찮아요!</p>
+            </div>
+
+            <div class="emotions-grid">
+                <button class="emotion-card" data-emotion="happy" data-name="기쁨">
+                    <div class="emotion-icon">😊</div>
+                    <div class="emotion-name">기쁨/행복</div>
+                </button>
+                <button class="emotion-card" data-emotion="sad" data-name="슬픔">
+                    <div class="emotion-icon">😢</div>
+                    <div class="emotion-name">슬픔/우울</div>
+                </button>
+                <button class="emotion-card" data-emotion="angry" data-name="화남">
+                    <div class="emotion-icon">😠</div>
+                    <div class="emotion-name">화남/짜증</div>
+                </button>
+                <button class="emotion-card" data-emotion="anxious" data-name="불안">
+                    <div class="emotion-icon">😰</div>
+                    <div class="emotion-name">불안/걱정</div>
+                </button>
+                <button class="emotion-card" data-emotion="calm" data-name="평온">
+                    <div class="emotion-icon">😐</div>
+                    <div class="emotion-name">평온/무덤덤</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: 감정 단어 선택 -->
+        <div class="step-container" id="step-2">
+            <div class="header">
+                <div class="emotion-summary">
+                    <span class="selected-emotion-icon"></span>
+                    <span class="selected-emotion-text"></span>
+                </div>
+                <h1>어떤 느낌인가요?</h1>
+                <p class="subtitle">마음에 드는 단어를 골라보세요 (여러 개 가능)</p>
+            </div>
+
+            <div class="loading-container" id="words-loading">
+                <div class="spinner"></div>
+                <p>AI가 단어를 만들고 있어요...</p>
+            </div>
+
+            <div class="words-grid" id="words-grid"></div>
+
+            <div class="step-actions">
+                <button class="btn-back" onclick="goToStep(1)">← 뒤로</button>
+                <button class="btn-next" id="btn-words-next" disabled>다음 →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: 이유 작성 -->
+        <div class="step-container" id="step-3">
+            <div class="header">
+                <div class="emotion-summary">
+                    <span class="selected-emotion-icon"></span>
+                    <span class="selected-emotion-text"></span>
+                </div>
+                <h1>왜 그런 기분이 들었나요?</h1>
+                <p class="subtitle">자유롭게 써보세요 (선택사항)</p>
+            </div>
+
+            <div class="selected-words-summary" id="selected-words-summary"></div>
+
+            <div class="reason-input-container">
+                <textarea id="reason-input" placeholder="예: 오늘 친구와 재미있게 놀아서 기분이 좋아요!" maxlength="200"></textarea>
+                <div class="char-counter">
+                    <span id="char-count">0</span> / 200자
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn-back" onclick="goToStep(2)">← 뒤로</button>
+                <button class="btn-skip" onclick="goToStep(4)">건너뛰기</button>
+                <button class="btn-next" onclick="goToStep(4)">다음 →</button>
+            </div>
+        </div>
+
+        <!-- Step 4: AI 조언 -->
+        <div class="step-container" id="step-4">
+            <div class="header">
+                <div class="header-emoji">✨</div>
+                <h1>AI가 응원 메시지를 보냈어요!</h1>
+            </div>
+
+            <div class="loading-container" id="advice-loading">
+                <div class="spinner"></div>
+                <p>AI가 메시지를 준비하고 있어요...</p>
+            </div>
+
+            <div class="advice-container" id="advice-container">
+                <div class="advice-card empathy-card">
+                    <div class="card-icon">💙</div>
+                    <h3>공감</h3>
+                    <p id="advice-empathy"></p>
+                </div>
+
+                <div class="advice-card suggestion-card">
+                    <div class="card-icon">💡</div>
+                    <h3>제안</h3>
+                    <p id="advice-suggestion"></p>
+                </div>
+
+                <div class="advice-card quote-card">
+                    <div class="card-icon">🌟</div>
+                    <h3>명언</h3>
+                    <blockquote id="advice-quote"></blockquote>
+                    <cite id="advice-source"></cite>
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn-main" onclick="completeCheckin()">메인으로 가기 →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="emotional-checkin.js"></script>
+</body>
+
+</html>

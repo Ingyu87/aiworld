@@ -118,9 +118,9 @@ studentForm.addEventListener('submit', async (e) => {
             // Continue anyway - don't block login
         }
 
-        // Success - redirect to main page
+        // Success - redirect to emotional check-in page
         console.log('Student login successful:', userData);
-        window.location.href = 'index.html';
+        window.location.href = 'emotional-checkin.html';
 
     } catch (error) {
         hideLoading();

@@ -513,8 +513,25 @@ async function checkAIAgreement() {
         return true;
     }
 
-    // Always show AI Safety Page for students every session
-    // We ignore previous agreement status to reinforce the message every time.
+    try {
+        // 오늘 감정 출석을 이미 했는지 확인
+        const today = new Date().toISOString().split('T')[0];
+        const checkinQuery = await db.collection('emotional_checkins')
+            .where('userId', '==', currentUser.uid)
+            .where('date', '==', today)
+            .get();
+
+        if (!checkinQuery.empty) {
+            // 이미 출석했으면 모달 띄우지 않고 바로 통과
+            return true;
+        }
+
+    } catch (error) {
+        console.error("Error checking emotion status:", error);
+        // 에러 나면 안전하게 모달 띄우기
+    }
+
+    // Always show AI Safety Page for students if check-in not done
     showAISafetyModal();
     return false;
 }

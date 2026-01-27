@@ -65,21 +65,33 @@ function initializeCheckin() {
             const emotionName = card.dataset.name;
             const emotionEmoji = card.querySelector('.emotion-icon').textContent;
 
-            console.log(`Emotion selected: ${emotionName} (${emotion})`);
+            // 디버깅용 알림 (성공 시 제거 예정)
+            console.log(`Emotion selected: ${emotionName}`);
+            alert(`감정 선택됨: ${emotionName}\n다음 단계로 이동 시도...`);
 
             checkinData.emotion = emotion;
             checkinData.emotionName = emotionName;
             checkinData.emotionEmoji = emotionEmoji;
 
             // 다음 단계로
-            await goToStep(2);
+            try {
+                await goToStep(2);
+            } catch (error) {
+                alert(`오류 발생: ${error.message}`);
+                console.error(error);
+            }
         }
     });
 
     // Step 2: 단어 선택 다음 버튼
-    document.getElementById('btn-words-next').addEventListener('click', () => {
-        goToStep(3);
-    });
+    const btnWordsNext = document.getElementById('btn-words-next');
+    if (btnWordsNext) {
+        btnWordsNext.addEventListener('click', () => {
+            goToStep(3);
+        });
+    }
+
+    // Step 3: 이유 입력 글자 수 카운터 및 검증
 
     // Step 3: 이유 입력 글자 수 카운터 및 검증
     const reasonInput = document.getElementById('reason-input');

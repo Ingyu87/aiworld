@@ -43,22 +43,14 @@ signupForm.addEventListener('submit', async (e) => {
     let password = document.getElementById('signup-password').value;
     let confirmPassword = document.getElementById('signup-confirm-password').value;
 
-    // Validation
+    // Validation for 4-digit password
     if (!emailInput || !password || !confirmPassword) {
         showError(signupError, '모든 항목을 입력해주세요.');
         return;
     }
 
-    // Auto-pad 4-digit password
-    if (password.length >= 4 && password.length < 6) {
-        password += '00';
-    }
-    if (confirmPassword.length >= 4 && confirmPassword.length < 6) {
-        confirmPassword += '00';
-    }
-
-    if (password.length < 6) {
-        showError(signupError, '비밀번호는 최소 4자(내부 6자) 이상이어야 합니다.');
+    if (password.length !== 4 || isNaN(password)) {
+        showError(signupError, '비밀번호는 숫자 4자리여야 합니다.');
         return;
     }
 
@@ -73,23 +65,26 @@ signupForm.addEventListener('submit', async (e) => {
         // Convert ID to email format
         const fullEmail = emailInput.includes('@') ? emailInput : `${emailInput}@ingyu-ai-world.com`;
 
-        // Create Firebase Authentication user
-        const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, password);
+        // 1. Create Firebase Authentication user with a fixed internal password
+        // The real security check is done against Firestore's simplePassword
+        const internalPassword = "fixed_student_pw_1234";
+        const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, internalPassword);
         const uid = userCredential.user.uid;
 
-        // Create user document in Firestore
+        // 2. Create user document in Firestore with simplePassword
         await db.collection('users').doc(uid).set({
             email: fullEmail,
             name,
             role: 'student',
-            grade,
-            class: classNum,
-            number,
+            simplePassword: password, // Store 4-digit code for simplified management
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Success - redirect to main page
+        // Sign out immediately to prevent auto-login
+        await auth.signOut();
+
+        // Success - redirect to login page
         alert('회원가입이 완료되었습니다! 로그인해 주세요.');
         window.location.href = 'login.html';
 

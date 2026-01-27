@@ -201,21 +201,24 @@ function updateEmotionChart() {
                     '#B8E6E1', // 피곤
                     '#FFB8D1'  // 놀람
                 ],
-                borderWidth: 2,
+                borderWidth: 1,
                 borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'right',
                     labels: {
                         font: {
-                            size: 14,
+                            size: 8,
                             family: 'Noto Sans KR'
                         },
-                        padding: 15
+                        padding: 5,
+                        boxWidth: 8,
+                        boxHeight: 8
                     }
                 }
             }

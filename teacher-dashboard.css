@@ -1086,11 +1086,11 @@ input:checked+.slider:before {
 
 /* Word Cloud */
 .emotion-chart-container {
-    height: 320px;
+    height: 80px;
 }
 
 .emotion-chart-container canvas {
-    max-height: 260px;
+    max-height: 65px;
 }
 
 .wordcloud-container {
@@ -1115,7 +1115,7 @@ input:checked+.slider:before {
     }
 
     .emotion-chart-container {
-        height: 260px;
+        height: 65px;
     }
 
     .wordcloud-container canvas {

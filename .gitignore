@@ -3,4 +3,5 @@ node_modules/
 .firebase/
 firebase-debug.log
 .vscode/
+.cursor/
 Thumbs.db

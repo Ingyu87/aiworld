@@ -79,11 +79,6 @@ studentForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    // Auto-pad 4-digit password
-    if (password.length >= 4 && password.length < 6) {
-        password += '00';
-    }
-
     // Convert ID to email format
     const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
 

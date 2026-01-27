@@ -75,22 +75,22 @@
                     <span class="selected-emotion-text"></span>
                 </div>
                 <h1>왜 그런 기분이 들었나요?</h1>
-                <p class="subtitle">자유롭게 써보세요 (선택사항)</p>
+                <p class="subtitle">구체적으로 써주세요 (필수)</p>
             </div>
 
             <div class="selected-words-summary" id="selected-words-summary"></div>
 
             <div class="reason-input-container">
-                <textarea id="reason-input" placeholder="예: 오늘 친구와 재미있게 놀아서 기분이 좋아요!" maxlength="200"></textarea>
+                <textarea id="reason-input" placeholder="예: 오늘 친구와 재미있게 놀아서 기분이 좋아요!" maxlength="200"
+                    required></textarea>
                 <div class="char-counter">
-                    <span id="char-count">0</span> / 200자
+                    <span id="char-count">0</span> / 200자 (최소 10자)
                 </div>
             </div>
 
             <div class="step-actions">
                 <button class="btn-back" onclick="goToStep(2)">← 뒤로</button>
-                <button class="btn-skip" onclick="goToStep(4)">건너뛰기</button>
-                <button class="btn-next" onclick="goToStep(4)">다음 →</button>
+                <button class="btn-next" id="btn-reason-next" disabled>다음 →</button>
             </div>
         </div>
 

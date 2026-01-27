@@ -66,12 +66,27 @@ function initializeCheckin() {
         goToStep(3);
     });
 
-    // Step 3: 이유 입력 글자 수 카운터
+    // Step 3: 이유 입력 글자 수 카운터 및 검증
     const reasonInput = document.getElementById('reason-input');
     const charCount = document.getElementById('char-count');
+    const reasonNextBtn = document.getElementById('btn-reason-next');
 
     reasonInput.addEventListener('input', () => {
-        charCount.textContent = reasonInput.value.length;
+        const length = reasonInput.value.trim().length;
+        charCount.textContent = length;
+
+        // 최소 10자 이상 입력해야 다음 버튼 활성화
+        reasonNextBtn.disabled = length < 10;
+    });
+
+    // Step 3: 다음 버튼
+    reasonNextBtn.addEventListener('click', () => {
+        const reason = reasonInput.value.trim();
+        if (reason.length < 10) {
+            alert('이유를 최소 10자 이상 작성해주세요.');
+            return;
+        }
+        goToStep(4);
     });
 }
 
@@ -230,10 +245,9 @@ async function generateAdvice() {
         }
     } catch (error) {
         console.error('Error generating advice:', error);
-        // 기본 조언 사용
-        const defaultAdvice = getDefaultAdvice(checkinData.emotion);
-        checkinData.aiAdvice = defaultAdvice;
-        displayAdvice(defaultAdvice);
+        alert('AI 조언을 불러오는 데 실패했습니다. 다시 시도해주세요.');
+        // 이전 단계로 돌아가기
+        goToStep(3);
     } finally {
         loadingEl.style.display = 'none';
         containerEl.style.display = 'grid';
@@ -305,40 +319,4 @@ function getDefaultWords(emotion) {
     return defaultWordSets[emotion] || defaultWordSets.calm;
 }
 
-// 기본 조언 (API 실패 시)
-function getDefaultAdvice(emotion) {
-    const defaultAdviceSet = {
-        happy: {
-            empathy: "정말 기쁜 일이 있었나 봐요! 행복한 마음이 느껴져요.",
-            suggestion: "이 기쁨을 친구들이나 가족과 나눠보는 건 어떨까요? 행복은 나눌수록 커진답니다!",
-            quote: "행복은 나눌수록 배가 된다.",
-            quoteSource: "속담"
-        },
-        sad: {
-            empathy: "슬픈 마음이 드는 날도 있어요. 그런 감정을 느끼는 것은 자연스러운 일이에요.",
-            suggestion: "슬플 때는 신뢰하는 사람에게 이야기하거나, 좋아하는 활동을 해보세요. 시간이 지나면 괜찮아질 거예요.",
-            quote: "비가 온 뒤에 땅이 더 단단해진다.",
-            quoteSource: "속담"
-        },
-        angry: {
-            empathy: "화가 나는 일이 있었군요. 그런 감정을 느끼는 건 괜찮아요.",
-            suggestion: "화가 날 때는 심호흡을 하거나 잠시 쉬어보세요. 마음이 진정되면 더 좋은 해결책을 찾을 수 있어요.",
-            quote: "화는 마음의 적이다.",
-            quoteSource: "속담"
-        },
-        anxious: {
-            empathy: "걱정되는 마음이 드는군요. 불안한 감정은 누구나 느낄 수 있어요.",
-            suggestion: "걱정될 때는 선생님이나 부모님께 이야기해보세요. 함께 해결 방법을 찾을 수 있을 거예요.",
-            quote: "걱정은 빚과 같아서, 갚지 않으면 이자가 붙는다.",
-            quoteSource: "명언"
-        },
-        calm: {
-            empathy: "마음이 평온하고 차분하네요. 좋은 상태예요!",
-            suggestion: "이 평온한 마음을 유지하면서 오늘 하루를 보내보세요. 좋은 에너지가 될 거예요.",
-            quote: "고요한 물이 깊다.",
-            quoteSource: "속담"
-        }
-    };
 
-    return defaultAdviceSet[emotion] || defaultAdviceSet.calm;
-}

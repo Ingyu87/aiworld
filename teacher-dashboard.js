@@ -335,8 +335,9 @@ async function loadUsageStats() {
         snapshot.forEach(doc => {
             const data = doc.data();
 
-            // Filter out teacher logs
+            // Filter out teacher logs (check both userId and userName)
             if (currentTeacher && data.userId === currentTeacher.uid) return;
+            if (data.userName && data.userName.includes('교사')) return;
 
             const key = `${data.userId}_${data.appName} `;
 

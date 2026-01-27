@@ -129,50 +129,39 @@ function updateEmotionSummary() {
     });
 }
 
-// Step 2: AI로 감정 단어 생성
+// Step 2: 감정 단어 표시 (하드코딩)
 async function loadEmotionWords() {
     const loadingEl = document.getElementById('words-loading');
     const gridEl = document.getElementById('words-grid');
 
-    loadingEl.style.display = 'block';
+    loadingEl.style.display = 'none';
     gridEl.innerHTML = '';
 
-    try {
-        const response = await fetch('/api/generate-words', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                emotion: checkinData.emotion,
-                emotionName: checkinData.emotionName
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.success && data.words) {
-            checkinData.aiGeneratedWords = data.words;
-            displayWords(data.words);
-        } else {
-            throw new Error('Failed to generate words');
-        }
-    } catch (error) {
-        console.error('Error loading words:', error);
-        // 기본 단어 사용
-        const defaultWords = getDefaultWords(checkinData.emotion);
-        checkinData.aiGeneratedWords = defaultWords;
-        displayWords(defaultWords);
-    } finally {
-        loadingEl.style.display = 'none';
-    }
+    // 하드코딩된 감정 단어
+    const words = getEmotionWords(checkinData.emotion);
+    checkinData.aiGeneratedWords = words;
+    displayWords(words);
 }
 
-// 단어 표시
+// 감정별 단어 목록 (하드코딩)
+function getEmotionWords(emotion) {
+    const emotionWordSets = {
+        happy: ["신나는", "뿌듯한", "설레는", "편안한", "즐거운", "행복한", "기쁜", "상쾌한", "흐뭇한", "만족스러운"],
+        sad: ["슬픈", "우울한", "속상한", "외로운", "쓸쓸한", "답답한", "서운한", "허전한", "아쉬운", "그리운"],
+        angry: ["화나는", "짜증나는", "억울한", "분한", "약오르는", "불쾌한", "답답한", "속상한", "불만스러운", "언짢은"],
+        anxious: ["불안한", "걱정되는", "초조한", "긴장되는", "두려운", "떨리는", "무서운", "조마조마한", "겁나는", "조심스러운"],
+        calm: ["평온한", "차분한", "편안한", "고요한", "안정된", "여유로운", "느긋한", "담담한", "무덤덤한", "조용한"]
+    };
+
+    return emotionWordSets[emotion] || emotionWordSets.calm;
+}
+
+// 단어 표시 (커스텀 입력 포함)
 function displayWords(words) {
     const gridEl = document.getElementById('words-grid');
     gridEl.innerHTML = '';
 
+    // 기본 단어 카드들
     words.forEach(word => {
         const wordCard = document.createElement('div');
         wordCard.className = 'word-card';
@@ -180,6 +169,55 @@ function displayWords(words) {
         wordCard.addEventListener('click', () => toggleWord(wordCard, word));
         gridEl.appendChild(wordCard);
     });
+
+    // 커스텀 단어 입력 카드
+    const customCard = document.createElement('div');
+    customCard.className = 'word-card custom-word-card';
+    customCard.innerHTML = `
+        <div class="custom-word-icon">➕</div>
+        <div class="custom-word-text">직접 입력</div>
+    `;
+    customCard.addEventListener('click', () => showCustomWordInput());
+    gridEl.appendChild(customCard);
+}
+
+// 커스텀 단어 입력 모달 표시
+function showCustomWordInput() {
+    const customWord = prompt('느끼는 감정을 직접 입력해주세요 (2-6글자):');
+
+    if (!customWord) return;
+
+    const trimmed = customWord.trim();
+
+    // 유효성 검사
+    if (trimmed.length < 2 || trimmed.length > 6) {
+        alert('2-6글자로 입력해주세요!');
+        return;
+    }
+
+    // 이미 선택된 단어인지 확인
+    if (checkinData.selectedWords.includes(trimmed)) {
+        alert('이미 선택한 단어입니다!');
+        return;
+    }
+
+    // 커스텀 단어 추가
+    checkinData.selectedWords.push(trimmed);
+
+    // 커스텀 단어 카드 생성 및 추가
+    const gridEl = document.getElementById('words-grid');
+    const customWordCard = document.createElement('div');
+    customWordCard.className = 'word-card selected custom-added';
+    customWordCard.textContent = trimmed;
+    customWordCard.addEventListener('click', () => toggleWord(customWordCard, trimmed));
+
+    // "직접 입력" 카드 바로 앞에 추가
+    const customInputCard = gridEl.querySelector('.custom-word-card');
+    gridEl.insertBefore(customWordCard, customInputCard);
+
+    // 다음 버튼 활성화
+    const nextBtn = document.getElementById('btn-words-next');
+    nextBtn.disabled = false;
 }
 
 // 단어 선택/해제

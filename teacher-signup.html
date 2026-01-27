@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교사 계정 생성/복구</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #4ECDC4;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4ECDC4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #3ebdb5;
+        }
+
+        .note {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 15px;
+            background: #fff8e1;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>👩‍🏫 교사 계정 생성</h1>
+        <div class="note">
+            <strong>주의:</strong> 이미 교사 계정이 있다면, 먼저 Firebase Console [Authentication]에서 기존 계정을 <strong>삭제</strong>한 후
+            진행해주세요.
+        </div>
+        <input type="email" id="email" value="teacher@ingyu-ai-world.com" readonly>
+        <input type="password" id="password" placeholder="새로운 비밀번호 입력" required>
+        <button onclick="createTeacher()">교사 계정 생성하기</button>
+    </div>
+
+    <script>
+        async function createTeacher() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!password) {
+                alert('비밀번호를 입력해주세요.');
+                return;
+            }
+
+            try {
+                // 1. Create Auth User
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 2. Create Firestore Doc
+                await db.collection('users').doc(user.uid).set({
+                    email: email,
+                    name: '선생님',
+                    role: 'teacher',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert('교사 계정이 성공적으로 생성되었습니다! 로그인 페이지로 이동합니다.');
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('이미 존재하는 계정입니다. Firebase Console에서 기존 계정을 삭제하고 다시 시도하세요.');
+                } else {
+                    alert('오류 발생: ' + error.message);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -797,9 +797,6 @@ function renderApprovalGrid() {
     const studentApps = apps.filter(app => app.category !== '학급운영');
 
     studentApps.forEach(app => {
-        // Default to true if undefined (lazy init) or use Firestore value
-        // Note: app.js init logic sets them to true.
-        // If not found in dashboardAppApprovals, assume true (so we don't block access unintentionally before init)
         let isApproved = true;
         if (dashboardAppApprovals.hasOwnProperty(app.title)) {
             isApproved = dashboardAppApprovals[app.title];
@@ -812,31 +809,20 @@ function renderApprovalGrid() {
 
 function createAppApprovalCard(app, isApproved) {
     const card = document.createElement('div');
-    card.className = `approval-card ${isApproved ? 'approved' : 'disapproved'}`;
+    card.className = `approval-card ${isApproved ? 'approved' : ''}`;
+    card.onclick = () => toggleAppApproval(app.title, !isApproved);
 
-    // Icon logic
-    let iconHTML;
-    if (app.iconImage) {
-        iconHTML = `<img src="${app.iconImage}" alt="${app.title}">`;
-    } else {
-        iconHTML = app.icon || '📱';
-    }
+    const icon = app.icon || '📱';
 
     card.innerHTML = `
-        <div class="app-info-header">
-            <div class="app-icon">${iconHTML}</div>
-            <div class="app-details">
-                <h4>${app.title}</h4>
-                <span class="app-category-badge">${app.category}</span>
-            </div>
-        </div >
-
-        <div class="approval-toggle-container">
-            <span class="approval-status-text">${isApproved ? '승인됨' : '비공개'}</span>
-            <label class="switch">
-                <input type="checkbox" ${isApproved ? 'checked' : ''} onchange="toggleAppApproval('${app.title}', this.checked)">
-                    <span class="slider"></span>
-            </label>
+        <div class="app-icon">${icon}</div>
+        <div class="app-info">
+            <div class="app-title">${app.title}</div>
+            <div class="app-category">${app.category}</div>
+        </div>
+        <div class="approval-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">${isApproved ? '승인됨' : '미승인'}</span>
         </div>
     `;
 
@@ -848,10 +834,9 @@ window.toggleAppApproval = async function (appTitle, isApproved) {
         const app = apps.find(a => a.title === appTitle);
         if (!app) return;
 
-        // Optimistic UI update
-        // We can update styles immediately, but let's wait for Firestore to ensure consistency?
-        // Let's do optimistic update for better UX
-        // But need to handle failure.
+        // Optimistic update
+        dashboardAppApprovals[appTitle] = isApproved;
+        renderApprovalGrid();
 
         await db.collection('app_approvals').doc(appTitle).set({
             appTitle: appTitle,
@@ -861,81 +846,65 @@ window.toggleAppApproval = async function (appTitle, isApproved) {
             approvedBy: currentTeacher ? currentTeacher.uid : 'unknown'
         }, { merge: true });
 
-        // Update local state
-        dashboardAppApprovals[appTitle] = isApproved;
-
-        // Update UI logic (find card and update class/text)
-        // For simplicity, just re-render is fine as list is small (20 items)
-        renderApprovalGrid();
-
     } catch (error) {
         console.error("Error toggling approval:", error);
+        // Revert on error
+        dashboardAppApprovals[appTitle] = !isApproved;
+        renderApprovalGrid();
         alert("상태 변경에 실패했습니다.");
-        loadAppApprovalsForDashboard(); // Revert
     }
 };
 
+// Bulk Actions
 const approveAllBtn = document.getElementById('approve-all-btn');
+const unapproveAllBtn = document.getElementById('unapprove-all-btn');
+
 if (approveAllBtn) {
     approveAllBtn.addEventListener('click', async () => {
-        if (!confirm('모든 앱을 학생들에게 공개하시겠습니까?')) return;
-
-        try {
-            const batch = db.batch();
-            const studentApps = apps.filter(app => app.category !== '학급운영');
-
-            studentApps.forEach(app => {
-                const ref = db.collection('app_approvals').doc(app.title);
-                batch.set(ref, {
-                    appTitle: app.title,
-                    category: app.category,
-                    isApproved: true,
-                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    approvedBy: currentTeacher ? currentTeacher.uid : 'unknown'
-                });
-            });
-
-            await batch.commit();
-            await loadAppApprovalsForDashboard();
-            alert("모든 앱이 승인되었습니다.");
-
-        } catch (error) {
-            console.error("Error approving all:", error);
-            alert("일괄 승인에 실패했습니다.");
-        }
+        if (!confirm('모든 앱을 승인하시겠습니까?')) return;
+        await setAllApprovals(true);
     });
 }
 
-const unapproveAllBtn = document.getElementById('unapprove-all-btn');
 if (unapproveAllBtn) {
     unapproveAllBtn.addEventListener('click', async () => {
-        if (!confirm('모든 앱을 비공개로 전환하시겠습니까?')) return;
-
-        try {
-            const batch = db.batch();
-            const studentApps = apps.filter(app => app.category !== '학급운영');
-
-            studentApps.forEach(app => {
-                const ref = db.collection('app_approvals').doc(app.title);
-                batch.set(ref, {
-                    appTitle: app.title,
-                    category: app.category,
-                    isApproved: false,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: currentTeacher ? currentTeacher.uid : 'unknown'
-                });
-            });
-
-            await batch.commit();
-            await loadAppApprovalsForDashboard();
-            alert("모든 앱이 비공개 처리되었습니다.");
-
-        } catch (error) {
-            console.error("Error unapproving all:", error);
-            alert("일괄 비공개 처리에 실패했습니다.");
-        }
+        if (!confirm('모든 앱을 승인 해제하시겠습니까?')) return;
+        await setAllApprovals(false);
     });
 }
+
+async function setAllApprovals(isApproved) {
+    try {
+        const batch = db.batch();
+        const studentApps = apps.filter(app => app.category !== '학급운영');
+
+        studentApps.forEach(app => {
+            const ref = db.collection('app_approvals').doc(app.title);
+            batch.set(ref, {
+                appTitle: app.title,
+                category: app.category,
+                isApproved: isApproved,
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: currentTeacher ? currentTeacher.uid : 'unknown'
+            }, { merge: true });
+
+            // Update local state
+            dashboardAppApprovals[app.title] = isApproved;
+        });
+
+        // Update UI immediately (Optimistic)
+        renderApprovalGrid();
+
+        await batch.commit();
+        // alert(`모든 앱이 ${isApproved ? '승인' : '미승인'} 처리되었습니다.`);
+
+    } catch (error) {
+        console.error("Error batch updating approvals:", error);
+        alert("일괄 처리에 실패했습니다.");
+        loadAppApprovalsForDashboard(); // Reload to ensure data consistency
+    }
+}
+
 // ===========================
 // Tab Management for Emotions
 // ===========================

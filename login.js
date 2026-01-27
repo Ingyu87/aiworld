@@ -106,9 +106,10 @@ studentForm.addEventListener('submit', async (e) => {
         const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
         const user = userCredential.user;
 
-        // 4. Update last login timestamp
+        // 4. Update last login timestamp and increment login count
         await db.collection('users').doc(userDoc.id).update({
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            loginCount: firebase.firestore.FieldValue.increment(1)
         });
 
         // Success - redirect to main page

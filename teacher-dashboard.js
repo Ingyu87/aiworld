@@ -912,3 +912,34 @@ if (approveAllBtn) {
         }
     });
 }
+
+const unapproveAllBtn = document.getElementById('unapprove-all-btn');
+if (unapproveAllBtn) {
+    unapproveAllBtn.addEventListener('click', async () => {
+        if (!confirm('모든 앱을 비공개로 전환하시겠습니까?')) return;
+
+        try {
+            const batch = db.batch();
+            const studentApps = apps.filter(app => app.category !== '학급운영');
+
+            studentApps.forEach(app => {
+                const ref = db.collection('app_approvals').doc(app.title);
+                batch.set(ref, {
+                    appTitle: app.title,
+                    category: app.category,
+                    isApproved: false,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentTeacher ? currentTeacher.uid : 'unknown'
+                });
+            });
+
+            await batch.commit();
+            await loadAppApprovalsForDashboard();
+            alert("모든 앱이 비공개 처리되었습니다.");
+
+        } catch (error) {
+            console.error("Error unapproving all:", error);
+            alert("일괄 비공개 처리에 실패했습니다.");
+        }
+    });
+}

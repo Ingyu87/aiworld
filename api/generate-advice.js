@@ -148,11 +148,30 @@ function getDefaultAdvice(emotion) {
             quote: "걱정은 빚과 같아서, 갚지 않으면 이자가 붙는다.",
             quoteSource: "명언"
         },
+
         calm: {
             empathy: "마음이 평온하고 차분하네요. 좋은 상태예요!",
             suggestion: "이 평온한 마음을 유지하면서 오늘 하루를 보내보세요. 좋은 에너지가 될 거예요.",
             quote: "고요한 물이 깊다.",
             quoteSource: "속담"
+        },
+        disappointed: {
+            empathy: "기대했던 것과 달라서 실망스러웠군요. 속상한 마음이 드는 건 당연해요.",
+            suggestion: "다음에 더 좋은 기회가 올 거예요. 잠시 기분 전환을 해보는 건 어떨까요?",
+            quote: "실패는 성공의 어머니.",
+            quoteSource: "속담"
+        },
+        tired: {
+            empathy: "몸도 마음도 지쳐있군요. 정말 고생 많았어요.",
+            suggestion: "오늘은 푹 쉬는 게 제일 중요해요. 따뜻한 우유를 마시거나 일찍 잠자리에 들어보세요.",
+            quote: "휴식은 게으름이 아니라 재충전이다.",
+            quoteSource: "명언"
+        },
+        surprised: {
+            empathy: "갑작스러운 일로 많이 놀라셨겠어요. 마음이 진정될 시간이 필요해요.",
+            suggestion: "천천히 심호흡을 해보세요. 놀란 마음을 가라앉히면 상황이 더 잘 보일 거예요.",
+            quote: "침착함이 이긴다.",
+            quoteSource: "명언"
         }
     };
 

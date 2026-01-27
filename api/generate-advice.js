@@ -70,6 +70,7 @@ JSON 형식으로만 응답:
 
         // JSON 파싱
         let advice;
+        let fallback = false;
         try {
             const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
@@ -79,12 +80,14 @@ JSON 형식으로만 응답:
             }
         } catch (parseError) {
             console.error('JSON parse error:', generatedText);
-            throw new Error('Failed to parse AI response');
+            advice = buildFallbackAdvice(emotionName);
+            fallback = true;
         }
 
         return res.status(200).json({
             success: true,
-            advice: advice
+            advice: advice,
+            fallback: fallback
         });
 
     } catch (error) {
@@ -94,4 +97,13 @@ JSON 형식으로만 응답:
             error: error.message
         });
     }
+}
+
+function buildFallbackAdvice(emotionName) {
+    return {
+        empathy: `${emotionName || '지금'} 감정을 느끼는 건 자연스러운 일이에요. 그 마음을 잘 알아차린 것만으로도 충분히 잘하고 있어요.`,
+        suggestion: '잠깐 깊게 숨을 쉬고, 물 한 잔을 마시면서 마음을 차분히 해보세요.',
+        quote: '오늘의 마음을 이해하는 것이 내일의 힘이 된다.',
+        quoteSource: '마음 다독이는 말'
+    };
 }

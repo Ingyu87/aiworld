@@ -17,6 +17,11 @@ auth.onAuthStateChanged(async (user) => {
         return;
     }
     
+    // 이미 로그인된 상태에서 다시 호출된 경우 (예: 다른 리스너에 의해)
+    if (user && currentUser && currentUser.uid === user.uid) {
+        return;
+    }
+    
     isInitializing = true;
     if (!user) {
         // Not logged in, redirect to login page
@@ -34,9 +39,6 @@ auth.onAuthStateChanged(async (user) => {
         }
 
         const userData = userDoc.data();
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:40',message:'Auth state changed',data:{uid:user.uid,role:userData.role},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-// #endregion
 
         // Allow both students and teachers
         if (userData.role !== 'student' && userData.role !== 'teacher') {
@@ -58,9 +60,6 @@ fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{metho
                 ? '선생님'
                 : displayName;
             userNameEl.textContent = userName;
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:52',message:'User name updated',data:{userName},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
-// #endregion
         }
 
         // Add dashboard link for teachers
@@ -172,9 +171,6 @@ const termsBackdrop = document.getElementById('terms-backdrop');
 // Render Functions
 // ===========================
 function renderApps(category = "전체") {
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:195',message:'renderApps called',data:{category},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
-// #endregion
     if (!appGrid) return;
 
     // Update active tab button
@@ -192,10 +188,6 @@ fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{metho
     let filteredApps = category === "전체"
         ? apps
         : apps.filter(app => app.category === category);
-
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:165',message:'Filtering apps',data:{category,appsCount:apps.length,filteredCount:filteredApps.length,firstApp:filteredApps[0]?.title},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
-// #endregion
 
     // Filter out teacher-only apps for students
     if (currentUser && currentUser.role === 'student') {

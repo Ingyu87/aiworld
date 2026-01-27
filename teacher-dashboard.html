@@ -105,9 +105,11 @@
                 </div>
 
                 <!-- Chart Container -->
-                <div class="chart-container emotion-chart-container"
-                    style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <canvas id="usageChart"></canvas>
+                <div class="chart-container usage-chart-card"
+                    style="background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div class="canvas-wrapper" style="height: 300px;">
+                        <canvas id="usageChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Statistics Table -->
@@ -228,18 +230,25 @@
                     </div>
                 </div>
 
-                <!-- Emotion Distribution Chart -->
-                <div class="chart-container"
-                    style="background: white; padding: 0.5rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <h3 style="margin-bottom: 0.5rem; color: #2d3748; font-size: 0.9rem;">감정 분포</h3>
-                    <canvas id="emotionChart"></canvas>
-                </div>
+                <!-- Emotion Distribution & Word Cloud Row -->
+                <div class="emotion-visuals-row">
+                    <!-- Emotion Distribution Chart -->
+                    <div class="chart-container emotion-chart-card"
+                        style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <h3 style="margin-bottom: 1rem; color: #2d3748; font-size: 1.1rem;">감정 분포</h3>
+                        <div class="canvas-wrapper">
+                            <canvas id="emotionChart"></canvas>
+                        </div>
+                    </div>
 
-                <!-- Word Cloud Section -->
-                <div class="wordcloud-container"
-                    style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 단어 클라우드</h3>
-                    <canvas id="wordCloud" width="800" height="400"></canvas>
+                    <!-- Word Cloud Section -->
+                    <div class="wordcloud-container emotion-wordcloud-card"
+                        style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <h3 style="margin-bottom: 1rem; color: #2d3748; font-size: 1.1rem;">감정 단어 클라우드</h3>
+                        <div class="canvas-wrapper">
+                            <canvas id="wordCloud"></canvas>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Students Emotion List -->

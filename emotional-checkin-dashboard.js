@@ -231,8 +231,8 @@ function updateWordCloud() {
     const canvas = document.getElementById('wordCloud');
     const ctx = canvas.getContext('2d');
 
-    const displayWidth = canvas.clientWidth || canvas.width || 600;
-    const displayHeight = canvas.clientHeight || canvas.height || 260;
+    const displayWidth = canvas.parentElement.clientWidth || canvas.clientWidth || 600;
+    const displayHeight = canvas.parentElement.clientHeight || canvas.clientHeight || 280;
 
     if (canvas.width !== displayWidth) {
         canvas.width = displayWidth;
@@ -341,11 +341,17 @@ function updateEmotionTable() {
 }
 
 // AI 분석 생성
+let isAnalyzing = false;
 async function generateAIAnalysis() {
+    if (isAnalyzing) return;
+    
     const card = document.getElementById('ai-analysis-card');
     const loading = document.getElementById('ai-analysis-loading');
     const content = document.getElementById('ai-analysis-content');
 
+    if (!card || !loading || !content) return;
+
+    isAnalyzing = true;
     card.style.display = 'block';
     loading.style.display = 'block';
     content.style.display = 'none';
@@ -406,6 +412,7 @@ async function generateAIAnalysis() {
         content.style.display = 'block';
     } finally {
         loading.style.display = 'none';
+        isAnalyzing = false;
     }
 }
 

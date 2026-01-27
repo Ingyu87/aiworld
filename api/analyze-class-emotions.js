@@ -89,6 +89,7 @@ JSON 형식으로 응답:
         });
 
         let analysis;
+        let fallback = false;
         try {
             const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
@@ -98,13 +99,15 @@ JSON 형식으로 응답:
             }
         } catch (parseError) {
             console.error('JSON parse error:', generatedText);
-            throw new Error('Failed to parse AI response');
+            analysis = buildFallbackAnalysis(emotionData, checkinRate, period);
+            fallback = true;
         }
 
         return res.status(200).json({
             success: true,
             analysis: analysis,
-            period: period
+            period: period,
+            fallback: fallback
         });
 
     } catch (error) {
@@ -154,4 +157,28 @@ function getPeriodName(period) {
         'quarter': '이번 학기'
     };
     return names[period] || period;
+}
+
+function buildFallbackAnalysis(emotionData, checkinRate, period) {
+    const total = Object.values(emotionData).reduce((sum, count) => sum + count, 0);
+    const emotionEntries = Object.entries(emotionData).sort((a, b) => b[1] - a[1]);
+    const topEmotion = emotionEntries[0]?.[0] || '감정';
+    const topCount = emotionEntries[0]?.[1] || 0;
+    const topRatio = total > 0 ? Math.round((topCount / total) * 100) : 0;
+
+    return {
+        overview: `${getPeriodName(period)} 기준으로 가장 많이 나타난 감정은 '${topEmotion}'이며, 전체의 약 ${topRatio}%를 차지합니다.`,
+        patterns: [
+            `체크인 참여율은 약 ${checkinRate}%로 집계되었습니다.`,
+            `가장 높은 감정 비중은 '${topEmotion}'입니다.`,
+            '최근 감정 변화는 일정 기간 추이를 함께 확인하는 것이 좋습니다.'
+        ],
+        suggestions: [
+            '학급 시작 전 2~3분 감정 나누기 시간을 마련해보세요.',
+            '긍정 감정을 강화할 수 있는 짧은 칭찬 카드를 활용해보세요.',
+            '부정 감정 비중이 높은 학생은 개별 대화를 시도해보세요.',
+            '감정 단어를 다양하게 표현할 수 있는 활동을 추가해보세요.'
+        ],
+        positives: '학생들이 감정을 기록하고 있다는 점 자체가 매우 긍정적입니다.'
+    };
 }

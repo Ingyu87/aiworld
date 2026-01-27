@@ -452,13 +452,21 @@ studentForm.addEventListener('submit', async (e) => {
             // Convert ID to email format
             const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
 
+            // Use a secondary Firebase app instance to create the user without logging out the teacher
+            // This is a workaround for client-side user creation
+            const secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+            const secondaryAuth = secondaryApp.auth();
+            
             // Create Firebase Auth user with a fixed internal password
-            // The real security check is done against Firestore's simplePassword
             const internalPassword = "fixed_student_pw_1234";
-            const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, internalPassword);
+            const userCredential = await secondaryAuth.createUserWithEmailAndPassword(fullEmail, internalPassword);
             const uid = userCredential.user.uid;
+            
+            // Sign out from secondary app immediately
+            await secondaryAuth.signOut();
+            await secondaryApp.delete();
 
-            // Create user document in Firestore
+            // Create user document in Firestore (using the main db instance where teacher is still logged in)
             await db.collection('users').doc(uid).set({
                 email: fullEmail,
                 name,

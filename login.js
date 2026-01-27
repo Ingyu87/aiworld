@@ -49,18 +49,17 @@ function hideError(element) {
 
 function showLoading() {
     loadingSpinner.style.display = 'block';
-    document.querySelectorAll('.login-form').forEach(form => {
-        form.style.display = 'none';
-    });
+    studentForm.classList.remove('active');
+    teacherForm.classList.remove('active');
 }
 
 function hideLoading() {
     loadingSpinner.style.display = 'none';
     const activeTab = document.querySelector('.tab-button.active').dataset.tab;
     if (activeTab === 'student') {
-        studentForm.style.display = 'block';
+        studentForm.classList.add('active');
     } else {
-        teacherForm.style.display = 'block';
+        teacherForm.classList.add('active');
     }
 }
 
@@ -209,21 +208,21 @@ teacherForm.addEventListener('submit', async (e) => {
 });
 
 // ===========================
-// Check if already logged in
+// Check if already logged in (Optional - can be removed if causing slowness)
 // ===========================
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                // Both teachers and students go to main page
-                if (userData.role === 'teacher' || userData.role === 'student') {
-                    window.location.href = 'index.html';
-                }
-            }
-        } catch (error) {
-            console.error('Error checking user status:', error);
-        }
-    }
-});
+// auth.onAuthStateChanged(async (user) => {
+//     if (user) {
+//         try {
+//             const userDoc = await db.collection('users').doc(user.uid).get();
+//             if (userDoc.exists) {
+//                 const userData = userDoc.data();
+//                 // Both teachers and students go to main page
+//                 if (userData.role === 'teacher' || userData.role === 'student') {
+//                     window.location.href = 'index.html';
+//                 }
+//             }
+//         } catch (error) {
+//             console.error('Error checking user status:', error);
+//         }
+//     }
+// });

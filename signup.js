@@ -66,20 +66,25 @@ signupForm.addEventListener('submit', async (e) => {
         const fullEmail = emailInput.includes('@') ? emailInput : `${emailInput}@ingyu-ai-world.com`;
 
         // 1. Create Firebase Authentication user with a fixed internal password
-        // The real security check is done against Firestore's simplePassword
         const internalPassword = "fixed_student_pw_1234";
         const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, internalPassword);
         const uid = userCredential.user.uid;
 
+        console.log('Auth user created:', uid);
+
         // 2. Create user document in Firestore with simplePassword
+        // Use BOTH doc(uid) and an explicit email field for maximum searchability
         await db.collection('users').doc(uid).set({
+            uid: uid,
             email: fullEmail,
             name,
             role: 'student',
-            simplePassword: password, // Store 4-digit code for simplified management
+            simplePassword: password,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        console.log('Firestore document created for:', fullEmail);
 
         // Sign out immediately to prevent auto-login
         await auth.signOut();
@@ -106,6 +111,7 @@ signupForm.addEventListener('submit', async (e) => {
                     // User exists in Auth but possibly deleted in Firestore
                     // Re-create the Firestore document (Account Recovery)
                     await db.collection('users').doc(currentUser.uid).set({
+                        uid: currentUser.uid,
                         email: fullEmail,
                         name,
                         role: 'student',
@@ -113,6 +119,8 @@ signupForm.addEventListener('submit', async (e) => {
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
+                    console.log('Firestore document recovered for:', fullEmail);
 
                     await auth.signOut();
                     alert('계정이 복구되었습니다! 로그인해 주세요.');

@@ -85,10 +85,36 @@ studentForm.addEventListener('submit', async (e) => {
         showLoading();
 
         // 1. Fetch user document from Firestore by ID (email) first
+        // We'll search by email field which is the fullEmail
         const usersSnapshot = await db.collection('users').where('email', '==', fullEmail).get();
 
         if (usersSnapshot.empty) {
-            throw new Error('등록되지 않은 학생입니다.');
+            // Fallback: Try searching by uid if email search fails (for older accounts or direct UID mapping)
+            // But since we don't have the UID yet, we can't do that.
+            // Let's try to sign in with Auth first to get the UID if Firestore search by email fails.
+            try {
+                const internalPassword = "fixed_student_pw_1234";
+                const tempCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
+                const tempUser = tempCredential.user;
+                
+                const userDocByUid = await db.collection('users').doc(tempUser.uid).get();
+                if (userDocByUid.exists) {
+                    const userData = userDocByUid.data();
+                    if (userData.simplePassword === password) {
+                        console.log('Login successful via UID fallback');
+                        window.location.href = 'index.html';
+                        return;
+                    } else {
+                        throw new Error('비밀번호가 올바르지 않습니다.');
+                    }
+                } else {
+                    // Even if Auth exists, if Firestore doc doesn't, it's an incomplete registration
+                    throw new Error('등록되지 않은 학생입니다.');
+                }
+            } catch (authError) {
+                console.error('Auth fallback failed:', authError);
+                throw new Error('등록되지 않은 학생입니다.');
+            }
         }
 
         const userDoc = usersSnapshot.docs[0];

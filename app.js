@@ -496,6 +496,7 @@ const aiAgreeBtn = document.getElementById('ai-agree-btn');
 
 // Check if user has agreed to AI safety guidelines
 // Check if user has agreed to AI safety guidelines
+// Check if user has agreed to AI safety guidelines
 async function checkAIAgreement() {
     if (!currentUser) return false;
 
@@ -504,20 +505,10 @@ async function checkAIAgreement() {
         return true;
     }
 
-    try {
-        const agreementDoc = await db.collection('user_agreements').doc(currentUser.uid).get();
-
-        if (!agreementDoc.exists || !agreementDoc.data().agreedToAISafety) {
-            // Show AI safety modal
-            showAISafetyModal();
-            return false;
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Error checking AI agreement:', error);
-        return false; // Default to false on error to be safe
-    }
+    // Always show AI Safety Page for students every session
+    // We ignore previous agreement status to reinforce the message every time.
+    showAISafetyModal();
+    return false;
 }
 
 function showAISafetyModal() {
@@ -540,23 +531,21 @@ if (aiAgreeBtn) {
         if (!currentUser) return;
 
         try {
-            // Save agreement to Firestore
-            await db.collection('user_agreements').doc(currentUser.uid).set({
+            // Log agreement to Firestore (optional, background)
+            db.collection('user_agreements').doc(currentUser.uid).set({
                 userId: currentUser.uid,
                 agreedToAISafety: true,
-                agreedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastShownAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+                lastAgreedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(err => console.error("Agreement log error:", err));
 
-            console.log('AI safety agreement recorded');
+            // Proceed immediately
             hideAISafetyModal();
-
-            // Render apps after agreement
             renderApps("전체");
 
         } catch (error) {
-            console.error('Error saving AI agreement:', error);
-            alert('동의를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+            console.error('Agreement error:', error);
+            hideAISafetyModal();
+            renderApps("전체");
         }
     });
 }

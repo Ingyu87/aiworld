@@ -237,7 +237,7 @@ async function loadStudents() {
         students.forEach(student => {
             const option = document.createElement('option');
             option.value = student.id;
-            option.textContent = `${student.name} (${student.grade}-${student.class}-${student.number})`;
+            option.textContent = student.name;
             studentFilter.appendChild(option);
         });
 
@@ -543,9 +543,8 @@ function openEditModal(studentId, studentData) {
     emailInput.value = displayEmail;
     emailInput.disabled = true; // Cannot change ID (Email) as it breaks Auth login
 
-    document.getElementById('student-grade').value = studentData.grade;
-    document.getElementById('student-class').value = studentData.class;
-    document.getElementById('student-number').value = studentData.number;
+    // emailInput.disabled = true; // Still disabled as it's the ID
+
 
     // Hide password field in edit mode (cannot retrieve or easily update without Admin SDK)
     document.getElementById('student-password').parentElement.style.display = 'none';

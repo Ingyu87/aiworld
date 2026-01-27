@@ -298,8 +298,7 @@ function createStudentRow(student) {
         <td><span class="badge" style="background: #e3f2fd; color: #1565c0;">${student.loginCount || 0}회</span></td>
         <td>
             <div class="action-buttons">
-                <button class="action-btn btn-edit" onclick="editStudent('${student.id}')">정보 수정</button>
-                <button class="action-btn btn-reset" onclick="resetPassword('${student.id}', '${student.name}')">비번초기화</button>
+                <button class="action-btn btn-reset" onclick="editPassword('${student.id}', '${student.name}')">비번 수정</button>
                 <button class="action-btn btn-delete" onclick="deleteStudent('${student.id}', '${student.name}')">삭제</button>
             </div>
         </td>
@@ -666,26 +665,21 @@ window.editStudent = async function (studentId) {
 };
 
 // ===========================
-// Reset Password
+// Edit Password (formerly Reset Password)
 // ===========================
-window.resetPassword = async function (studentId, studentName) {
-    const newPassword = prompt(`${studentName} 학생의 새 비밀번호를 입력하세요(최소 6자): `);
+window.editPassword = async function (studentId, studentName) {
+    const newPassword = prompt(`${studentName} 학생의 새 비밀번호를 입력하세요(4자리): `);
 
     if (!newPassword) return;
 
-    if (newPassword.length < 6) {
-        alert('비밀번호는 최소 6자 이상이어야 합니다.');
+    if (newPassword.length !== 4 || isNaN(newPassword)) {
+        alert('비밀번호는 반드시 숫자 4자리여야 합니다.');
         return;
     }
 
     try {
-        // In production, this should be done via Cloud Function with Admin SDK
-        // For demonstration, we're noting this limitation
-        alert('비밀번호 재설정은 Firebase Admin SDK를 통해 구현해야 합니다.\n\n프로덕션에서는 Cloud Function을 사용하여 구현하세요.\n\n임시 방법: Firebase Console > Authentication에서 직접 비밀번호를 재설정할 수 있습니다.');
-
-        // TODO: Implement via Cloud Function
-        // const resetPasswordFunction = firebase.functions().httpsCallable('resetStudentPassword');
-        // await resetPasswordFunction({ userId: studentId, newPassword });
+        // Note: Password update requires Admin SDK in standard Firebase
+        alert(`비밀번호 수정은 Firebase Admin SDK가 필요합니다.\n\n요청하신 4자리(${newPassword})로의 변경 기능은 추후 서버 연동 시 반영됩니다.\n\n임시: Firebase Console에서 해당 학생의 비밀번호를 '${newPassword}'로 직접 변경해주세요.`);
 
     } catch (error) {
         console.error('Error resetting password:', error);

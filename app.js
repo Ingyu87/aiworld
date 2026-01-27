@@ -220,7 +220,7 @@ auth.onAuthStateChanged(async (user) => {
         if (currentUser.role === 'student') {
             const agreed = await checkAIAgreement();
             if (agreed) {
-                renderApps("전체");
+                renderApps("창체");
             } else {
                 // Do NOT render apps yet. Wait for agreement.
                 // Optionally hide any loading state if present
@@ -231,7 +231,7 @@ auth.onAuthStateChanged(async (user) => {
             }
         } else {
             // Teacher or others
-            renderApps("전체");
+            renderApps("창체");
         }
 
     } catch (error) {

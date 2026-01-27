@@ -67,7 +67,7 @@ function initializeCheckin() {
 
             // 디버깅용 알림 (성공 시 제거 예정)
             console.log(`Emotion selected: ${emotionName}`);
-            alert(`감정 선택됨: ${emotionName}\n다음 단계로 이동 시도...`);
+            // alert(`감정 선택됨: ${emotionName}\n다음 단계로 이동 시도...`);
 
             checkinData.emotion = emotion;
             checkinData.emotionName = emotionName;

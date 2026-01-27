@@ -556,15 +556,6 @@ function openEditModal(studentId, studentData) {
     studentModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
-document.getElementById('student-number').value = studentData.number;
-
-// Hide password field for editing
-document.getElementById('student-password').parentElement.style.display = 'none';
-
-modalError.classList.remove('show');
-studentModal.classList.add('active');
-document.body.style.overflow = 'hidden';
-}
 
 function closeModal() {
     studentModal.classList.remove('active');

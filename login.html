@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - Ingyu's AI World</title>
+    <meta name="description" content="ingyu's AI world 로그인 페이지">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Quicksand:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <!-- Left Side: Login Form -->
+        <div class="login-left">
+            <div class="login-content">
+                <div class="logo">
+                    <h1 class="logo-text">Ingyu's AI World</h1>
+                    <p class="logo-subtitle">초등학교 AI 웹앱 자료집</p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button class="tab-button active" data-tab="student" aria-label="학생 로그인">
+                        <span class="tab-icon">👨‍🎓</span>
+                        <span class="tab-text">학생</span>
+                    </button>
+                    <button class="tab-button" data-tab="teacher" aria-label="교사 로그인">
+                        <span class="tab-icon">👨‍🏫</span>
+                        <span class="tab-text">교사</span>
+                    </button>
+                </div>
+
+                <!-- Login Forms -->
+                <div class="form-container">
+                    <!-- Student Login Form -->
+                    <form id="student-form" class="login-form active">
+                        <h2 class="form-title">학생 로그인</h2>
+
+                        <div class="form-group">
+                            <label for="student-email" class="form-label">아이디</label>
+                            <input type="text" id="student-email" class="form-input" placeholder="student1" required
+                                autocomplete="username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="student-password" class="form-label">비밀번호</label>
+                            <input type="password" id="student-password" class="form-input" placeholder="••••••••"
+                                required autocomplete="current-password">
+                        </div>
+
+                        <button type="submit" class="submit-button">
+                            <span class="button-text">로그인</span>
+                            <span class="button-icon">→</span>
+                        </button>
+
+                        <div class="error-message" id="student-error"></div>
+                    </form>
+
+
+                    <!-- Teacher Login Form -->
+                    <form id="teacher-form" class="login-form">
+                        <h2 class="form-title">교사 로그인</h2>
+
+                        <div class="form-group">
+                            <label for="teacher-password" class="form-label">비밀번호</label>
+                            <input type="password" id="teacher-password" class="form-input" placeholder="••••••••"
+                                required autocomplete="current-password">
+                        </div>
+
+                        <button type="submit" class="submit-button">
+                            <span class="button-text">로그인</span>
+                            <span class="button-icon">→</span>
+                        </button>
+
+                        <div class="error-message" id="teacher-error"></div>
+                    </form>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loading-spinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>로그인 중...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Hero Image -->
+        <div class="login-right">
+            <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Login Script -->
+    <script src="login.js"></script>
+</body>
+
+</html>

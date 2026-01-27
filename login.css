@@ -1,0 +1,444 @@
+/* ===========================
+   CSS Reset & Base Styles
+   =========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Vibrant Color Palette */
+    --primary-pink: #FF6B9D;
+    --primary-teal: #4ECDC4;
+    --accent-yellow: #FFE66D;
+    --accent-green: #A8E6CF;
+    --accent-blue: #95B8FC;
+    --accent-purple: #C3B1E1;
+    --accent-orange: #FFB84D;
+
+    /* Neutral Colors */
+    --cream: #FFF9F0;
+    --warm-white: #FFFEF9;
+    --text-dark: #2D3436;
+    --text-light: #636E72;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --error-red: #FF6B6B;
+
+    /* Typography */
+    --font-main: 'Noto Sans KR', sans-serif;
+    --font-display: 'Quicksand', 'Noto Sans KR', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+}
+
+body {
+    font-family: var(--font-main);
+    background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===========================
+   Login Container
+   =========================== */
+.login-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1400px;
+    width: 95%;
+    min-height: 700px;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: slideUp 0.6s ease;
+}
+
+/* ===========================
+   Left Side: Login Form
+   =========================== */
+.login-left {
+    padding: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-content {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Logo */
+.logo {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-teal), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-xs);
+}
+
+.logo-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    background: var(--cream);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-md);
+}
+
+.tab-button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-teal));
+    color: white;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.tab-icon {
+    font-size: 1.5rem;
+}
+
+/* Form Container */
+.form-container {
+    position: relative;
+}
+
+.login-form {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.login-form.active {
+    display: block;
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.9rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--cream);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+    background: var(--warm-white);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-teal);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--text-light);
+    opacity: 0.6;
+}
+
+/* Submit Button */
+.submit-button {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-teal));
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+    margin-top: var(--spacing-lg);
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+}
+
+.submit-button:hover .button-icon {
+    transform: translateX(5px);
+}
+
+/* Error Message */
+.error-message {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: rgba(255, 107, 107, 0.1);
+    border-left: 4px solid var(--error-red);
+    border-radius: var(--radius-sm);
+    color: var(--error-red);
+    font-size: 0.9rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+    animation: shake 0.4s ease;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto var(--spacing-md);
+    border: 4px solid var(--cream);
+    border-top: 4px solid var(--primary-teal);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner p {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* ===========================
+   Right Side: Hero Image
+   =========================== */
+.login-right {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(78, 205, 196, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-right::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+.hero-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    animation: float 6s ease-in-out infinite;
+}
+
+/* ===========================
+   Animations
+   =========================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+@media (max-width: 1024px) {
+    .login-container {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+    }
+
+    .login-right {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-left {
+        padding: var(--spacing-lg);
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+    }
+
+    .form-title {
+        font-size: 1.25rem;
+    }
+
+    .tab-button {
+        font-size: 0.9rem;
+        padding: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+    }
+
+    .login-left {
+        padding: var(--spacing-md);
+    }
+
+    .tab-text {
+        display: none;
+    }
+
+    .tab-icon {
+        font-size: 1.8rem;
+    }
+}

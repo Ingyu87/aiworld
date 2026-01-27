@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 회원가입 - Ingyu's AI World</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Quicksand:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <link rel="stylesheet" href="login.css">
+    <style>
+        .info-message {
+            background: linear-gradient(135deg, #e3f2fd, #fff8e1);
+            border-left: 4px solid var(--primary-teal);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .info-message strong {
+            color: var(--primary-teal);
+            display: block;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: var(--spacing-lg);
+        }
+
+        .back-link a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: var(--primary-pink);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-header">
+                <h1 class="login-title">학생 회원가입</h1>
+                <p class="login-subtitle">Ingyu's AI World와 함께 시작해요!</p>
+            </div>
+
+            <div class="info-message">
+                <strong>📢 안내</strong>
+                현재 시스템에서는 <strong>선생님이 학생 계정을 생성</strong>해주셔야 합니다.
+                선생님께 계정 생성을 요청해주세요!
+            </div>
+
+            <form id="signup-form" class="login-form active" style="display: none;">
+                <div class="error-message" id="signup-error"></div>
+
+                <div class="form-group">
+                    <label for="signup-name" class="form-label">이름</label>
+                    <input type="text" id="signup-name" class="form-input" placeholder="홍길동" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-email" class="form-label">이메일</label>
+                    <input type="email" id="signup-email" class="form-input" placeholder="student@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-grade" class="form-label">학년</label>
+                    <select id="signup-grade" class="form-input" required>
+                        <option value="">선택하세요</option>
+                        <option value="1">1학년</option>
+                        <option value="2">2학년</option>
+                        <option value="3">3학년</option>
+                        <option value="4">4학년</option>
+                        <option value="5">5학년</option>
+                        <option value="6">6학년</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-class" class="form-label">반</label>
+                    <input type="number" id="signup-class" class="form-input" placeholder="1" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-number" class="form-label">번호</label>
+                    <input type="number" id="signup-number" class="form-input" placeholder="1" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password" class="form-label">비밀번호</label>
+                    <input type="password" id="signup-password" class="form-input" placeholder="최소 6자 이상" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-confirm-password" class="form-label">비밀번호 확인</label>
+                    <input type="password" id="signup-confirm-password" class="form-input" placeholder="비밀번호 다시 입력"
+                        required>
+                </div>
+
+                <button type="submit" class="login-button">
+                    <span class="button-text">회원가입</span>
+                </button>
+            </form>
+
+            <div class="back-link">
+                <a href="login.html">← 로그인 페이지로 돌아가기</a>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+        </div>
+    </div>
+
+    <div class="loading-spinner" id="loading-spinner">
+        <div class="spinner"></div>
+        <p>처리 중...</p>
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+    <script src="signup.js"></script>
+</body>
+
+</html>

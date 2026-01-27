@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교사 대시보드 - Ingyu's AI World</title>
+    <meta name="description" content="교사용 학생 관리 대시보드">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Quicksand:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="teacher-dashboard.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-left">
+                <h1 class="header-title">Ingyu's AI World</h1>
+                <span class="header-subtitle">교사 대시보드</span>
+            </div>
+            <div class="header-right">
+                <span class="user-info" id="teacher-name">교사</span>
+                <button class="logout-button" id="logout-btn">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <!-- Tab Navigation -->
+            <div class="dashboard-tabs">
+                <button class="tab-button active" data-tab="students">학생 관리</button>
+                <button class="tab-button" data-tab="approvals">앱 승인 관리</button>
+            </div>
+
+            <!-- Student Management Tab -->
+            <div id="students-tab" class="tab-content active">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">학생 관리</h2>
+                        <p class="section-subtitle" id="student-count">0명의 학생</p>
+                    </div>
+                    <button class="primary-button" id="add-student-btn">
+                        <span class="button-icon">➕</span>
+                        <span class="button-text">학생 추가</span>
+                    </button>
+                </div>
+
+                <!-- Students Table -->
+                <div class="table-container">
+                    <table class="students-table">
+                        <thead>
+                            <tr>
+                                <th>이름</th>
+                                <th>이메일</th>
+                                <th>학년</th>
+                                <th>반</th>
+                                <th>번호</th>
+                                <th>가입일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-tbody">
+                            <tr class="loading-row">
+                                <td colspan="7">
+                                    <div class="table-loading">
+                                        <div class="spinner"></div>
+                                        <p>학생 목록을 불러오는 중...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state" id="empty-state" style="display: none;">
+                        <div class="empty-icon">👨‍🎓</div>
+                        <p class="empty-text">등록된 학생이 없습니다</p>
+                        <p class="empty-subtext">학생 추가 버튼을 눌러 학생을 등록하세요</p>
+                    </div>
+                </div>
+
+                <!-- Usage Statistics Section -->
+                <div class="section-header" style="margin-top: 3rem;">
+                    <div>
+                        <h2 class="section-title">사용 통계</h2>
+                        <p class="section-subtitle">웹앱 사용 내역</p>
+                    </div>
+                    <div class="stats-filters">
+                        <select class="filter-select" id="student-filter">
+                            <option value="all">전체 학생</option>
+                        </select>
+                        <select class="filter-select" id="app-filter">
+                            <option value="all">전체 앱</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Statistics Table -->
+                <div class="table-container">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>학생</th>
+                                <th>앱 이름</th>
+                                <th>카테고리</th>
+                                <th>클릭 횟수</th>
+                                <th>최근 접속</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody">
+                            <tr class="loading-row">
+                                <td colspan="5">
+                                    <div class="table-loading">
+                                        <div class="spinner"></div>
+                                        <p>통계를 불러오는 중...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state" id="stats-empty-state" style="display: none;">
+                        <div class="empty-icon">📊</div>
+                        <p class="empty-text">사용 기록이 없습니다</p>
+                        <p class="empty-subtext">학생들이 앱을 사용하면 여기에 표시됩니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Approval Tab -->
+            <div id="approvals-tab" class="tab-content">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">앱 승인 관리</h2>
+                        <p class="section-subtitle">학생들에게 보여질 앱을 선택해주세요</p>
+                    </div>
+                    <div class="filters">
+                        <button class="primary-button" id="approve-all-btn">모두 승인</button>
+                    </div>
+                </div>
+
+                <div class="approval-grid" id="approval-grid">
+                    <!-- App Approval Cards will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Student Modal -->
+    <div class="modal" id="student-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">학생 추가</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="student-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">이름 *</label>
+                            <input type="text" id="student-name" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이메일 *</label>
+                            <input type="email" id="student-email" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">학년 *</label>
+                            <input type="number" id="student-grade" class="form-input" min="1" max="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">반 *</label>
+                            <input type="number" id="student-class" class="form-input" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">번호 *</label>
+                            <input type="number" id="student-number" class="form-input" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">비밀번호 *</label>
+                        <input type="password" id="student-password" class="form-input" minlength="6" required>
+                        <small class="form-hint">6자 이상 입력해주세요</small>
+                    </div>
+
+                    <div class="error-message" id="modal-error"></div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="secondary-button" id="cancel-btn">취소</button>
+                        <button type="submit" class="primary-button">
+                            <span class="button-text" id="submit-text">추가</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">학생 삭제 확인</h3>
+                <button class="modal-close" id="delete-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-message">정말로 <strong id="delete-student-name"></strong> 학생을 삭제하시겠습니까?</p>
+                <p class="delete-warning">⚠️ 학생의 모든 데이터와 사용 기록이 영구적으로 삭제됩니다.</p>
+
+                <div class="modal-footer">
+                    <button type="button" class="secondary-button" id="delete-cancel-btn">취소</button>
+                    <button type="button" class="danger-button" id="delete-confirm-btn">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Dashboard Script -->
+    <script src="teacher-dashboard.js"></script>
+</body>
+
+</html>

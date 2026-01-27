@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==================================================
+    // Helper Functions
+    // ==================================================
+    
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user is accessing their own document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Check if the user is a teacher (reads role from their user doc)
+    function isTeacher() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+
+    // ==================================================
+    // Collection Rules
+    // ==================================================
+
+    // 1. Users Collection
+    // - Creation: Anyone (Sign up)
+    // - Read: Owner or Teacher (Teacher needs to list students)
+    // - Write: Owner (Update profile) or Teacher (Reset password/edit)
+    match /users/{userId} {
+      allow create: if isAuthenticated();
+      allow read: if isOwner(userId) || isTeacher();
+      allow write: if isOwner(userId) || isTeacher();
+    }
+
+    // 2. Usage Logs
+    // - Create: Any authenticated user (Logging clicks)
+    // - Read: Teachers only (For dashboard stats)
+    // - Delete: Teachers only (When deleting a student)
+    match /usage_logs/{logId} {
+      allow create: if isAuthenticated();
+      allow read, delete: if isTeacher();
+    }
+
+    // 3. App Approvals (NEW)
+    // - Read: Everyone (Students need to filter apps)
+    // - Write: Teachers only (Toggle approval)
+    match /app_approvals/{appId} {
+      allow read: if isAuthenticated();
+      allow write: if isTeacher();
+    }
+  }
+}

@@ -265,24 +265,8 @@ async function loadStudents() {
 function createStudentRow(student) {
     const row = document.createElement('tr');
 
-    const createdDate = student.createdAt ?
-        new Date(student.createdAt.toDate()).toLocaleDateString('ko-KR') :
-        '-';
-
-    row.innerHTML = `
-        <td>
-            <div class="student-name">${student.name}</div>
-        </td>
-        <td>
-            <div class="student-email">${student.email}</div>
-        </td>
-        <td>
-            <span class="badge badge-grade">${student.grade}학년</span>
-        </td>
-        <td>${student.class}반</td>
-        <td>${student.number}번</td>
     const createdDate = student.createdAt ? new Date(student.createdAt.seconds * 1000).toLocaleDateString() : '-';
-    
+
     // Format Last Login
     let lastLoginStr = '-';
     if (student.lastLogin) {
@@ -290,37 +274,34 @@ function createStudentRow(student) {
         const now = new Date();
         const diffMs = now - lastLoginDate;
         const diffMins = Math.floor(diffMs / 60000);
-        
+
         if (diffMins < 1) {
             lastLoginStr = '방금 전';
         } else if (diffMins < 60) {
-            lastLoginStr = `${ diffMins }분 전`;
+            lastLoginStr = `${diffMins}분 전`;
         } else if (diffMins < 1440) {
             const diffHours = Math.floor(diffMins / 60);
-            lastLoginStr = `${ diffHours }시간 전`;
+            lastLoginStr = `${diffHours}시간 전`;
         } else {
             lastLoginStr = lastLoginDate.toLocaleDateString();
         }
     }
 
+    const loginCount = student.loginCount || 0;
+
     row.innerHTML = `
-        < td >
-        <div class="student-name">${student.name}</div>
-        </td >
-        <td>
-            <div class="student-email">${student.email}</div>
-        </td>
-        <td>
-            <span class="badge badge-grade">${student.grade}학년</span>
-        </td>
+        <td><div class="student-name">${student.name}</div></td>
+        <td><div class="student-email">${student.email}</div></td>
+        <td><span class="badge badge-grade">${student.grade}학년</span></td>
         <td>${student.class}반</td>
         <td>${student.number}번</td>
         <td>${createdDate}</td>
         <td style="font-weight: 500; color: var(--primary-teal);">${lastLoginStr}</td>
+        <td style="font-weight: bold; text-align: center;">${loginCount}회</td>
         <td>
             <div class="action-buttons">
-                <button class="action-btn btn-edit" onclick="editStudent('${student.id}')">수정</button>
-                <button class="action-btn btn-reset" onclick="resetPassword('${student.id}', '${student.name}')">비밀번호 초기화</button>
+                <button class="action-btn btn-edit" onclick="editStudent('${student.id}')">정보 수정</button>
+                <button class="action-btn btn-reset" onclick="resetPassword('${student.id}', '${student.name}')">비번초기화</button>
                 <button class="action-btn btn-delete" onclick="deleteStudent('${student.id}', '${student.name}')">삭제</button>
             </div>
         </td>
@@ -360,7 +341,7 @@ async function loadUsageStats() {
             // Filter out teacher logs
             if (currentTeacher && data.userId === currentTeacher.uid) return;
 
-            const key = `${ data.userId }_${ data.appName } `;
+            const key = `${data.userId}_${data.appName} `;
 
             if (!stats[key]) {
                 stats[key] = {
@@ -540,6 +521,12 @@ function openAddModal() {
     modalTitle.textContent = '학생 추가';
     submitText.textContent = '추가';
     studentForm.reset();
+
+    // Enable email input
+    document.getElementById('student-email').disabled = false;
+    // Show password field
+    document.getElementById('student-password').parentElement.style.display = 'block';
+
     modalError.classList.remove('show');
     studentModal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -554,17 +541,29 @@ function openEditModal(studentId, studentData) {
     const displayEmail = studentData.email.replace('@ingyu-ai-world.com', '');
 
     // document.getElementById('student-name').value = studentData.name; // Removed field
-    document.getElementById('student-email').value = displayEmail;
+    const emailInput = document.getElementById('student-email');
+    emailInput.value = displayEmail;
+    emailInput.disabled = true; // Cannot change ID (Email) as it breaks Auth login
+
     document.getElementById('student-grade').value = studentData.grade;
     document.getElementById('student-class').value = studentData.class;
     document.getElementById('student-number').value = studentData.number;
 
-    // Hide password field for editing
+    // Hide password field in edit mode (cannot retrieve or easily update without Admin SDK)
     document.getElementById('student-password').parentElement.style.display = 'none';
 
     modalError.classList.remove('show');
     studentModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+}
+document.getElementById('student-number').value = studentData.number;
+
+// Hide password field for editing
+document.getElementById('student-password').parentElement.style.display = 'none';
+
+modalError.classList.remove('show');
+studentModal.classList.add('active');
+document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
@@ -591,7 +590,7 @@ studentForm.addEventListener('submit', async (e) => {
     try {
         if (editingStudentId) {
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${ email } @ingyu-ai - world.com`;
+            const fullEmail = email.includes('@') ? email : `${email} @ingyu-ai - world.com`;
 
             // Update existing student
             await db.collection('users').doc(editingStudentId).update({
@@ -616,7 +615,7 @@ studentForm.addEventListener('submit', async (e) => {
             }
 
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${ email } @ingyu-ai - world.com`;
+            const fullEmail = email.includes('@') ? email : `${email} @ingyu-ai - world.com`;
 
             // Create Firebase Auth user
             const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, password);
@@ -682,7 +681,7 @@ window.editStudent = async function (studentId) {
 // Reset Password
 // ===========================
 window.resetPassword = async function (studentId, studentName) {
-    const newPassword = prompt(`${ studentName } 학생의 새 비밀번호를 입력하세요(최소 6자): `);
+    const newPassword = prompt(`${studentName} 학생의 새 비밀번호를 입력하세요(최소 6자): `);
 
     if (!newPassword) return;
 
@@ -778,7 +777,7 @@ tabs.forEach(tab => {
         // Update contents
         tabContents.forEach(content => {
             content.classList.remove('active');
-            if (content.id === `${ target } -tab`) {
+            if (content.id === `${target} -tab`) {
                 content.classList.add('active');
             }
         });
@@ -838,7 +837,7 @@ function renderApprovalGrid() {
 
 function createAppApprovalCard(app, isApproved) {
     const card = document.createElement('div');
-    card.className = `approval - card ${ isApproved ? 'approved' : 'disapproved' } `;
+    card.className = `approval - card ${isApproved ? 'approved' : 'disapproved'} `;
 
     // Icon logic
     let iconHTML;

@@ -108,9 +108,10 @@ studentForm.addEventListener('submit', async (e) => {
             throw new Error('학생 계정이 아닙니다. 교사 탭에서 로그인해주세요.');
         }
 
-        // Update last login time
+        // Update last login time and increment login count
         await db.collection('users').doc(user.uid).update({
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            loginCount: firebase.firestore.FieldValue.increment(1)
         });
 
         // Success - redirect to main page

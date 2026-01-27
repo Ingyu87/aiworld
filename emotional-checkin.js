@@ -387,6 +387,7 @@ async function completeCheckin() {
 
             emotion: checkinData.emotion,
             emotionEmoji: checkinData.emotionEmoji,
+            emotionName: checkinData.emotionName,
 
             aiGeneratedWords: checkinData.aiGeneratedWords,
             selectedWords: checkinData.selectedWords,

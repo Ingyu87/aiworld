@@ -187,25 +187,25 @@ function updateEmotionChart() {
 
     // 감정별 카운트
     const emotionCounts = {
-        '😊 기쁨': 0,
-        '😢 슬픔': 0,
-        '😠 화남': 0,
-        '😰 불안': 0,
-        '😐 평온': 0,
-        '😔 실망': 0,
-        '😴 피곤': 0,
-        '😳 놀람': 0
+        '기쁨': 0,
+        '슬픔': 0,
+        '화남': 0,
+        '불안': 0,
+        '평온': 0,
+        '실망': 0,
+        '피곤': 0,
+        '놀람': 0
     };
 
     const emotionMap = {
-        'happy': '😊 기쁨',
-        'sad': '😢 슬픔',
-        'angry': '😠 화남',
-        'anxious': '😰 불안',
-        'calm': '😐 평온',
-        'disappointed': '😔 실망',
-        'tired': '😴 피곤',
-        'surprised': '😳 놀람'
+        'happy': '기쁨',
+        'sad': '슬픔',
+        'angry': '화남',
+        'anxious': '불안',
+        'calm': '평온',
+        'disappointed': '실망',
+        'tired': '피곤',
+        'surprised': '놀람'
     };
 
     emotionData.forEach(d => {
@@ -355,7 +355,7 @@ function updateEmotionTable() {
             <tr>
                 <td><strong>${latest.userName || '학생'}</strong></td>
                 <td>
-                    <span class="emotion-badge">${latest.emotionEmoji} ${latest.emotionName || latest.emotion}</span>
+                    <span class="emotion-badge">${latest.emotionEmoji} ${latest.emotionName || ''}</span>
                 </td>
                 <td>
                     <div class="emotion-words">
@@ -475,7 +475,7 @@ function viewStudentEmotionDetail(userId, userName) {
 
     alert(`${userName} 학생의 감정 기록 (${studentData.length}회)\n\n` +
         studentData.slice(0, 5).map(d =>
-            `${d.date}: ${d.emotionEmoji} ${d.emotionName}\n단어: ${(d.selectedWords || []).join(', ')}\n이유: ${d.reason || '-'}`
+            `${d.date}: ${d.emotionEmoji} ${d.emotionName || ''}\n단어: ${(d.selectedWords || []).join(', ')}\n이유: ${d.reason || '-'}`
         ).join('\n\n')
     );
 }

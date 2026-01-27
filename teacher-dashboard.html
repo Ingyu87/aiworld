@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교사 ?�?�보??- Ingyu's AI World</title>
-    <meta name="description" content="교사???�생 관�??�?�보??>
+    <title>교사 대시보드 - Ingyu's AI World</title>
+    <meta name="description" content="교사용 학생 관리 대시보드">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -21,15 +21,15 @@
         <div class="header-container">
             <div class="header-left">
                 <h1 class="header-title">Ingyu's AI World</h1>
-                <span class="header-subtitle">교사 ?�?�보??/span>
+                <span class="header-subtitle">교사 대시보드</span>
             </div>
             <div class="header-right">
                 <a href="index.html" class="secondary-button"
                     style="text-decoration: none; display: inline-flex; align-items: center; margin-right: 1rem; font-size: 0.9rem; padding: 0.5rem 1rem;">
-                    ?�� ?�앱?�로 ?�동
+                    🏠 웹앱으로 이동
                 </a>
                 <span class="user-info" id="teacher-name">교사</span>
-                <button class="logout-button" id="logout-btn">로그?�웃</button>
+                <button class="logout-button" id="logout-btn">로그아웃</button>
             </div>
         </div>
     </header>
@@ -39,21 +39,21 @@
         <div class="dashboard-container">
             <!-- Tab Navigation -->
             <div class="dashboard-tabs">
-                <button class="tab-button active" data-tab="students">?�생 관�?/button>
+                <button class="tab-button active" data-tab="students">학생 관리</button>
                 <button class="tab-button" data-tab="emotions">감정 출석부</button>
-                <button class="tab-button" data-tab="approvals">???�인 관�?/button>
+                <button class="tab-button" data-tab="approvals">앱 승인 관리</button>
             </div>
 
             <!-- Student Management Tab -->
             <div id="students-tab" class="tab-content active">
                 <div class="section-header">
                     <div>
-                        <h2 class="section-title">?�생 관�?/h2>
-                        <p class="section-subtitle" id="student-count">0명의 ?�생</p>
+                        <h2 class="section-title">학생 관리</h2>
+                        <p class="section-subtitle" id="student-count">0명의 학생</p>
                     </div>
                     <button class="primary-button" id="add-student-btn">
-                        <span class="button-icon">??/span>
-                        <span class="button-text">?�생 추�?</span>
+                        <span class="button-icon">➕</span>
+                        <span class="button-text">학생 추가</span>
                     </button>
                 </div>
 
@@ -62,11 +62,11 @@
                     <table class="students-table">
                         <thead>
                             <tr>
-                                <th>?�름</th>
-                                <th>가?�일</th>
-                                <th>최근 ?�속</th>
-                                <th>로그???�수</th>
-                                <th>관�?/th>
+                                <th>이름</th>
+                                <th>가입일</th>
+                                <th>최근 접속</th>
+                                <th>로그인 횟수</th>
+                                <th>관리</th>
                             </tr>
                         </thead>
                         <tbody id="students-tbody">
@@ -74,7 +74,7 @@
                                 <td colspan="7">
                                     <div class="table-loading">
                                         <div class="spinner"></div>
-                                        <p>?�생 목록??불러?�는 �?..</p>
+                                        <p>학생 목록을 불러오는 중...</p>
                                     </div>
                                 </td>
                             </tr>
@@ -82,24 +82,24 @@
                     </table>
 
                     <div class="empty-state" id="empty-state" style="display: none;">
-                        <div class="empty-icon">?��?��?/div>
-                        <p class="empty-text">?�록???�생???�습?�다</p>
-                        <p class="empty-subtext">?�생 추�? 버튼???�러 ?�생???�록?�세??/p>
+                        <div class="empty-icon">👨‍🎓</div>
+                        <p class="empty-text">등록된 학생이 없습니다</p>
+                        <p class="empty-subtext">학생 추가 버튼을 눌러 학생을 등록하세요</p>
                     </div>
                 </div>
 
                 <!-- Usage Statistics Section -->
                 <div class="section-header" style="margin-top: 3rem;">
                     <div>
-                        <h2 class="section-title">?�용 ?�계</h2>
-                        <p class="section-subtitle">?�앱 ?�용 ?�역</p>
+                        <h2 class="section-title">사용 통계</h2>
+                        <p class="section-subtitle">웹앱 사용 내역</p>
                     </div>
                     <div class="stats-filters">
                         <select class="filter-select" id="student-filter">
-                            <option value="all">?�체 ?�생</option>
+                            <option value="all">전체 학생</option>
                         </select>
                         <select class="filter-select" id="app-filter">
-                            <option value="all">?�체 ??/option>
+                            <option value="all">전체 앱</option>
                         </select>
                     </div>
                 </div>
@@ -115,11 +115,11 @@
                     <table class="stats-table">
                         <thead>
                             <tr>
-                                <th>?�생</th>
-                                <th>???�름</th>
+                                <th>학생</th>
+                                <th>앱 이름</th>
                                 <th>카테고리</th>
-                                <th>?�릭 ?�수</th>
-                                <th>최근 ?�속</th>
+                                <th>클릭 횟수</th>
+                                <th>최근 접속</th>
                             </tr>
                         </thead>
                         <tbody id="stats-tbody">
@@ -127,7 +127,7 @@
                                 <td colspan="5">
                                     <div class="table-loading">
                                         <div class="spinner"></div>
-                                        <p>?�계�?불러?�는 �?..</p>
+                                        <p>통계를 불러오는 중...</p>
                                     </div>
                                 </td>
                             </tr>
@@ -135,168 +135,169 @@
                     </table>
 
                     <div class="empty-state" id="stats-empty-state" style="display: none;">
-                        <div class="empty-icon">?��</div>
-                        <p class="empty-text">?�용 기록???�습?�다</p>
-                        <p class="empty-subtext">?�생?�이 ?�을 ?�용?�면 ?�기???�시?�니??/p>
+                        <div class="empty-icon">📊</div>
+                        <p class="empty-text">사용 기록이 없습니다</p>
+                        <p class="empty-subtext">학생들이 앱을 사용하면 여기에 표시됩니다</p>
                     </div>
                 </div>
             </div>
-<!-- Emotional Check-in Tab -->
-<div id="emotions-tab" class="tab-content">
-    <!-- Overview Section -->
-    <div class="section-header">
-        <div>
-            <h2 class="section-title">감정 출석부</h2>
-            <p class="section-subtitle" id="emotion-summary">?�생?�의 감정 ?�태�??�인?�세??/p>
-        </div>
-        <div class="stats-filters">
-            <select class="filter-select" id="emotion-period-filter">
-                <option value="today">?�늘</option>
-                <option value="week" selected>?�번 �?/option>
-                <option value="month">?�번 ??/option>
-                <option value="quarter">분기�?/option>
-            </select>
-        </div>
-    </div>
 
-    <!-- AI Analysis Card -->
-    <div class="ai-analysis-card" id="ai-analysis-card" style="display: none;">
-        <div class="ai-analysis-header">
-            <div class="ai-icon">?��</div>
-            <h3>AI ?�급 분석 리포??/h3>
-            <button class="btn-refresh" id="btn-refresh-analysis">?�� ?�로고침</button>
-        </div>
+            <!-- Emotional Check-in Tab -->
+            <div id="emotions-tab" class="tab-content">
+                <!-- Overview Section -->
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">감정 출석부</h2>
+                        <p class="section-subtitle" id="emotion-summary">학생들의 감정 상태를 확인하세요</p>
+                    </div>
+                    <div class="stats-filters">
+                        <select class="filter-select" id="emotion-period-filter">
+                            <option value="today">오늘</option>
+                            <option value="week" selected>이번 주</option>
+                            <option value="month">이번 달</option>
+                            <option value="quarter">분기별</option>
+                        </select>
+                    </div>
+                </div>
 
-        <div class="ai-analysis-loading" id="ai-analysis-loading">
-            <div class="spinner"></div>
-            <p>AI가 ?�급 감정??분석?�고 ?�어??..</p>
-        </div>
+                <!-- AI Analysis Card -->
+                <div class="ai-analysis-card" id="ai-analysis-card" style="display: none;">
+                    <div class="ai-analysis-header">
+                        <div class="ai-icon">🤖</div>
+                        <h3>AI 학급 분석 리포트</h3>
+                        <button class="btn-refresh" id="btn-refresh-analysis">🔄 새로고침</button>
+                    </div>
 
-        <div class="ai-analysis-content" id="ai-analysis-content" style="display: none;">
-            <div class="analysis-section">
-                <h4>?�� ?�반?�인 ?�급 분위�?/h4>
-                <p id="analysis-overview"></p>
-            </div>
+                    <div class="ai-analysis-loading" id="ai-analysis-loading">
+                        <div class="spinner"></div>
+                        <p>AI가 학급 감정을 분석하고 있어요...</p>
+                    </div>
 
-            <div class="analysis-section">
-                <h4>?�� 주목???�턴</h4>
-                <ul id="analysis-patterns"></ul>
-            </div>
-
-            <div class="analysis-section">
-                <h4>???�천 ?�안</h4>
-                <ul id="analysis-suggestions"></ul>
-            </div>
-
-            <div class="analysis-section positive">
-                <h4>?�� 긍정?�인 ??/h4>
-                <p id="analysis-positives"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="emotion-stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">?��</div>
-            <div class="stat-content">
-                <div class="stat-label">�?체크??/div>
-                <div class="stat-value" id="total-checkins">0??/div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">??/div>
-            <div class="stat-content">
-                <div class="stat-label">참여??/div>
-                <div class="stat-value" id="checkin-rate">0%</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">?��</div>
-            <div class="stat-content">
-                <div class="stat-label">가??많�? 감정</div>
-                <div class="stat-value" id="top-emotion">-</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">?�️</div>
-            <div class="stat-content">
-                <div class="stat-label">관???�요 ?�생</div>
-                <div class="stat-value" id="attention-students">0�?/div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Emotion Distribution Chart -->
-    <div class="chart-container"
-        style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 분포</h3>
-        <canvas id="emotionChart"></canvas>
-    </div>
-
-    <!-- Word Cloud Section -->
-    <div class="wordcloud-container"
-        style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 ?�어 ?�라?�드</h3>
-        <canvas id="wordCloud" width="800" height="400"></canvas>
-    </div>
-
-    <!-- Students Emotion List -->
-    <div class="section-header" style="margin-top: 2rem;">
-        <div>
-            <h3 class="section-title">?�생�?감정 기록</h3>
-            <p class="section-subtitle">개별 ?�생??감정 ?�턴???�인?�세??/p>
-        </div>
-    </div>
-
-    <div class="table-container">
-        <table class="emotions-table">
-            <thead>
-                <tr>
-                    <th>?�생</th>
-                    <th>최근 감정</th>
-                    <th>?�택 ?�어</th>
-                    <th>체크???�수</th>
-                    <th>최근 체크??/th>
-                    <th>?�세</th>
-                </tr>
-            </thead>
-            <tbody id="emotions-tbody">
-                <tr class="loading-row">
-                    <td colspan="6">
-                        <div class="table-loading">
-                            <div class="spinner"></div>
-                            <p>감정 기록??불러?�는 �?..</p>
+                    <div class="ai-analysis-content" id="ai-analysis-content" style="display: none;">
+                        <div class="analysis-section">
+                            <h4>💡 전반적인 학급 분위기</h4>
+                            <p id="analysis-overview"></p>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
 
-        <div class="empty-state" id="emotions-empty-state" style="display: none;">
-            <div class="empty-icon">?��</div>
-            <p class="empty-text">감정 체크??기록???�습?�다</p>
-            <p class="empty-subtext">?�생?�이 감정 출석부�??�성?�면 ?�기???�시?�니??/p>
-        </div>
-    </div>
-</div>
+                        <div class="analysis-section">
+                            <h4>📌 주목할 패턴</h4>
+                            <ul id="analysis-patterns"></ul>
+                        </div>
 
+                        <div class="analysis-section">
+                            <h4>✨ 실천 제안</h4>
+                            <ul id="analysis-suggestions"></ul>
+                        </div>
+
+                        <div class="analysis-section positive">
+                            <h4>👍 긍정적인 점</h4>
+                            <p id="analysis-positives"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="emotion-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">총 체크인</div>
+                            <div class="stat-value" id="total-checkins">0회</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-label">참여율</div>
+                            <div class="stat-value" id="checkin-rate">0%</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">😊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">가장 많은 감정</div>
+                            <div class="stat-value" id="top-emotion">-</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-content">
+                            <div class="stat-label">관심 필요 학생</div>
+                            <div class="stat-value" id="attention-students">0명</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emotion Distribution Chart -->
+                <div class="chart-container"
+                    style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 분포</h3>
+                    <canvas id="emotionChart"></canvas>
+                </div>
+
+                <!-- Word Cloud Section -->
+                <div class="wordcloud-container"
+                    style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 단어 클라우드</h3>
+                    <canvas id="wordCloud" width="800" height="400"></canvas>
+                </div>
+
+                <!-- Students Emotion List -->
+                <div class="section-header" style="margin-top: 2rem;">
+                    <div>
+                        <h3 class="section-title">학생별 감정 기록</h3>
+                        <p class="section-subtitle">개별 학생의 감정 패턴을 확인하세요</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="emotions-table">
+                        <thead>
+                            <tr>
+                                <th>학생</th>
+                                <th>최근 감정</th>
+                                <th>선택 단어</th>
+                                <th>체크인 횟수</th>
+                                <th>최근 체크인</th>
+                                <th>상세</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emotions-tbody">
+                            <tr class="loading-row">
+                                <td colspan="6">
+                                    <div class="table-loading">
+                                        <div class="spinner"></div>
+                                        <p>감정 기록을 불러오는 중...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state" id="emotions-empty-state" style="display: none;">
+                        <div class="empty-icon">😊</div>
+                        <p class="empty-text">감정 체크인 기록이 없습니다</p>
+                        <p class="empty-subtext">학생들이 감정 출석부를 작성하면 여기에 표시됩니다</p>
+                    </div>
+                </div>
+            </div>
 
             <!-- App Approval Tab -->
             <div id="approvals-tab" class="tab-content">
                 <div class="section-header">
                     <div>
-                        <h2 class="section-title">???�인 관�?/h2>
-                        <p class="section-subtitle">?�생?�에�?보여�??�을 ?�택?�주?�요</p>
+                        <h2 class="section-title">앱 승인 관리</h2>
+                        <p class="section-subtitle">학생들에게 보여질 앱을 선택해주세요</p>
                     </div>
-                    <div class="filters">
-                        <button class="primary-button" id="approve-all-btn">모두 ?�인</button>
-                        <button class="secondary-button" id="unapprove-all-btn"
-                            style="background: #f44336; color: white; border: none;">모두 미승??/button>
+                    <div class="actions">
+                        <button class="primary-button" id="save-approvals-btn">
+                            <span class="button-icon">💾</span>
+                            <span class="button-text">변경사항 저장</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="approval-grid" id="approval-grid">
+                <div class="approvals-grid" id="approvals-grid">
                     <!-- App Approval Cards will be inserted here -->
                 </div>
             </div>
@@ -308,23 +309,23 @@
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="modal-title">?�생 추�?</h3>
+                <h3 class="modal-title" id="modal-title">학생 추가</h3>
                 <button class="modal-close" id="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <form id="student-form">
                     <div class="form-row">
                         <div class="form-group" style="width: 100%;">
-                            <label class="form-label">?�이??*</label>
-                            <input type="text" id="student-email" class="form-input" required placeholder="?? student1">
+                            <label class="form-label">아이디 *</label>
+                            <input type="text" id="student-email" class="form-input" required placeholder="예: student1">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">비�?번호 *</label>
+                        <label class="form-label">비밀번호 *</label>
                         <input type="text" id="student-password" class="form-input" minlength="4" required
-                            placeholder="4?�리 ?�자 (?? 1234)">
-                        <small class="form-hint">4?�리 ?�자�??�력?�주?�요. (?? 1234)</small>
+                            placeholder="4자리 숫자 (예: 1234)">
+                        <small class="form-hint">4자리 숫자를 입력해주세요. (예: 1234)</small>
                     </div>
 
                     <div class="error-message" id="modal-error"></div>
@@ -332,7 +333,7 @@
                     <div class="modal-footer">
                         <button type="button" class="secondary-button" id="cancel-btn">취소</button>
                         <button type="submit" class="primary-button">
-                            <span class="button-text" id="submit-text">추�?</span>
+                            <span class="button-text" id="submit-text">추가</span>
                         </button>
                     </div>
                 </form>
@@ -345,16 +346,16 @@
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">?�생 ??�� ?�인</h3>
+                <h3 class="modal-title">학생 삭제 확인</h3>
                 <button class="modal-close" id="delete-modal-close">×</button>
             </div>
             <div class="modal-body">
-                <p class="delete-message">?�말�?<strong id="delete-student-name"></strong> ?�생????��?�시겠습?�까?</p>
-                <p class="delete-warning">?�️ ?�생??모든 ?�이?��? ?�용 기록???�구?�으�???��?�니??</p>
+                <p class="delete-message">정말로 <strong id="delete-student-name"></strong> 학생을 삭제하시겠습니까?</p>
+                <p class="delete-warning">해당 학생의 모든 데이터와 사용 기록이 영구적으로 삭제됩니다.</p>
 
                 <div class="modal-footer">
                     <button type="button" class="secondary-button" id="delete-cancel-btn">취소</button>
-                    <button type="button" class="danger-button" id="delete-confirm-btn">??��</button>
+                    <button type="button" class="danger-button" id="delete-confirm-btn">삭제</button>
                 </div>
             </div>
         </div>
@@ -370,9 +371,7 @@
 
     <!-- Dashboard Script -->
     <script src="teacher-dashboard.js"></script>
-</body>
-
-</html>
     <script src="emotional-checkin-dashboard.js"></script>
 </body>
+
 </html>

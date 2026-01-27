@@ -313,7 +313,7 @@ async function generateAdvice() {
         }
     } catch (error) {
         console.error('Error generating advice:', error);
-        alert('AI 조언을 불러오는 데 실패했습니다. 다시 시도해주세요.');
+        alert('AI 선생님과 연결할 수 없어요. 잠시 후 다시 시도해주세요.');
         // 이전 단계로 돌아가기
         goToStep(3);
     } finally {

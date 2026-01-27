@@ -100,7 +100,7 @@ JSON 형식으로만 응답:
             }
         } catch (parseError) {
             console.error('JSON parse error:', generatedText);
-            advice = getDefaultAdvice(emotion);
+            throw new Error('Failed to parse AI response');
         }
 
         return res.status(200).json({
@@ -110,70 +110,9 @@ JSON 형식으로만 응답:
 
     } catch (error) {
         console.error('Error generating advice:', error);
-
-        const defaultAdvice = getDefaultAdvice(req.body.emotion);
-
-        return res.status(200).json({
-            success: true,
-            advice: defaultAdvice,
-            fallback: true
+        return res.status(500).json({
+            success: false,
+            error: error.message
         });
     }
-}
-
-// 기본 조언 (API 실패 시 사용)
-function getDefaultAdvice(emotion) {
-    const defaultAdviceSet = {
-        happy: {
-            empathy: "정말 기쁜 일이 있었나 봐요! 행복한 마음이 느껴져요.",
-            suggestion: "이 기쁨을 친구들이나 가족과 나눠보는 건 어떨까요? 행복은 나눌수록 커진답니다!",
-            quote: "행복은 나눌수록 배가 된다.",
-            quoteSource: "속담"
-        },
-        sad: {
-            empathy: "슬픈 마음이 드는 날도 있어요. 그런 감정을 느끼는 것은 자연스러운 일이에요.",
-            suggestion: "슬플 때는 신뢰하는 사람에게 이야기하거나, 좋아하는 활동을 해보세요. 시간이 지나면 괜찮아질 거예요.",
-            quote: "비가 온 뒤에 땅이 더 단단해진다.",
-            quoteSource: "속담"
-        },
-        angry: {
-            empathy: "화가 나는 일이 있었군요. 그런 감정을 느끼는 건 괜찮아요.",
-            suggestion: "화가 날 때는 심호흡을 하거나 잠시 쉬어보세요. 마음이 진정되면 더 좋은 해결책을 찾을 수 있어요.",
-            quote: "화는 마음의 적이다.",
-            quoteSource: "속담"
-        },
-        anxious: {
-            empathy: "걱정되는 마음이 드는군요. 불안한 감정은 누구나 느낄 수 있어요.",
-            suggestion: "걱정될 때는 선생님이나 부모님께 이야기해보세요. 함께 해결 방법을 찾을 수 있을 거예요.",
-            quote: "걱정은 빚과 같아서, 갚지 않으면 이자가 붙는다.",
-            quoteSource: "명언"
-        },
-
-        calm: {
-            empathy: "마음이 평온하고 차분하네요. 좋은 상태예요!",
-            suggestion: "이 평온한 마음을 유지하면서 오늘 하루를 보내보세요. 좋은 에너지가 될 거예요.",
-            quote: "고요한 물이 깊다.",
-            quoteSource: "속담"
-        },
-        disappointed: {
-            empathy: "기대했던 것과 달라서 실망스러웠군요. 속상한 마음이 드는 건 당연해요.",
-            suggestion: "다음에 더 좋은 기회가 올 거예요. 잠시 기분 전환을 해보는 건 어떨까요?",
-            quote: "실패는 성공의 어머니.",
-            quoteSource: "속담"
-        },
-        tired: {
-            empathy: "몸도 마음도 지쳐있군요. 정말 고생 많았어요.",
-            suggestion: "오늘은 푹 쉬는 게 제일 중요해요. 따뜻한 우유를 마시거나 일찍 잠자리에 들어보세요.",
-            quote: "휴식은 게으름이 아니라 재충전이다.",
-            quoteSource: "명언"
-        },
-        surprised: {
-            empathy: "갑작스러운 일로 많이 놀라셨겠어요. 마음이 진정될 시간이 필요해요.",
-            suggestion: "천천히 심호흡을 해보세요. 놀란 마음을 가라앉히면 상황이 더 잘 보일 거예요.",
-            quote: "침착함이 이긴다.",
-            quoteSource: "명언"
-        }
-    };
-
-    return defaultAdviceSet[emotion] || defaultAdviceSet.calm;
 }

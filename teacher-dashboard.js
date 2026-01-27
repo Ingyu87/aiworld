@@ -936,3 +936,24 @@ if (unapproveAllBtn) {
         }
     });
 }
+// ===========================
+// Tab Management for Emotions
+// ===========================
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Update active tab button
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update active tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        
+        // Initialize emotions tab if selected
+        if (tabName === 'emotions' && typeof initEmotionsTab === 'function') {
+            initEmotionsTab();
+        }
+    });
+});

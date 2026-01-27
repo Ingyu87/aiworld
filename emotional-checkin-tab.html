@@ -1,0 +1,139 @@
+<!-- Emotional Check-in Tab -->
+<div id="emotions-tab" class="tab-content">
+    <!-- Overview Section -->
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">감정 출석부</h2>
+            <p class="section-subtitle" id="emotion-summary">학생들의 감정 상태를 확인하세요</p>
+        </div>
+        <div class="stats-filters">
+            <select class="filter-select" id="emotion-period-filter">
+                <option value="today">오늘</option>
+                <option value="week" selected>이번 주</option>
+                <option value="month">이번 달</option>
+                <option value="quarter">분기별</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- AI Analysis Card -->
+    <div class="ai-analysis-card" id="ai-analysis-card" style="display: none;">
+        <div class="ai-analysis-header">
+            <div class="ai-icon">🤖</div>
+            <h3>AI 학급 분석 리포트</h3>
+            <button class="btn-refresh" id="btn-refresh-analysis">🔄 새로고침</button>
+        </div>
+
+        <div class="ai-analysis-loading" id="ai-analysis-loading">
+            <div class="spinner"></div>
+            <p>AI가 학급 감정을 분석하고 있어요...</p>
+        </div>
+
+        <div class="ai-analysis-content" id="ai-analysis-content" style="display: none;">
+            <div class="analysis-section">
+                <h4>💡 전반적인 학급 분위기</h4>
+                <p id="analysis-overview"></p>
+            </div>
+
+            <div class="analysis-section">
+                <h4>📌 주목할 패턴</h4>
+                <ul id="analysis-patterns"></ul>
+            </div>
+
+            <div class="analysis-section">
+                <h4>✨ 실천 제안</h4>
+                <ul id="analysis-suggestions"></ul>
+            </div>
+
+            <div class="analysis-section positive">
+                <h4>👍 긍정적인 점</h4>
+                <p id="analysis-positives"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="emotion-stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <div class="stat-label">총 체크인</div>
+                <div class="stat-value" id="total-checkins">0회</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <div class="stat-label">참여율</div>
+                <div class="stat-value" id="checkin-rate">0%</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">😊</div>
+            <div class="stat-content">
+                <div class="stat-label">가장 많은 감정</div>
+                <div class="stat-value" id="top-emotion">-</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-content">
+                <div class="stat-label">관심 필요 학생</div>
+                <div class="stat-value" id="attention-students">0명</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emotion Distribution Chart -->
+    <div class="chart-container"
+        style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 분포</h3>
+        <canvas id="emotionChart"></canvas>
+    </div>
+
+    <!-- Word Cloud Section -->
+    <div class="wordcloud-container"
+        style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 1.5rem; color: #2d3748;">감정 단어 클라우드</h3>
+        <canvas id="wordCloud" width="800" height="400"></canvas>
+    </div>
+
+    <!-- Students Emotion List -->
+    <div class="section-header" style="margin-top: 2rem;">
+        <div>
+            <h3 class="section-title">학생별 감정 기록</h3>
+            <p class="section-subtitle">개별 학생의 감정 패턴을 확인하세요</p>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="emotions-table">
+            <thead>
+                <tr>
+                    <th>학생</th>
+                    <th>최근 감정</th>
+                    <th>선택 단어</th>
+                    <th>체크인 횟수</th>
+                    <th>최근 체크인</th>
+                    <th>상세</th>
+                </tr>
+            </thead>
+            <tbody id="emotions-tbody">
+                <tr class="loading-row">
+                    <td colspan="6">
+                        <div class="table-loading">
+                            <div class="spinner"></div>
+                            <p>감정 기록을 불러오는 중...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="empty-state" id="emotions-empty-state" style="display: none;">
+            <div class="empty-icon">😊</div>
+            <p class="empty-text">감정 체크인 기록이 없습니다</p>
+            <p class="empty-subtext">학생들이 감정 출석부를 작성하면 여기에 표시됩니다</p>
+        </div>
+    </div>
+</div>

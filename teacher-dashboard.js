@@ -212,9 +212,6 @@ async function loadStudents() {
     try {
         const snapshot = await db.collection('users')
             .where('role', '==', 'student')
-            .orderBy('grade')
-            .orderBy('class')
-            .orderBy('number')
             .get();
 
         const students = [];
@@ -223,6 +220,13 @@ async function loadStudents() {
                 id: doc.id,
                 ...doc.data()
             });
+        });
+
+        // Client-side sort: Grade > Class > Number
+        students.sort((a, b) => {
+            if (a.grade !== b.grade) return a.grade - b.grade;
+            if (a.class !== b.class) return a.class - b.class;
+            return a.number - b.number;
         });
 
         // Update count
@@ -581,7 +585,7 @@ studentForm.addEventListener('submit', async (e) => {
     try {
         if (editingStudentId) {
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${email} @ingyu-ai - world.com`;
+            const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
 
             // Update existing student
             await db.collection('users').doc(editingStudentId).update({
@@ -768,7 +772,7 @@ tabs.forEach(tab => {
         // Update contents
         tabContents.forEach(content => {
             content.classList.remove('active');
-            if (content.id === `${target} -tab`) {
+            if (content.id === `${target}-tab`) {
                 content.classList.add('active');
             }
         });
@@ -828,18 +832,18 @@ function renderApprovalGrid() {
 
 function createAppApprovalCard(app, isApproved) {
     const card = document.createElement('div');
-    card.className = `approval - card ${isApproved ? 'approved' : 'disapproved'} `;
+    card.className = `approval-card ${isApproved ? 'approved' : 'disapproved'}`;
 
     // Icon logic
     let iconHTML;
     if (app.iconImage) {
-        iconHTML = `< img src = "${app.iconImage}" alt = "${app.title}" > `;
+        iconHTML = `<img src="${app.iconImage}" alt="${app.title}">`;
     } else {
         iconHTML = app.icon || '📱';
     }
 
     card.innerHTML = `
-        < div class="app-info-header" >
+        <div class="app-info-header">
             <div class="app-icon">${iconHTML}</div>
             <div class="app-details">
                 <h4>${app.title}</h4>

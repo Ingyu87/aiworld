@@ -22,8 +22,10 @@ service cloud.firestore {
       allow update: if isAuthenticated() && 
                       (request.auth.uid == userId || isTeacher());
       
-      // Only teachers can create new users
-      allow create: if isTeacher();
+      // Allow creation if:
+      // 1. User is a teacher (standard management)
+      // 2. User is creating their own document (self-signup/recovery)
+      allow create: if isTeacher() || (isAuthenticated() && request.auth.uid == userId);
       
       // Only teachers can delete users
       allow delete: if isTeacher();

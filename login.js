@@ -89,15 +89,16 @@ studentForm.addEventListener('submit', async (e) => {
         const usersSnapshot = await db.collection('users').where('email', '==', fullEmail).get();
 
         if (usersSnapshot.empty) {
-            // Fallback: Try searching by uid if email search fails (for older accounts or direct UID mapping)
-            // But since we don't have the UID yet, we can't do that.
-            // Let's try to sign in with Auth first to get the UID if Firestore search by email fails.
+            console.log('No user found in Firestore by email, trying Auth fallback...');
+            // Fallback: Try signing in to Auth first to see if the account exists
             try {
                 const internalPassword = "fixed_student_pw_1234";
                 const tempCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
                 const tempUser = tempCredential.user;
                 
+                console.log('Auth login successful, checking Firestore by UID:', tempUser.uid);
                 const userDocByUid = await db.collection('users').doc(tempUser.uid).get();
+                
                 if (userDocByUid.exists) {
                     const userData = userDocByUid.data();
                     if (userData.simplePassword === password) {
@@ -108,12 +109,20 @@ studentForm.addEventListener('submit', async (e) => {
                         throw new Error('비밀번호가 올바르지 않습니다.');
                     }
                 } else {
-                    // Even if Auth exists, if Firestore doc doesn't, it's an incomplete registration
-                    throw new Error('등록되지 않은 학생입니다.');
+                    // Auth exists but Firestore doesn't. This is the "Incomplete Registration" state.
+                    // Let's automatically fix it if the password matches the one they just entered!
+                    // Since we can't verify the old simplePassword, we'll redirect to a recovery flow or 
+                    // just tell them to re-register which will now work thanks to the rules update.
+                    console.error('Auth exists but Firestore document is missing.');
+                    await auth.signOut();
+                    throw new Error('계정 설정이 완료되지 않았습니다. 회원가입 페이지에서 다시 한번 가입해 주세요. (데이터가 자동으로 복구됩니다)');
                 }
             } catch (authError) {
                 console.error('Auth fallback failed:', authError);
-                throw new Error('등록되지 않은 학생입니다.');
+                if (authError.code === 'auth/wrong-password' || authError.code === 'auth/user-not-found') {
+                    throw new Error('등록되지 않은 학생이거나 비밀번호가 틀렸습니다.');
+                }
+                throw new Error(authError.message || '등록되지 않은 학생입니다.');
             }
         }
 

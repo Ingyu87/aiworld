@@ -253,7 +253,12 @@ async function loadStudents() {
 
     } catch (error) {
         console.error('Error loading students:', error);
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">학생 목록을 불러오는 데 실패했습니다.</td></tr>';
+        emptyState.style.display = 'none'; // Hide empty state if showing error
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 2rem;">' +
+            '학생 목록을 불러올 수 없습니다.<br>' +
+            '<small>네트워크 연결을 확인하거나, 잠시 후 다시 시도해주세요.<br>' +
+            '오류 내용: ' + (error.message || '알 수 없는 오류') + '</small>' +
+            '</td></tr>';
     }
 }
 
@@ -276,7 +281,42 @@ function createStudentRow(student) {
         </td>
         <td>${student.class}반</td>
         <td>${student.number}번</td>
+    const createdDate = student.createdAt ? new Date(student.createdAt.seconds * 1000).toLocaleDateString() : '-';
+    
+    // Format Last Login
+    let lastLoginStr = '-';
+    if (student.lastLogin) {
+        const lastLoginDate = new Date(student.lastLogin.seconds * 1000);
+        const now = new Date();
+        const diffMs = now - lastLoginDate;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) {
+            lastLoginStr = '방금 전';
+        } else if (diffMins < 60) {
+            lastLoginStr = `${ diffMins }분 전`;
+        } else if (diffMins < 1440) {
+            const diffHours = Math.floor(diffMins / 60);
+            lastLoginStr = `${ diffHours }시간 전`;
+        } else {
+            lastLoginStr = lastLoginDate.toLocaleDateString();
+        }
+    }
+
+    row.innerHTML = `
+        < td >
+        <div class="student-name">${student.name}</div>
+        </td >
+        <td>
+            <div class="student-email">${student.email}</div>
+        </td>
+        <td>
+            <span class="badge badge-grade">${student.grade}학년</span>
+        </td>
+        <td>${student.class}반</td>
+        <td>${student.number}번</td>
         <td>${createdDate}</td>
+        <td style="font-weight: 500; color: var(--primary-teal);">${lastLoginStr}</td>
         <td>
             <div class="action-buttons">
                 <button class="action-btn btn-edit" onclick="editStudent('${student.id}')">수정</button>
@@ -320,7 +360,7 @@ async function loadUsageStats() {
             // Filter out teacher logs
             if (currentTeacher && data.userId === currentTeacher.uid) return;
 
-            const key = `${data.userId}_${data.appName}`;
+            const key = `${ data.userId }_${ data.appName } `;
 
             if (!stats[key]) {
                 stats[key] = {
@@ -386,7 +426,7 @@ function createStatsRow(stat) {
         '-';
 
     row.innerHTML = `
-        <td><strong>${stat.userName}</strong></td>
+        < td > <strong>${stat.userName}</strong></td >
         <td>${stat.appName}</td>
         <td><span class="badge badge-grade">${stat.appCategory}</span></td>
         <td><strong>${stat.count}회</strong></td>
@@ -551,7 +591,7 @@ studentForm.addEventListener('submit', async (e) => {
     try {
         if (editingStudentId) {
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
+            const fullEmail = email.includes('@') ? email : `${ email } @ingyu-ai - world.com`;
 
             // Update existing student
             await db.collection('users').doc(editingStudentId).update({
@@ -576,7 +616,7 @@ studentForm.addEventListener('submit', async (e) => {
             }
 
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
+            const fullEmail = email.includes('@') ? email : `${ email } @ingyu-ai - world.com`;
 
             // Create Firebase Auth user
             const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, password);
@@ -642,7 +682,7 @@ window.editStudent = async function (studentId) {
 // Reset Password
 // ===========================
 window.resetPassword = async function (studentId, studentName) {
-    const newPassword = prompt(`${studentName} 학생의 새 비밀번호를 입력하세요 (최소 6자):`);
+    const newPassword = prompt(`${ studentName } 학생의 새 비밀번호를 입력하세요(최소 6자): `);
 
     if (!newPassword) return;
 
@@ -738,7 +778,7 @@ tabs.forEach(tab => {
         // Update contents
         tabContents.forEach(content => {
             content.classList.remove('active');
-            if (content.id === `${target}-tab`) {
+            if (content.id === `${ target } -tab`) {
                 content.classList.add('active');
             }
         });
@@ -798,30 +838,30 @@ function renderApprovalGrid() {
 
 function createAppApprovalCard(app, isApproved) {
     const card = document.createElement('div');
-    card.className = `approval-card ${isApproved ? 'approved' : 'disapproved'}`;
+    card.className = `approval - card ${ isApproved ? 'approved' : 'disapproved' } `;
 
     // Icon logic
     let iconHTML;
     if (app.iconImage) {
-        iconHTML = `<img src="${app.iconImage}" alt="${app.title}">`;
+        iconHTML = `< img src = "${app.iconImage}" alt = "${app.title}" > `;
     } else {
         iconHTML = app.icon || '📱';
     }
 
     card.innerHTML = `
-        <div class="app-info-header">
+        < div class="app-info-header" >
             <div class="app-icon">${iconHTML}</div>
             <div class="app-details">
                 <h4>${app.title}</h4>
                 <span class="app-category-badge">${app.category}</span>
             </div>
-        </div>
-        
+        </div >
+
         <div class="approval-toggle-container">
             <span class="approval-status-text">${isApproved ? '승인됨' : '비공개'}</span>
             <label class="switch">
                 <input type="checkbox" ${isApproved ? 'checked' : ''} onchange="toggleAppApproval('${app.title}', this.checked)">
-                <span class="slider"></span>
+                    <span class="slider"></span>
             </label>
         </div>
     `;

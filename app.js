@@ -279,6 +279,18 @@ function renderApps(category = "전체") {
     if (currentUser && currentUser.role === 'student') {
         const teacherOnlyCategories = ['학급운영'];
         filteredApps = filteredApps.filter(app => !teacherOnlyCategories.includes(app.category));
+
+        // Hide Class Management Nav Button
+        const classMgmtBtn = document.querySelector('.nav-item[data-category="학급운영"]');
+        if (classMgmtBtn) {
+            classMgmtBtn.style.display = 'none';
+        }
+    } else {
+        // Show for teachers
+        const classMgmtBtn = document.querySelector('.nav-item[data-category="학급운영"]');
+        if (classMgmtBtn) {
+            classMgmtBtn.style.display = 'flex';
+        }
     }
 
     // Filter by approval status

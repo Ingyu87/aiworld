@@ -108,6 +108,11 @@ studentForm.addEventListener('submit', async (e) => {
             throw new Error('학생 계정이 아닙니다. 교사 탭에서 로그인해주세요.');
         }
 
+        // Update last login time
+        await db.collection('users').doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         // Success - redirect to main page
         console.log('Student login successful:', userData);
         window.location.href = 'index.html';

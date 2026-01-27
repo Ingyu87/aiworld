@@ -43,23 +43,37 @@ auth.onAuthStateChanged(async (user) => {
     initializeCheckin();
 });
 
+// 초기화 여부 플래그
+let isInitialized = false;
+
 // 초기화
 function initializeCheckin() {
-    // Step 1: 감정 선택
-    document.querySelectorAll('.emotion-card').forEach(card => {
-        card.addEventListener('click', async function () {
-            const emotion = this.dataset.emotion;
-            const emotionName = this.dataset.name;
-            const emotionEmoji = this.querySelector('.emotion-icon').textContent;
+    if (isInitialized) return;
+    isInitialized = true;
 
-            checkinData.emotion = emotion;
-            checkinData.emotionName = emotionName;
-            checkinData.emotionEmoji = emotionEmoji;
+    console.log('Initializing emotional check-in...');
 
-            // 다음 단계로
-            await goToStep(2);
+    // Step 1: 감정 선택 (이벤트 위임)
+    const emotionsGrid = document.querySelector('.emotions-grid');
+    if (emotionsGrid) {
+        emotionsGrid.addEventListener('click', async (e) => {
+            const card = e.target.closest('.emotion-card');
+            if (card) {
+                const emotion = card.dataset.emotion;
+                const emotionName = card.dataset.name;
+                const emotionEmoji = card.querySelector('.emotion-icon').textContent;
+
+                console.log(`Emotion selected: ${emotionName} (${emotion})`);
+
+                checkinData.emotion = emotion;
+                checkinData.emotionName = emotionName;
+                checkinData.emotionEmoji = emotionEmoji;
+
+                // 다음 단계로
+                await goToStep(2);
+            }
         });
-    });
+    }
 
     // Step 2: 단어 선택 다음 버튼
     document.getElementById('btn-words-next').addEventListener('click', () => {

@@ -277,6 +277,14 @@ const termsBackdrop = document.getElementById('terms-backdrop');
 // Render Functions
 // ===========================
 function renderApps(category = "전체") {
+    // Update active tab button
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.category === category) {
+            btn.classList.add('active');
+        }
+    });
+
     // Clear grid
     appGrid.innerHTML = '';
 

@@ -107,10 +107,16 @@ studentForm.addEventListener('submit', async (e) => {
         const user = userCredential.user;
 
         // 4. Update last login timestamp and increment login count
-        await db.collection('users').doc(userDoc.id).update({
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-            loginCount: firebase.firestore.FieldValue.increment(1)
-        });
+        try {
+            await db.collection('users').doc(userDoc.id).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                loginCount: firebase.firestore.FieldValue.increment(1)
+            });
+            console.log('Login stats updated successfully');
+        } catch (updateError) {
+            console.error('Failed to update login stats:', updateError);
+            // Continue anyway - don't block login
+        }
 
         // Success - redirect to main page
         console.log('Student login successful:', userData);

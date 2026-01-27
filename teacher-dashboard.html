@@ -12,6 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Quicksand:wght@600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="teacher-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -23,6 +24,10 @@
                 <span class="header-subtitle">교사 대시보드</span>
             </div>
             <div class="header-right">
+                <a href="index.html" class="secondary-button"
+                    style="text-decoration: none; display: inline-flex; align-items: center; margin-right: 1rem; font-size: 0.9rem; padding: 0.5rem 1rem;">
+                    🏠 웹앱으로 이동
+                </a>
                 <span class="user-info" id="teacher-name">교사</span>
                 <button class="logout-button" id="logout-btn">로그아웃</button>
             </div>
@@ -100,6 +105,12 @@
                     </div>
                 </div>
 
+                <!-- Chart Container -->
+                <div class="chart-container"
+                    style="background: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <canvas id="usageChart"></canvas>
+                </div>
+
                 <!-- Statistics Table -->
                 <div class="table-container">
                     <table class="stats-table">
@@ -162,35 +173,24 @@
             <div class="modal-body">
                 <form id="student-form">
                     <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">이름 *</label>
-                            <input type="text" id="student-name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">이메일 *</label>
-                            <input type="email" id="student-email" class="form-input" required>
+                        <div class="form-group" style="width: 100%;">
+                            <label class="form-label">아이디 *</label>
+                            <input type="text" id="student-email" class="form-input" required placeholder="예: student1">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">학년 *</label>
-                            <input type="number" id="student-grade" class="form-input" min="1" max="6" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">반 *</label>
-                            <input type="number" id="student-class" class="form-input" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">번호 *</label>
-                            <input type="number" id="student-number" class="form-input" min="1" required>
-                        </div>
+                    <!-- Hidden fields for Grade/Class/Number (Defaults to 1-1-1) -->
+                    <div class="form-row" style="display: none;">
+                        <input type="number" id="student-grade" class="form-input" value="1">
+                        <input type="number" id="student-class" class="form-input" value="1">
+                        <input type="number" id="student-number" class="form-input" value="1">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">비밀번호 *</label>
-                        <input type="password" id="student-password" class="form-input" minlength="6" required>
-                        <small class="form-hint">6자 이상 입력해주세요</small>
+                        <input type="text" id="student-password" class="form-input" minlength="4" required
+                            placeholder="4자리 숫자 (예: 1234)">
+                        <small class="form-hint">4자리 입력 시 자동으로 뒤에 '00'이 붙어 저장됩니다. (예: 1234 → 123400)</small>
                     </div>
 
                     <div class="error-message" id="modal-error"></div>

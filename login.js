@@ -72,11 +72,16 @@ studentForm.addEventListener('submit', async (e) => {
     hideError(studentError);
 
     const email = document.getElementById('student-email').value.trim();
-    const password = document.getElementById('student-password').value;
+    let password = document.getElementById('student-password').value;
 
     if (!email || !password) {
         showError(studentError, '아이디와 비밀번호를 입력해주세요.');
         return;
+    }
+
+    // Auto-pad 4-digit password
+    if (password.length >= 4 && password.length < 6) {
+        password += '00';
     }
 
     // Convert ID to email format

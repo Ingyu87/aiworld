@@ -316,6 +316,10 @@ async function loadUsageStats() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
+
+            // Filter out teacher logs
+            if (currentTeacher && data.userId === currentTeacher.uid) return;
+
             const key = `${data.userId}_${data.appName}`;
 
             if (!stats[key]) {
@@ -363,6 +367,9 @@ async function loadUsageStats() {
         studentFilter.addEventListener('change', filterStats);
         appFilter.addEventListener('change', filterStats);
 
+        // Render Chart
+        renderChart(statsArray);
+
     } catch (error) {
         console.error('Error loading usage stats:', error);
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">통계를 불러오는 데 실패했습니다.</td></tr>';
@@ -404,6 +411,72 @@ function filterStats() {
             row.style.display = 'none';
         }
     });
+});
+}
+
+// ===========================
+// Chart Rendering
+// ===========================
+let usageChart = null;
+
+function renderChart(statsArray) {
+    const ctx = document.getElementById('usageChart');
+    if (!ctx) return;
+
+    // Aggregate by App
+    const appCounts = {};
+    statsArray.forEach(stat => {
+        appCounts[stat.appName] = (appCounts[stat.appName] || 0) + stat.count;
+    });
+
+    // Sort by count
+    const sortedApps = Object.entries(appCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10); // Top 10
+
+    const labels = sortedApps.map(item => item[0]);
+    const data = sortedApps.map(item => item[1]);
+
+    // Destroy existing chart if any
+    if (usageChart) {
+        usageChart.destroy();
+    }
+
+    usageChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '앱 실행 횟수',
+                data: data,
+                backgroundColor: 'rgba(78, 205, 196, 0.6)',
+                borderColor: 'rgba(78, 205, 196, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: '인기 앱 TOP 10'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
 }
 
 // ===========================
@@ -441,7 +514,7 @@ function openEditModal(studentId, studentData) {
     // Extract ID from email (remove @ingyu-ai-world.com)
     const displayEmail = studentData.email.replace('@ingyu-ai-world.com', '');
 
-    document.getElementById('student-name').value = studentData.name;
+    // document.getElementById('student-name').value = studentData.name; // Removed field
     document.getElementById('student-email').value = displayEmail;
     document.getElementById('student-grade').value = studentData.grade;
     document.getElementById('student-class').value = studentData.class;
@@ -468,12 +541,13 @@ studentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     modalError.classList.remove('show');
 
-    const name = document.getElementById('student-name').value.trim();
     const email = document.getElementById('student-email').value.trim();
-    const grade = parseInt(document.getElementById('student-grade').value);
-    const classNum = parseInt(document.getElementById('student-class').value);
-    const number = parseInt(document.getElementById('student-number').value);
-    const password = document.getElementById('student-password').value;
+    const name = email; // Use ID as Name
+    // Default to 1 if hidden/empty
+    const grade = parseInt(document.getElementById('student-grade').value) || 1;
+    const classNum = parseInt(document.getElementById('student-class').value) || 1;
+    const number = parseInt(document.getElementById('student-number').value) || 1;
+    let password = document.getElementById('student-password').value;
 
     try {
         if (editingStudentId) {
@@ -492,6 +566,11 @@ studentForm.addEventListener('submit', async (e) => {
 
             alert('학생 정보가 수정되었습니다.');
         } else {
+            // Auto-pad 4-digit password
+            if (password.length >= 4 && password.length < 6) {
+                password += '00';
+            }
+
             // Create new student
             if (!password || password.length < 6) {
                 throw new Error('비밀번호는 6자 이상이어야 합니다.');

@@ -7,9 +7,17 @@ const apps = window.APPS_DATA || [];
 // Authentication & Current User
 // ===========================
 let currentUser = null;
+let isInitializing = false; // 초기화 중복 방지 플래그
 
 // Check authentication status
 auth.onAuthStateChanged(async (user) => {
+    // 중복 초기화 방지
+    if (isInitializing) {
+        console.log('Already initializing, skipping...');
+        return;
+    }
+    
+    isInitializing = true;
     if (!user) {
         // Not logged in, redirect to login page
         window.location.href = 'login.html';
@@ -119,6 +127,8 @@ fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{metho
         alert('로그인 처리 중 오류가 발생했습니다.');
         // await auth.signOut();
         // window.location.href = 'login.html';
+    } finally {
+        isInitializing = false;
     }
 });
 
@@ -414,11 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
 const aiSafetyModal = document.getElementById('ai-safety-modal');
 const aiAgreeBtn = document.getElementById('ai-agree-btn');
 
-// Check if user has agreed to AI safety guidelines (로그인할 때마다)
+// Check if user has agreed to AI safety guidelines (하루에 한 번만)
 async function checkAIAgreement() {
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:424',message:'checkAIAgreement called',data:{role:currentUser?.role},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-// #endregion
     if (!currentUser) return false;
 
     // 학생만 동의 필요 (교사는 제외)
@@ -426,7 +433,23 @@ fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{metho
         return true;
     }
 
-    // 로그인할 때마다 항상 모달 표시
+    // 오늘 날짜로 localStorage 확인 (하루에 한 번만)
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `ai_safety_agreed_${currentUser.uid}_${today}`;
+    const hasAgreedToday = localStorage.getItem(storageKey);
+
+    if (hasAgreedToday === 'true') {
+        // 오늘 이미 동의했으면 통과
+        return true;
+    }
+
+    // 모달이 이미 표시되어 있는지 확인
+    if (aiSafetyModal && aiSafetyModal.classList.contains('show')) {
+        // 이미 표시되어 있으면 false 반환 (중복 표시 방지)
+        return false;
+    }
+
+    // 오늘 동의하지 않았으면 모달 표시
     showAISafetyModal();
     return false;
 }
@@ -448,13 +471,30 @@ function hideAISafetyModal() {
 
 // Handle agreement button click
 if (aiAgreeBtn) {
+    let isProcessing = false; // 중복 클릭 방지
+    
     aiAgreeBtn.addEventListener('click', async () => {
         if (!currentUser) return;
-
+        
+        // 중복 클릭 방지
+        if (isProcessing) {
+            console.log('Already processing agreement...');
+            return;
+        }
+        
+        isProcessing = true;
+        
         try {
-            // Firestore에 기록 (통계 및 감사 목적)
+            // 오늘 날짜로 localStorage에 동의 기록 (하루 동안 다시 표시하지 않음)
             const today = new Date().toISOString().split('T')[0];
-            await db.collection('user_agreements').doc(currentUser.uid).set({
+            const storageKey = `ai_safety_agreed_${currentUser.uid}_${today}`;
+            localStorage.setItem(storageKey, 'true');
+            
+            // 모달 즉시 닫기
+            hideAISafetyModal();
+
+            // Firestore에 기록 (비동기, 실패해도 계속 진행)
+            db.collection('user_agreements').doc(currentUser.uid).set({
                 userId: currentUser.uid,
                 userName: currentUser.name,
                 agreedToAISafety: true,
@@ -463,15 +503,22 @@ if (aiAgreeBtn) {
                 agreementCount: firebase.firestore.FieldValue.increment(1)
             }, { merge: true }).catch(err => console.error("Agreement log error:", err));
 
-            // 감정 체크인 페이지로 이동
-            hideAISafetyModal();
+            // 감정 체크인 페이지로 즉시 이동
             window.location.href = 'emotional-checkin.html';
 
         } catch (error) {
             console.error('Agreement error:', error);
-            // 에러가 나도 감정 체크인 페이지로 이동
+            // localStorage는 성공했으므로 계속 진행
+            const today = new Date().toISOString().split('T')[0];
+            const storageKey = `ai_safety_agreed_${currentUser.uid}_${today}`;
+            localStorage.setItem(storageKey, 'true');
             hideAISafetyModal();
             window.location.href = 'emotional-checkin.html';
+        } finally {
+            // 페이지 이동이 실패할 경우를 대비해 플래그 리셋 (타임아웃)
+            setTimeout(() => {
+                isProcessing = false;
+            }, 1000);
         }
     });
 }

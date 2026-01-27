@@ -400,8 +400,8 @@ async function completeCheckin() {
 
         console.log('Emotional check-in saved successfully');
 
-        // 메인 페이지로 이동
-        window.location.href = 'index.html';
+        // 메인 페이지로 이동 (감정 체크인 완료 표시)
+        window.location.href = 'index.html?fromCheckin=true';
 
     } catch (error) {
         console.error('Error saving check-in:', error);

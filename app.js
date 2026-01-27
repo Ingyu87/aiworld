@@ -16,6 +16,9 @@ auth.onAuthStateChanged(async (user) => {
         return;
     }
 
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:82',message:'Auth state changed',data:{uid:user.uid,role:userData.role},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+// #endregion
     try {
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
@@ -81,18 +84,30 @@ auth.onAuthStateChanged(async (user) => {
 
         // 3. Check AI Agreement (Student only)
         if (currentUser.role === 'student') {
-            const agreed = await checkAIAgreement();
-            if (agreed) {
+            // URL 파라미터 확인 (감정 체크인 완료 후 돌아온 경우)
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromCheckin = urlParams.get('fromCheckin') === 'true';
+            
+            if (fromCheckin) {
+                // 감정 체크인 완료 후 돌아온 경우 - 바로 앱 목록 표시 (안전수칙 표시 안 함)
+                // URL 파라미터 제거
+                window.history.replaceState({}, document.title, window.location.pathname);
                 renderApps("창체");
             } else {
-                // Do NOT render apps yet. Wait for agreement.
-                console.log('Waiting for AI Safety Agreement...');
-                const appGridEl = document.getElementById('app-grid');
-                const sectionTitleEl = document.getElementById('section-title');
-                const appCountEl = document.getElementById('app-count');
-                if (appGridEl) appGridEl.innerHTML = '';
-                if (sectionTitleEl) sectionTitleEl.textContent = 'AI 안전 수칙 동의 필요';
-                if (appCountEl) appCountEl.textContent = '';
+                // 일반 로그인 - 안전수칙 확인
+                const agreed = await checkAIAgreement();
+                if (agreed) {
+                    renderApps("창체");
+                } else {
+                    // Do NOT render apps yet. Wait for agreement.
+                    console.log('Waiting for AI Safety Agreement...');
+                    const appGridEl = document.getElementById('app-grid');
+                    const sectionTitleEl = document.getElementById('section-title');
+                    const appCountEl = document.getElementById('app-count');
+                    if (appGridEl) appGridEl.innerHTML = '';
+                    if (sectionTitleEl) sectionTitleEl.textContent = 'AI 안전 수칙 동의 필요';
+                    if (appCountEl) appCountEl.textContent = '';
+                }
             }
         } else {
             // Teacher or others
@@ -144,6 +159,9 @@ const termsBackdrop = document.getElementById('terms-backdrop');
 // Render Functions
 // ===========================
 function renderApps(category = "전체") {
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:195',message:'renderApps called',data:{category},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+// #endregion
     if (!appGrid) return;
 
     // Update active tab button
@@ -398,6 +416,9 @@ const aiAgreeBtn = document.getElementById('ai-agree-btn');
 
 // Check if user has agreed to AI safety guidelines (로그인할 때마다)
 async function checkAIAgreement() {
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/e290a389-4d17-4bde-9005-c39371110250',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app.js:424',message:'checkAIAgreement called',data:{role:currentUser?.role},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+// #endregion
     if (!currentUser) return false;
 
     // 학생만 동의 필요 (교사는 제외)

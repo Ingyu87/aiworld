@@ -1,6 +1,8 @@
 // Vercel Serverless Function: 감정 단어 생성
 // 경로: /api/generate-words
 
+import { generateGeminiText } from './_gemini.js';
+
 export default async function handler(req, res) {
     // CORS 설정
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,10 +25,6 @@ export default async function handler(req, res) {
         // Gemini API 키 (환경변수에서 가져옴)
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured');
-        }
-
         // Gemini API 호출
         const prompt = `
 당신은 초등학생의 감정을 이해하고 도와주는 친절한 선생님입니다.
@@ -44,33 +42,14 @@ export default async function handler(req, res) {
 예시: ["신나는", "뿌듯한", "설레는", "편안한", "즐거운", "행복한", "기쁜", "상쾌한", "흐뭇한", "만족스러운"]
 `;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.9,
-                        maxOutputTokens: 200,
-                    }
-                })
+        const generatedText = await generateGeminiText({
+            apiKey: GEMINI_API_KEY,
+            prompt,
+            generationConfig: {
+                temperature: 0.9,
+                maxOutputTokens: 200,
             }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const generatedText = data.candidates[0].content.parts[0].text;
+        });
 
         // JSON 파싱 (Gemini가 가끔 마크다운으로 감싸서 반환하므로 처리)
         let words;

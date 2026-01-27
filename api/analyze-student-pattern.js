@@ -1,6 +1,8 @@
 // Vercel Serverless Function: 개별 학생 감정 패턴 분석
 // 경로: /api/analyze-student-pattern
 
+import { generateGeminiText } from './_gemini.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -22,10 +24,6 @@ export default async function handler(req, res) {
         } = req.body;
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured');
-        }
 
         // 학생 데이터 요약
         const studentSummary = generateStudentSummary(studentName, checkinHistory, period);
@@ -77,33 +75,14 @@ JSON 형식으로 응답:
 초등학생의 발달 단계를 고려하여 작성해주세요.
 `;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 800,
-                    }
-                })
+        const generatedText = await generateGeminiText({
+            apiKey: GEMINI_API_KEY,
+            prompt,
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 800,
             }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const generatedText = data.candidates[0].content.parts[0].text;
+        });
 
         let analysis;
         try {

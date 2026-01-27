@@ -1,6 +1,8 @@
 // Vercel Serverless Function: AI 조언 생성
 // 경로: /api/generate-advice
 
+import { generateGeminiText } from './_gemini.js';
+
 export default async function handler(req, res) {
     // CORS 설정
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,10 +21,6 @@ export default async function handler(req, res) {
         const { emotion, emotionName, selectedWords, reason } = req.body;
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured');
-        }
 
         // Gemini API 호출
         const prompt = `
@@ -61,33 +59,14 @@ JSON 형식으로만 응답:
 다른 설명 없이 JSON만 반환해주세요.
 `;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.8,
-                        maxOutputTokens: 500,
-                    }
-                })
+        const generatedText = await generateGeminiText({
+            apiKey: GEMINI_API_KEY,
+            prompt,
+            generationConfig: {
+                temperature: 0.8,
+                maxOutputTokens: 500,
             }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const generatedText = data.candidates[0].content.parts[0].text;
+        });
 
         // JSON 파싱
         let advice;

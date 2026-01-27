@@ -1,6 +1,8 @@
 // Vercel Serverless Function: 학급 감정 분석
 // 경로: /api/analyze-class-emotions
 
+import { generateGeminiText } from './_gemini.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -23,10 +25,6 @@ export default async function handler(req, res) {
         } = req.body;
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured');
-        }
 
         // 데이터 요약 생성
         const dataSummary = generateDataSummary(emotionData, studentCount, checkinRate, period);
@@ -81,33 +79,14 @@ JSON 형식으로 응답:
 초등학교 교사가 이해하기 쉽고 실천 가능한 내용으로 작성해주세요.
 `;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1000,
-                    }
-                })
+        const generatedText = await generateGeminiText({
+            apiKey: GEMINI_API_KEY,
+            prompt,
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1000,
             }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const generatedText = data.candidates[0].content.parts[0].text;
+        });
 
         let analysis;
         try {

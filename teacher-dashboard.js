@@ -568,10 +568,6 @@ studentForm.addEventListener('submit', async (e) => {
 
     const email = document.getElementById('student-email').value.trim();
     const name = email; // Use ID as Name
-    // Default to 1 if hidden/empty
-    const grade = parseInt(document.getElementById('student-grade').value) || 1;
-    const classNum = parseInt(document.getElementById('student-class').value) || 1;
-    const number = parseInt(document.getElementById('student-number').value) || 1;
     let password = document.getElementById('student-password').value;
 
     try {
@@ -583,26 +579,18 @@ studentForm.addEventListener('submit', async (e) => {
             await db.collection('users').doc(editingStudentId).update({
                 name,
                 email: fullEmail,
-                grade,
-                class: classNum,
-                number,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
             alert('학생 정보가 수정되었습니다.');
         } else {
-            // Auto-pad 4-digit password
-            if (password.length >= 4 && password.length < 6) {
-                password += '00';
-            }
-
             // Create new student
-            if (!password || password.length < 6) {
-                throw new Error('비밀번호는 6자 이상이어야 합니다.');
+            if (!password || password.length !== 4 || isNaN(password)) {
+                throw new Error('비밀번호는 숫자 4자리여야 합니다.');
             }
 
             // Convert ID to email format
-            const fullEmail = email.includes('@') ? email : `${email} @ingyu-ai - world.com`;
+            const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
 
             // Create Firebase Auth user with a fixed internal password
             // The real security check is done against Firestore's simplePassword
@@ -615,13 +603,10 @@ studentForm.addEventListener('submit', async (e) => {
                 email: fullEmail,
                 name,
                 role: 'student',
-                simplePassword: password, // Store password for simplified management
+                simplePassword: password, // Store 4-digit password for simplified management
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            // Sign out the newly created user (since we're logged in as teacher)
-            await auth.updateCurrentUser(currentTeacher.uid);
 
             alert('학생이 추가되었습니다.');
         }

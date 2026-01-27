@@ -111,23 +111,6 @@ studentForm.addEventListener('submit', async (e) => {
         const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
         const user = userCredential.user;
 
-        if (!userDoc.exists) {
-            throw new Error('사용자 정보를 찾을 수 없습니다.');
-        }
-
-        const userData = userDoc.data();
-
-        if (userData.role !== 'student') {
-            await auth.signOut();
-            throw new Error('학생 계정이 아닙니다. 교사 탭에서 로그인해주세요.');
-        }
-
-        // Update last login time and increment login count
-        await db.collection('users').doc(user.uid).update({
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-            loginCount: firebase.firestore.FieldValue.increment(1)
-        });
-
         // Success - redirect to main page
         console.log('Student login successful:', userData);
         window.location.href = 'index.html';

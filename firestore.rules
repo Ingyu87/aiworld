@@ -3,54 +3,37 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ==================================================
-    // Helper Functions
-    // ==================================================
-    
-    // Check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-    
-    // Check if the user is accessing their own document
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-    
-    // Check if the user is a teacher (reads role from their user doc)
-    function isTeacher() {
-      return isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
-    }
-
-    // ==================================================
-    // Collection Rules
+    // Shim Mode Rules (Relaxed for No-Admin-SDK Flow)
     // ==================================================
 
     // 1. Users Collection
-    // - Creation: Anyone (Sign up)
-    // - Read: Owner or Teacher (Teacher needs to list students)
-    // - Write: Owner (Update profile) or Teacher (Reset password/edit)
+    // - Read: Public (Required for login.js to check simplePassword before auth)
+    // - Write: Public (Required for signup.js and account recovery)
     match /users/{userId} {
-      allow create: if isAuthenticated();
-      allow read: if isOwner(userId) || isTeacher();
-      allow write: if isOwner(userId) || isTeacher();
+      allow read, write: if true;
     }
 
-    // 2. Usage Logs
-    // - Create: Any authenticated user (Logging clicks)
-    // - Read: Teachers only (For dashboard stats)
-    // - Delete: Teachers only (When deleting a student)
-    match /usage_logs/{logId} {
-      allow create: if isAuthenticated();
-      allow read, delete: if isTeacher();
+    // 2. App Approvals
+    // - Read: Public (Students need to see apps)
+    // - Write: Public (Teachers manage approvals)
+    match /app_approvals/{document=**} {
+      allow read, write: if true;
     }
 
-    // 3. App Approvals (NEW)
-    // - Read: Everyone (Students need to filter apps)
-    // - Write: Teachers only (Toggle approval)
-    match /app_approvals/{appId} {
-      allow read: if isAuthenticated();
-      allow write: if isTeacher();
+    // 3. Usage Logs
+    // - Read/Write: Public
+    match /usage_logs/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // 4. Agreements
+    match /agreements/{document=**} {
+        allow read, write: if true;
+    }
+    
+    // Default: Open for development/shim
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

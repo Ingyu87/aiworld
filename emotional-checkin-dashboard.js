@@ -36,6 +36,42 @@ async function initEmotionsTab() {
         generateAIAnalysis();
     });
 
+    // 감정 기록 초기화 버튼
+    const resetEmotionsBtn = document.getElementById('reset-emotions-btn');
+    if (resetEmotionsBtn) {
+        resetEmotionsBtn.addEventListener('click', async () => {
+            if (!confirm('모든 학생의 감정 출석 기록을 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+
+            try {
+                resetEmotionsBtn.disabled = true;
+                const originalText = resetEmotionsBtn.innerHTML;
+                resetEmotionsBtn.innerHTML = '<span>초기화 중...</span>';
+
+                const db = firebase.firestore();
+                const snapshot = await db.collection('emotional_checkins').get();
+                const batch = db.batch();
+
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                alert('감정 기록이 초기화되었습니다.');
+
+                resetEmotionsBtn.innerHTML = originalText;
+                resetEmotionsBtn.disabled = false;
+
+                // 데이터 다시 로드
+                await loadEmotionData();
+
+            } catch (error) {
+                console.error('Error resetting emotion data:', error);
+                alert('기록 초기화에 실패했습니다.');
+                resetEmotionsBtn.disabled = false;
+            }
+        });
+    }
+
     // 데이터 로드
     await loadEmotionData();
 }

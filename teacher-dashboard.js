@@ -603,6 +603,44 @@ deleteConfirmBtn.addEventListener('click', async () => {
 });
 
 // ===========================
+// Reset Usage Statistics
+// ===========================
+const resetUsageBtn = document.getElementById('reset-usage-btn');
+if (resetUsageBtn) {
+    resetUsageBtn.addEventListener('click', async () => {
+        if (!confirm('모든 학생의 앱 사용 기록을 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+
+        try {
+            resetUsageBtn.disabled = true;
+            const submitText = resetUsageBtn.querySelector('.button-text');
+            const originalText = submitText.textContent;
+            submitText.textContent = '초기화 중...';
+
+            const snapshot = await db.collection('usage_logs').get();
+            const batch = db.batch();
+            
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+
+            await batch.commit();
+            alert('사용 기록이 초기화되었습니다.');
+            
+            submitText.textContent = originalText;
+            resetUsageBtn.disabled = false;
+            
+            // Reload stats
+            loadUsageStats();
+
+        } catch (error) {
+            console.error('Error resetting usage stats:', error);
+            alert('기록 초기화에 실패했습니다.');
+            resetUsageBtn.disabled = false;
+        }
+    });
+}
+
+// ===========================
 // Tab Management
 // ===========================
 const tabs = document.querySelectorAll('.tab-button');

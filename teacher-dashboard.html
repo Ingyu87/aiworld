@@ -51,10 +51,16 @@
                         <h2 class="section-title">학생 관리</h2>
                         <p class="section-subtitle" id="student-count">0명의 학생</p>
                     </div>
-                    <button class="primary-button" id="add-student-btn">
-                        <span class="button-icon">➕</span>
-                        <span class="button-text">학생 추가</span>
-                    </button>
+                    <div class="actions">
+                        <button class="danger-button" id="reset-usage-btn" style="margin-right: 0.5rem;">
+                            <span class="button-icon">🗑️</span>
+                            <span class="button-text">사용 기록 초기화</span>
+                        </button>
+                        <button class="primary-button" id="add-student-btn">
+                            <span class="button-icon">➕</span>
+                            <span class="button-text">학생 추가</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Students Table -->
@@ -153,6 +159,10 @@
                         <p class="section-subtitle" id="emotion-summary">학생들의 감정 상태를 확인하세요</p>
                     </div>
                     <div class="stats-filters">
+                        <button class="danger-button" id="reset-emotions-btn" style="margin-right: 1rem;">
+                            <span class="button-icon">🗑️</span>
+                            <span class="button-text">감정 기록 초기화</span>
+                        </button>
                         <select class="filter-select" id="emotion-period-filter">
                             <option value="today">오늘</option>
                             <option value="week" selected>이번 주</option>

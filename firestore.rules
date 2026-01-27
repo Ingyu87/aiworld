@@ -2,38 +2,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // ==================================================
-    // Shim Mode Rules (Relaxed for No-Admin-SDK Flow)
-    // ==================================================
-
-    // 1. Users Collection
-    // - Read: Public (Required for login.js to check simplePassword before auth)
-    // - Write: Public (Required for signup.js and account recovery)
+    // Helper function to check if user is a teacher
+    function isTeacher() {
+      return request.auth != null && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Users collection
     match /users/{userId} {
-      allow read, write: if true;
-    }
-
-    // 2. App Approvals
-    // - Read: Public (Students need to see apps)
-    // - Write: Public (Teachers manage approvals)
-    match /app_approvals/{document=**} {
-      allow read, write: if true;
-    }
-
-    // 3. Usage Logs
-    // - Read/Write: Public
-    match /usage_logs/{document=**} {
-      allow read, write: if true;
+      // Anyone can read user documents (needed for login shim to check passwords)
+      allow read: if true;
+      
+      // Only the user themselves or a teacher can update
+      allow update: if isAuthenticated() && 
+                      (request.auth.uid == userId || isTeacher());
+      
+      // Only teachers can create new users
+      allow create: if isTeacher();
+      
+      // Only teachers can delete users
+      allow delete: if isTeacher();
     }
     
-    // 4. Agreements
-    match /agreements/{document=**} {
-        allow read, write: if true;
+    // App approvals - only teachers can manage
+    match /app_approvals/{appId} {
+      allow read: if isAuthenticated();
+      allow write: if isTeacher();
     }
     
-    // Default: Open for development/shim
-    match /{document=**} {
-      allow read, write: if true;
+    // Usage logs - anyone authenticated can create, only teachers can read
+    match /usage_logs/{logId} {
+      allow read: if isTeacher();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Logs should not be modified
+    }
+    
+    // User agreements - users can read/write their own, teachers can read all
+    match /user_agreements/{userId} {
+      allow read: if isAuthenticated() && 
+                    (request.auth.uid == userId || isTeacher());
+      allow write: if isAuthenticated() && request.auth.uid == userId;
     }
   }
 }

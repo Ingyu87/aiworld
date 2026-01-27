@@ -82,7 +82,7 @@ JSON 형식으로 응답:
 `;
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: {
@@ -119,7 +119,7 @@ JSON 형식으로 응답:
             }
         } catch (parseError) {
             console.error('JSON parse error:', generatedText);
-            analysis = getDefaultAnalysis(period);
+            throw new Error('Failed to parse AI response');
         }
 
         return res.status(200).json({
@@ -131,10 +131,9 @@ JSON 형식으로 응답:
     } catch (error) {
         console.error('Error analyzing emotions:', error);
 
-        return res.status(200).json({
-            success: true,
-            analysis: getDefaultAnalysis(req.body.period),
-            fallback: true
+        return res.status(500).json({
+            success: false,
+            error: error.message
         });
     }
 }
@@ -153,12 +152,16 @@ function generateDataSummary(emotionData, studentCount, checkinRate, period) {
         sad: '슬픔/우울',
         angry: '화남/짜증',
         anxious: '불안/걱정',
-        calm: '평온/무덤덤'
+        calm: '평온/무덤덤',
+        disappointed: '실망/좌절',
+        tired: '피곤/지침',
+        surprised: '놀람/당황'
     };
 
     for (const [emotion, count] of Object.entries(emotionData)) {
         const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-        summary += `- ${emotionNames[emotion]}: ${count}회 (${percentage}%)\n`;
+        const emotionName = emotionNames[emotion] || emotion;
+        summary += `- ${emotionName}: ${count}명 (${percentage}%)\n`;
     }
 
     return summary;
@@ -166,28 +169,10 @@ function generateDataSummary(emotionData, studentCount, checkinRate, period) {
 
 function getPeriodName(period) {
     const names = {
-        today: '오늘',
-        week: '이번 주',
-        month: '이번 달',
-        quarter: '이번 분기'
+        'today': '오늘',
+        'week': '이번 주',
+        'month': '이번 달',
+        'quarter': '이번 학기'
     };
-    return names[period] || '기간';
-}
-
-function getDefaultAnalysis(period) {
-    return {
-        overview: `${getPeriodName(period)} 학급의 감정 상태를 분석했습니다. 전반적으로 안정적인 분위기를 유지하고 있습니다.`,
-        patterns: [
-            "학생들의 감정 표현이 다양하게 나타나고 있습니다.",
-            "긍정적 감정과 부정적 감정의 균형을 유지하고 있습니다.",
-            "대부분의 학생들이 감정 체크인에 적극적으로 참여하고 있습니다."
-        ],
-        suggestions: [
-            "학생들과의 개별 대화 시간을 늘려보세요.",
-            "긍정적인 학급 분위기 조성을 위한 활동을 계획해보세요.",
-            "부정적 감정을 표현한 학생들에게 관심을 가져주세요.",
-            "감정 표현을 격려하는 활동을 지속해주세요."
-        ],
-        positives: "학생들이 자신의 감정을 솔직하게 표현하고 있다는 것은 매우 긍정적입니다. 안전한 학급 분위기가 형성되어 있습니다."
-    };
+    return names[period] || period;
 }

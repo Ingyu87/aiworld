@@ -53,27 +53,28 @@ function initializeCheckin() {
 
     console.log('Initializing emotional check-in...');
 
-    // Step 1: 감정 선택 (이벤트 위임)
-    const emotionsGrid = document.querySelector('.emotions-grid');
-    if (emotionsGrid) {
-        emotionsGrid.addEventListener('click', async (e) => {
-            const card = e.target.closest('.emotion-card');
-            if (card) {
-                const emotion = card.dataset.emotion;
-                const emotionName = card.dataset.name;
-                const emotionEmoji = card.querySelector('.emotion-icon').textContent;
+    // Step 1: 감정 선택 (Global Event Delegation)
+    // 문서 전체에 이벤트를 걸어서 확실하게 잡음
+    document.body.addEventListener('click', async (e) => {
+        const card = e.target.closest('.emotion-card');
+        if (card) {
+            // 현재 단계가 1단계일 때만 동작하도록 제한 (선택적)
+            if (currentStep !== 1) return;
 
-                console.log(`Emotion selected: ${emotionName} (${emotion})`);
+            const emotion = card.dataset.emotion;
+            const emotionName = card.dataset.name;
+            const emotionEmoji = card.querySelector('.emotion-icon').textContent;
 
-                checkinData.emotion = emotion;
-                checkinData.emotionName = emotionName;
-                checkinData.emotionEmoji = emotionEmoji;
+            console.log(`Emotion selected: ${emotionName} (${emotion})`);
 
-                // 다음 단계로
-                await goToStep(2);
-            }
-        });
-    }
+            checkinData.emotion = emotion;
+            checkinData.emotionName = emotionName;
+            checkinData.emotionEmoji = emotionEmoji;
+
+            // 다음 단계로
+            await goToStep(2);
+        }
+    });
 
     // Step 2: 단어 선택 다음 버튼
     document.getElementById('btn-words-next').addEventListener('click', () => {

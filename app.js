@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const aiSafetyModal = document.getElementById('ai-safety-modal');
 const aiAgreeBtn = document.getElementById('ai-agree-btn');
 
-// Check if user has agreed to AI safety guidelines (하루에 한 번만)
+// Check if user has agreed to AI safety guidelines (세션당 한 번)
 async function checkAIAgreement() {
     if (!currentUser) return false;
 
@@ -432,13 +432,11 @@ async function checkAIAgreement() {
         return true;
     }
 
-    // 오늘 날짜로 localStorage 확인 (하루에 한 번만)
-    const today = new Date().toISOString().split('T')[0];
-    const storageKey = `ai_safety_agreed_${currentUser.uid}_${today}`;
-    const hasAgreedToday = localStorage.getItem(storageKey);
+    // 세션에서 이미 동의했는지 확인
+    const sessionKey = `ai_safety_agreed_session_${currentUser.uid}`;
+    const hasAgreedSession = sessionStorage.getItem(sessionKey);
 
-    if (hasAgreedToday === 'true') {
-        // 오늘 이미 동의했으면 통과
+    if (hasAgreedSession === 'true') {
         return true;
     }
 
@@ -484,7 +482,11 @@ if (aiAgreeBtn) {
         isProcessing = true;
         
         try {
-            // 오늘 날짜로 localStorage에 동의 기록 (하루 동안 다시 표시하지 않음)
+            // 세션 동안 다시 표시하지 않음
+            const sessionKey = `ai_safety_agreed_session_${currentUser.uid}`;
+            sessionStorage.setItem(sessionKey, 'true');
+
+            // 기록용 localStorage (통계/감사 목적)
             const today = new Date().toISOString().split('T')[0];
             const storageKey = `ai_safety_agreed_${currentUser.uid}_${today}`;
             localStorage.setItem(storageKey, 'true');

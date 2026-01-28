@@ -89,6 +89,41 @@
                         <input type="hidden" id="signup-class" value="1">
                         <input type="hidden" id="signup-number" value="1">
 
+                        <!-- Consent Checkboxes -->
+                        <div class="consent-section"
+                            style="margin-top: 1.5rem; text-align: left; padding: 1rem; background-color: rgba(255,255,255,0.5); border-radius: 8px;">
+                            <h4
+                                style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--text-dark); border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.5rem;">
+                                개인정보 수집 및 보호자 동의 (필수)</h4>
+
+                            <div class="checkbox-group"
+                                style="margin-bottom: 0.4rem; display: flex; align-items: flex-start; gap: 8px;">
+                                <input type="checkbox" id="consent-privacy" required style="margin-top: 4px;">
+                                <label for="consent-privacy"
+                                    style="font-size: 0.9rem; color: var(--text-dark); cursor: pointer; line-height: 1.4;">
+                                    (필수) 개인정보 수집 및 이용에 동의합니다.
+                                </label>
+                            </div>
+
+                            <div class="checkbox-group"
+                                style="margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 8px;">
+                                <input type="checkbox" id="consent-guardian" required style="margin-top: 4px;">
+                                <label for="consent-guardian"
+                                    style="font-size: 0.9rem; color: var(--text-dark); cursor: pointer; line-height: 1.4;">
+                                    (필수) (만 14세 미만인 경우) 학교 가정통신문 등을 통해 보호자 동의를 완료하였습니다.
+                                </label>
+                            </div>
+
+                            <div class="download-section"
+                                style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.1);">
+                                <a href="개인정보활용동의서.pdf" download class="download-link"
+                                    style="font-size: 0.85rem; color: var(--primary-teal); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                                    <span>📄</span>
+                                    <span>개인정보 처리 동의서 양식 다운로드 (PDF)</span>
+                                </a>
+                            </div>
+                        </div>
+
                         <button type="submit" class="submit-button" style="margin-top: 2rem;">
                             <span class="button-text">회원가입 완료</span>
                             <span class="button-icon">→</span>
@@ -138,9 +173,11 @@
             </div>
             <div class="modal-body">
                 <div class="privacy-content">
-                    <p><strong>ingyu's AI world</strong> (이하 본 서비스) 이용약관에 오신 것을 환영합니다. 본 약관은 서비스 이용에 관한 기본적인 사항을 정하고 있습니다.</p>
+                    <p><strong>ingyu's AI world</strong> (이하 본 서비스) 이용약관에 오신 것을 환영합니다. 본 약관은 서비스 이용에 관한 기본적인 사항을 정하고
+                        있습니다.</p>
                     <h4>제1조 (목적)</h4>
-                    <p>본 약관은 ingyu's AI world(이하 "서비스")가 제공하는 교육용 AI 웹앱 자료집 서비스의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                    <p>본 약관은 ingyu's AI world(이하 "서비스")가 제공하는 교육용 AI 웹앱 자료집 서비스의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을
+                        규정함을 목적으로 합니다.</p>
                     <h4>제2조 (서비스의 제공)</h4>
                     <p>① 본 서비스는 초등학생 대상의 AI 기반 교육용 웹앱을 제공합니다.</p>
                     <p>② 제공되는 서비스의 종류는 다음과 같습니다:</p>
@@ -202,9 +239,11 @@
             </div>
             <div class="modal-body">
                 <div class="privacy-content">
-                    <p><strong>ingyu's AI world</strong> (이하 본 서비스)은(는) 개인정보 보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
+                    <p><strong>ingyu's AI world</strong> (이하 본 서비스)은(는) 개인정보 보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을
+                        신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
                     <h4>제1조 (개인정보의 처리 목적)</h4>
-                    <p>본 서비스는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
+                    <p>본 서비스는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법
+                        제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
                     <ol>
                         <li>학생 회원 가입 및 관리: 학급 구성원 식별, 학습 진도율 확인, 교사의 피드백 제공</li>
                         <li>서비스 제공: 학습 콘텐츠 제공, 과제 제출 및 기록 저장, 학습 이력 관리</li>
@@ -223,7 +262,8 @@
                         <li>수집하지 않는 항목: 주민등록번호, 주소, 전화번호, 이메일 등 불필요한 민감 정보</li>
                     </ol>
                     <h4>제4조 (만 14세 미만 아동의 개인정보 처리에 관한 사항)</h4>
-                    <p>① 본 서비스는 만 14세 미만 아동의 개인정보를 처리하기 위하여 가입 단계 또는 학기 초 학교 가정통신문(개인정보 수집·이용 동의서)을 통하여 법정대리인의 동의를 받습니다.</p>
+                    <p>① 본 서비스는 만 14세 미만 아동의 개인정보를 처리하기 위하여 가입 단계 또는 학기 초 학교 가정통신문(개인정보 수집·이용 동의서)을 통하여 법정대리인의 동의를 받습니다.
+                    </p>
                     <p>② 법정대리인이 동의하지 않는 경우, 해당 아동은 서비스 가입 및 이용이 제한될 수 있습니다.</p>
                     <h4>제5조 (개인정보의 파기 절차 및 방법)</h4>
                     <p>① 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
@@ -232,14 +272,16 @@
                     <p>본 서비스는 개인정보 보호법 제29조에 따라 다음과 같이 안전성 확보에 필요한 기술적/관리적 및 물리적 조치를 하고 있습니다.</p>
                     <ol>
                         <li>비밀번호 암호화: 이용자의 비밀번호는 일방향 암호화(Hash) 되어 저장 및 관리되며, 개발자(관리자)도 알 수 없습니다.</li>
-                        <li>해킹 등에 대비한 기술적 대책: 보안 인증을 획득한 전문 클라우드 플랫폼(Google Firebase / AWS / Vercel 등)을 기반으로 운영되며, 전 구간 보안 통신(HTTPS)을 사용하여 데이터를 암호화하여 전송합니다.</li>
+                        <li>해킹 등에 대비한 기술적 대책: 보안 인증을 획득한 전문 클라우드 플랫폼(Google Firebase / AWS / Vercel 등)을 기반으로 운영되며, 전 구간
+                            보안 통신(HTTPS)을 사용하여 데이터를 암호화하여 전송합니다.</li>
                         <li>개인정보 취급 직원의 최소화: 개인정보를 처리하는 담당자를 개발 교사 1인으로 지정하여 접근 권한을 관리합니다.</li>
                     </ol>
                     <h4>제7조 (정보주체와 법정대리인의 권리·의무 및 행사방법)</h4>
                     <p>① 정보주체(학생) 및 법정대리인은 언제든지 개인정보 열람·정정·삭제·처리정지 요구 등의 권리를 행사할 수 있습니다.</p>
                     <p>② 권리 행사는 서비스 내 [회원탈퇴] 기능을 통하여 즉시 가능하며, 또는 개발 교사에게 구두나 서면으로 요청하면 지체 없이 조치하겠습니다.</p>
                     <h4>제8조 (개인정보 보호책임자)</h4>
-                    <p>본 서비스는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
+                    <p>본 서비스는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고
+                        있습니다.</p>
                     <ul>
                         <li>성명: 백인규 (개발자)</li>
                         <li>소속: 서울가동초등학교</li>

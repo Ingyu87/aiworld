@@ -43,6 +43,19 @@ signupForm.addEventListener('submit', async (e) => {
     let password = document.getElementById('signup-password').value;
     let confirmPassword = document.getElementById('signup-confirm-password').value;
 
+    const consentPrivacy = document.getElementById('consent-privacy');
+    const consentGuardian = document.getElementById('consent-guardian');
+
+    if (!consentPrivacy.checked) {
+        showError(signupError, '개인정보 수집 및 이용에 동의해야 합니다.');
+        return;
+    }
+
+    if (!consentGuardian.checked) {
+        showError(signupError, '만 14세 미만 보호자 동의 확인에 체크해야 합니다.');
+        return;
+    }
+
     // Validation for 4-digit password
     if (!emailInput || !password || !confirmPassword) {
         showError(signupError, '모든 항목을 입력해주세요.');

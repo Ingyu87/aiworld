@@ -62,8 +62,6 @@ body {
     align-items: center;
     justify-content: center;
     padding: var(--spacing-lg);
-    padding-bottom: 120px;
-    padding-bottom: 8rem;
     width: 100%;
     box-sizing: border-box;
     min-height: 0;
@@ -83,7 +81,6 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     animation: slideUp 0.6s ease;
-    margin-bottom: 2.5rem;
 }
 
 /* ===========================
@@ -91,18 +88,15 @@ body {
    =========================== */
 .footer {
     flex-shrink: 0 !important;
-    width: min(520px, 42vw) !important;
-    padding: 1.5rem 1.5rem;
+    width: 100% !important;
+    padding: 2rem 0;
     background-color: #374151;
     color: white;
     text-align: center;
     font-family: var(--font-main);
     margin-top: auto;
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
-    border-top-left-radius: 18px;
+    position: relative;
+    z-index: 1;
 }
 
 .footer-container {
@@ -565,11 +559,6 @@ body {
     .footer {
         position: static;
         width: 100% !important;
-        border-top-left-radius: 0;
-    }
-
-    .login-wrapper {
-        padding-bottom: var(--spacing-lg);
     }
 }
 

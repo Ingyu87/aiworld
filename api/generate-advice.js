@@ -86,6 +86,7 @@ JSON 형식으로만 응답:
         }
 
         if (!advice) {
+            console.error('Failed to parse AI response:', generatedText?.slice(0, 400));
             throw new Error('Failed to parse AI response');
         }
 
@@ -105,13 +106,21 @@ JSON 형식으로만 응답:
 
 function parseAdviceJson(text) {
     try {
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const cleaned = String(text || '')
+            .replace(/```json|```/gi, '')
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
+            .replace(/,\s*}/g, '}')
+            .replace(/,\s*]/g, ']')
+            .trim();
+
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
             return JSON.parse(jsonMatch[0]);
         }
-        return JSON.parse(text);
+        return JSON.parse(cleaned);
     } catch (parseError) {
-        console.error('JSON parse error:', text);
+        console.error('JSON parse error:', String(text || '').slice(0, 400));
         return null;
     }
 }

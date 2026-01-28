@@ -55,66 +55,248 @@
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-left">
-            <div class="login-content">
-                <div class="logo">
-                    <h1 class="logo-text">학생 회원가입</h1>
-                    <p class="logo-subtitle">Ingyu's AI World와 함께 시작해요!</p>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-left">
+                <div class="login-content">
+                    <div class="logo">
+                        <h1 class="logo-text">학생 회원가입</h1>
+                        <p class="logo-subtitle">Ingyu's AI World와 함께 시작해요!</p>
+                    </div>
+
+                    <form id="signup-form" class="login-form active">
+                        <div class="error-message" id="signup-error"></div>
+
+                        <div class="form-group">
+                            <label for="signup-email" class="form-label">아이디</label>
+                            <input type="text" id="signup-email" class="form-input" placeholder="예: student1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signup-password" class="form-label">비밀번호</label>
+                            <input type="text" id="signup-password" class="form-input" placeholder="4자리 숫자 (예: 1234)"
+                                minlength="4" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signup-confirm-password" class="form-label">비밀번호 확인</label>
+                            <input type="text" id="signup-confirm-password" class="form-input" placeholder="비밀번호 다시 입력"
+                                minlength="4" required>
+                        </div>
+
+                        <!-- Hidden defaults -->
+                        <input type="hidden" id="signup-grade" value="1">
+                        <input type="hidden" id="signup-class" value="1">
+                        <input type="hidden" id="signup-number" value="1">
+
+                        <button type="submit" class="submit-button" style="margin-top: 2rem;">
+                            <span class="button-text">회원가입 완료</span>
+                            <span class="button-icon">→</span>
+                        </button>
+
+                        <div class="signup-link-container" style="text-align: center; margin-top: 1.5rem;">
+                            <a href="login.html"
+                                style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">← 로그인 페이지로
+                                돌아가기</a>
+                        </div>
+                    </form>
+
+                    <div class="loading-spinner" id="loading-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>처리 중...</p>
+                    </div>
                 </div>
+            </div>
 
-                <form id="signup-form" class="login-form active">
-                    <div class="error-message" id="signup-error"></div>
+            <div class="login-right">
+                <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+            </div>
+        </div>
+    </div>
 
-                    <div class="form-group">
-                        <label for="signup-email" class="form-label">아이디</label>
-                        <input type="text" id="signup-email" class="form-input" placeholder="예: student1" required>
-                    </div>
+    <!-- Footer with Privacy Policy -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <span class="footer-copy">© 2026 ingyu's AI world. All rights reserved.</span>
+                <a href="#" class="footer-link" id="terms-link">이용약관</a>
+                <a href="#" class="footer-link" id="privacy-link">개인정보처리방침</a>
+            </div>
+            <div class="footer-info">
+                <p class="footer-text">개인정보책임자: 백인규 교사 (서울가동초등학교) | 문의: 02-448-5766</p>
+            </div>
+        </div>
+    </footer>
 
-                    <div class="form-group">
-                        <label for="signup-password" class="form-label">비밀번호</label>
-                        <input type="text" id="signup-password" class="form-input" placeholder="4자리 숫자 (예: 1234)"
-                            minlength="4" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="signup-confirm-password" class="form-label">비밀번호 확인</label>
-                        <input type="text" id="signup-confirm-password" class="form-input" placeholder="비밀번호 다시 입력"
-                            minlength="4" required>
-                    </div>
-
-                    <!-- Hidden defaults -->
-                    <input type="hidden" id="signup-grade" value="1">
-                    <input type="hidden" id="signup-class" value="1">
-                    <input type="hidden" id="signup-number" value="1">
-
-                    <button type="submit" class="submit-button" style="margin-top: 2rem;">
-                        <span class="button-text">회원가입 완료</span>
-                        <span class="button-icon">→</span>
-                    </button>
-
-                    <div class="signup-link-container" style="text-align: center; margin-top: 1.5rem;">
-                        <a href="login.html"
-                            style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">← 로그인 페이지로
-                            돌아가기</a>
-                    </div>
-                </form>
-
-                <div class="loading-spinner" id="loading-spinner" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>처리 중...</p>
+    <!-- Terms of Service Modal -->
+    <div class="modal" id="terms-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content-inner">
+            <div class="modal-header">
+                <h3 class="modal-title">이용약관</h3>
+                <button class="modal-close" id="terms-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-content">
+                    <p><strong>ingyu's AI world</strong> (이하 본 서비스) 이용약관에 오신 것을 환영합니다. 본 약관은 서비스 이용에 관한 기본적인 사항을 정하고 있습니다.</p>
+                    <h4>제1조 (목적)</h4>
+                    <p>본 약관은 ingyu's AI world(이하 "서비스")가 제공하는 교육용 AI 웹앱 자료집 서비스의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                    <h4>제2조 (서비스의 제공)</h4>
+                    <p>① 본 서비스는 초등학생 대상의 AI 기반 교육용 웹앱을 제공합니다.</p>
+                    <p>② 제공되는 서비스의 종류는 다음과 같습니다:</p>
+                    <ol>
+                        <li>창의적 체험활동(창체) 관련 AI 학습 도구</li>
+                        <li>교과 학습 지원(수학, 국어, 사회 등) AI 앱</li>
+                        <li>학급 운영 및 생활 지원 도구</li>
+                    </ol>
+                    <h4>제3조 (서비스 이용 대상)</h4>
+                    <p>① 본 서비스는 초등학생을 주 대상으로 합니다.</p>
+                    <p>② 만 14세 미만 이용자는 법정대리인(보호자)의 동의를 받아야 합니다.</p>
+                    <p>③ 교사는 학급 단위로 학생들의 서비스 이용을 관리할 수 있습니다.</p>
+                    <h4>제4조 (서비스 이용 시간)</h4>
+                    <p>① 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.</p>
+                    <p>② 다음의 경우 서비스 제공이 일시 중단될 수 있습니다:</p>
+                    <ol>
+                        <li>시스템 정기 점검 및 유지보수</li>
+                        <li>긴급한 시스템 장애 복구</li>
+                        <li>기타 불가피한 사유</li>
+                    </ol>
+                    <h4>제5조 (이용자의 의무)</h4>
+                    <p>① 이용자는 다음 행위를 하여서는 안 됩니다:</p>
+                    <ol>
+                        <li>타인의 정보 도용</li>
+                        <li>서비스 운영을 방해하는 행위</li>
+                        <li>타인에게 해를 끼치는 내용의 게시</li>
+                        <li>저작권 등 타인의 권리를 침해하는 행위</li>
+                        <li>AI를 부적절한 목적으로 사용하는 행위</li>
+                    </ol>
+                    <h4>제6조 (서비스 제공자의 의무)</h4>
+                    <p>① 서비스 제공자는 안정적인 서비스 제공을 위해 최선을 다합니다.</p>
+                    <p>② 개인정보 보호 위해 관련 법령과 개인정보처리방침을 준수합니다.</p>
+                    <p>③ 이용자의 의견을 수렴하여 서비스 개선에 노력합니다.</p>
+                    <h4>제7조 (저작권)</h4>
+                    <p>① 서비스 내 모든 콘텐츠의 저작권은 서비스 제공자에게 있습니다.</p>
+                    <p>② 이용자가 생성한 콘텐츠의 저작권은 이용자에게 있으나, 서비스 제공자는 교육 목적으로 이를 활용할 수 있습니다.</p>
+                    <h4>제8조 (책임의 제한)</h4>
+                    <p>① 서비스 제공자는 천재지변, 불가항력적 사유로 인한 서비스 중단에 대해 책임을 지지 않습니다.</p>
+                    <p>② 이용자의 귀책사유로 인한 서비스 이용 장애에 대해서는 책임을 지지 않습니다.</p>
+                    <p>③ AI 생성 콘텐츠의 정확성에 대해서는 보증하지 않으며, 교육적 참고 자료로만 활용해야 합니다.</p>
+                    <h4>제9조 (분쟁 해결)</h4>
+                    <p>① 서비스 이용과 관련한 분쟁은 상호 협의를 통해 해결함을 원칙으로 합니다.</p>
+                    <p>② 협의가 이루어지지 않을 경우, 관련 법령에 따라 해결합니다.</p>
+                    <h4>제10조 (약관의 효력 및 변경)</h4>
+                    <p>① 본 약관은 2026년 3월 1일부터 시행됩니다.</p>
+                    <p>② 약관이 변경되는 경우, 서비스 내 공지를 통해 사전에 안내합니다.</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="login-right">
-            <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+    <!-- Privacy Policy Modal -->
+    <div class="modal" id="privacy-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content-inner">
+            <div class="modal-header">
+                <h3 class="modal-title">개인정보처리방침</h3>
+                <button class="modal-close" id="privacy-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-content">
+                    <p><strong>ingyu's AI world</strong> (이하 본 서비스)은(는) 개인정보 보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
+                    <h4>제1조 (개인정보의 처리 목적)</h4>
+                    <p>본 서비스는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
+                    <ol>
+                        <li>학생 회원 가입 및 관리: 학급 구성원 식별, 학습 진도율 확인, 교사의 피드백 제공</li>
+                        <li>서비스 제공: 학습 콘텐츠 제공, 과제 제출 및 기록 저장, 학습 이력 관리</li>
+                    </ol>
+                    <h4>제2조 (개인정보의 처리 및 보유기간)</h4>
+                    <p>① 본 서비스는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.</p>
+                    <p>② 각각의 개인정보 처리 및 보유 기간은 다음과 같습니다.</p>
+                    <ol>
+                        <li>보유 기간: 해당 학년도 종료 시(익년 2월 말) 또는 학생의 졸업/진급 시까지</li>
+                        <li>파기 시점: 보유 기간 종료 후 지체 없이(5일 이내) 파기</li>
+                    </ol>
+                    <h4>제3조 (처리하는 개인정보 항목)</h4>
+                    <p>본 서비스는 학습 지원을 위해 필요한 최소한의 개인정보만을 수집합니다.</p>
+                    <ol>
+                        <li>수집 항목: 아이디, 비밀번호, 이름(또는 닉네임), 학년, 반, 번호</li>
+                        <li>수집하지 않는 항목: 주민등록번호, 주소, 전화번호, 이메일 등 불필요한 민감 정보</li>
+                    </ol>
+                    <h4>제4조 (만 14세 미만 아동의 개인정보 처리에 관한 사항)</h4>
+                    <p>① 본 서비스는 만 14세 미만 아동의 개인정보를 처리하기 위하여 가입 단계 또는 학기 초 학교 가정통신문(개인정보 수집·이용 동의서)을 통하여 법정대리인의 동의를 받습니다.</p>
+                    <p>② 법정대리인이 동의하지 않는 경우, 해당 아동은 서비스 가입 및 이용이 제한될 수 있습니다.</p>
+                    <h4>제5조 (개인정보의 파기 절차 및 방법)</h4>
+                    <p>① 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+                    <p>② 파기 방법: 전자적 파일 형태로 기록·저장된 개인정보는 기록을 재생할 수 없도록 파기(DB 영구 삭제)하며, 종이 문서는 분쇄하거나 소각하여 파기합니다.</p>
+                    <h4>제6조 (개인정보의 안전성 확보조치)</h4>
+                    <p>본 서비스는 개인정보 보호법 제29조에 따라 다음과 같이 안전성 확보에 필요한 기술적/관리적 및 물리적 조치를 하고 있습니다.</p>
+                    <ol>
+                        <li>비밀번호 암호화: 이용자의 비밀번호는 일방향 암호화(Hash) 되어 저장 및 관리되며, 개발자(관리자)도 알 수 없습니다.</li>
+                        <li>해킹 등에 대비한 기술적 대책: 보안 인증을 획득한 전문 클라우드 플랫폼(Google Firebase / AWS / Vercel 등)을 기반으로 운영되며, 전 구간 보안 통신(HTTPS)을 사용하여 데이터를 암호화하여 전송합니다.</li>
+                        <li>개인정보 취급 직원의 최소화: 개인정보를 처리하는 담당자를 개발 교사 1인으로 지정하여 접근 권한을 관리합니다.</li>
+                    </ol>
+                    <h4>제7조 (정보주체와 법정대리인의 권리·의무 및 행사방법)</h4>
+                    <p>① 정보주체(학생) 및 법정대리인은 언제든지 개인정보 열람·정정·삭제·처리정지 요구 등의 권리를 행사할 수 있습니다.</p>
+                    <p>② 권리 행사는 서비스 내 [회원탈퇴] 기능을 통하여 즉시 가능하며, 또는 개발 교사에게 구두나 서면으로 요청하면 지체 없이 조치하겠습니다.</p>
+                    <h4>제8조 (개인정보 보호책임자)</h4>
+                    <p>본 서비스는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
+                    <ul>
+                        <li>성명: 백인규 (개발자)</li>
+                        <li>소속: 서울가동초등학교</li>
+                        <li>직위: 교사</li>
+                        <li>연락처: 02-448-5766 (학교 교무실 내선 번호)</li>
+                    </ul>
+                    <p class="privacy-note">※ 개인정보보호를 위해 교사의 개인 휴대전화 번호는 기재하지 않습니다.</p>
+                    <h4>제9조 (개인정보 처리방침 변경)</h4>
+                    <p>이 개인정보 처리방침은 2026년 3월 1일부터 적용됩니다.</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Firebase Config -->
     <script src="firebase-config.js"></script>
     <script src="signup.js"></script>
+
+    <script>
+        // Footer Modal Logic
+        const termsLink = document.getElementById('terms-link');
+        const privacyLink = document.getElementById('privacy-link');
+        const termsModal = document.getElementById('terms-modal');
+        const privacyModal = document.getElementById('privacy-modal');
+        const termsClose = document.getElementById('terms-close');
+        const privacyClose = document.getElementById('privacy-close');
+
+        if (termsLink) {
+            termsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.add('active');
+            });
+        }
+
+        if (privacyLink) {
+            privacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                privacyModal.classList.add('active');
+            });
+        }
+
+        [termsClose, privacyClose].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    termsModal.classList.remove('active');
+                    privacyModal.classList.remove('active');
+                });
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-backdrop')) {
+                termsModal.classList.remove('active');
+                privacyModal.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 
 </html>

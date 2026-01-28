@@ -15,199 +15,119 @@
 </head>
 
 <body>
-    <div class="login-container">
-        <!-- Left Side: Login Form -->
-        <div class="login-left">
-            <div class="login-content">
-                <div class="logo">
-                    <h1 class="logo-text">Ingyu's AI World</h1>
-                    <p class="logo-subtitle">초등학교 AI 웹앱 자료집</p>
-                </div>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <!-- Left Side: Login Form -->
+            <div class="login-left">
+                <div class="login-content">
+                    <div class="logo">
+                        <h1 class="logo-text">Ingyu's AI World</h1>
+                        <p class="logo-subtitle">초등학교 AI 웹앱 자료집</p>
+                    </div>
 
-                <!-- Tab Navigation -->
-                <div class="tab-navigation">
-                    <button class="tab-button active" data-tab="student" aria-label="학생 로그인">
-                        <span class="tab-icon">👨‍🎓</span>
-                        <span class="tab-text">학생</span>
-                    </button>
-                    <button class="tab-button" data-tab="teacher" aria-label="교사 로그인">
-                        <span class="tab-icon">👨‍🏫</span>
-                        <span class="tab-text">교사</span>
-                    </button>
-                </div>
-
-                <!-- Login Forms -->
-                <div class="form-container">
-                    <!-- Student Login Form -->
-                    <form id="student-form" class="login-form active">
-                        <h2 class="form-title">학생 로그인</h2>
-
-                        <div class="form-group">
-                            <label for="student-email" class="form-label">아이디</label>
-                            <input type="text" id="student-email" class="form-input" placeholder="student1" required
-                                autocomplete="username">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="student-password" class="form-label">비밀번호</label>
-                            <input type="password" id="student-password" class="form-input" placeholder="••••••••"
-                                required autocomplete="current-password">
-                        </div>
-
-                        <button type="submit" class="submit-button">
-                            <span class="button-text">로그인</span>
-                            <span class="button-icon">→</span>
+                    <!-- Tab Navigation -->
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="student" aria-label="학생 로그인">
+                            <span class="tab-icon">👨‍🎓</span>
+                            <span class="tab-text">학생</span>
                         </button>
-
-                        <div class="signup-link-container" style="text-align: center; margin-top: 1rem;">
-                            <p style="font-size: 0.9rem; color: var(--text-light);">계정이 없으신가요? <a href="signup.html"
-                                    style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">회원가입</a>
-                            </p>
-                        </div>
-
-                        <div class="error-message" id="student-error"></div>
-                    </form>
-
-
-                    <!-- Teacher Login Form -->
-                    <form id="teacher-form" class="login-form">
-                        <h2 class="form-title">교사 로그인</h2>
-
-                        <div class="form-group">
-                            <label for="teacher-email-display" class="form-label">아이디</label>
-                            <input type="text" id="teacher-email-display" class="form-input" value="teacher" readonly
-                                style="background-color: var(--cream); cursor: not-allowed;">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="teacher-password" class="form-label">비밀번호</label>
-                            <input type="password" id="teacher-password" class="form-input" placeholder="••••••••"
-                                required autocomplete="current-password">
-                        </div>
-
-                        <button type="submit" class="submit-button">
-                            <span class="button-text">로그인</span>
-                            <span class="button-icon">→</span>
+                        <button class="tab-button" data-tab="teacher" aria-label="교사 로그인">
+                            <span class="tab-icon">👨‍🏫</span>
+                            <span class="tab-text">교사</span>
                         </button>
+                    </div>
 
-                        <div class="error-message" id="teacher-error"></div>
-                    </form>
-                </div>
+                    <!-- Login Forms -->
+                    <div class="form-container">
+                        <!-- Student Login Form -->
+                        <form id="student-form" class="login-form active">
+                            <h2 class="form-title">학생 로그인</h2>
 
-                <!-- Loading Spinner -->
-                <div class="loading-spinner" id="loading-spinner" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>로그인 중...</p>
+                            <div class="form-group">
+                                <label for="student-email" class="form-label">아이디</label>
+                                <input type="text" id="student-email" class="form-input" placeholder="student1" required
+                                    autocomplete="username">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="student-password" class="form-label">비밀번호</label>
+                                <input type="password" id="student-password" class="form-input" placeholder="••••••••"
+                                    required autocomplete="current-password">
+                            </div>
+
+                            <button type="submit" class="submit-button">
+                                <span class="button-text">로그인</span>
+                                <span class="button-icon">→</span>
+                            </button>
+
+                            <div class="signup-link-container" style="text-align: center; margin-top: 1rem;">
+                                <p style="font-size: 0.9rem; color: var(--text-light);">계정이 없으신가요? <a href="signup.html"
+                                        style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">회원가입</a>
+                                </p>
+                            </div>
+
+                            <div class="error-message" id="student-error"></div>
+                        </form>
+
+
+                        <!-- Teacher Login Form -->
+                        <form id="teacher-form" class="login-form">
+                            <h2 class="form-title">교사 로그인</h2>
+
+                            <div class="form-group">
+                                <label for="teacher-email-display" class="form-label">아이디</label>
+                                <input type="text" id="teacher-email-display" class="form-input" value="teacher" readonly
+                                    style="background-color: var(--cream); cursor: not-allowed;">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacher-password" class="form-label">비밀번호</label>
+                                <input type="password" id="teacher-password" class="form-input" placeholder="••••••••"
+                                    required autocomplete="current-password">
+                            </div>
+
+                            <button type="submit" class="submit-button">
+                                <span class="button-text">로그인</span>
+                                <span class="button-icon">→</span>
+                            </button>
+
+                            <div class="error-message" id="teacher-error"></div>
+                        </form>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loading-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>로그인 중...</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Side: Hero Image -->
-        <div class="login-right">
-            <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+            <!-- Right Side: Hero Image -->
+            <div class="login-right">
+                <img src="assets/hero.png" alt="Ingyu's AI World" class="hero-image">
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <!-- Firebase Config -->
-    <script src="firebase-config.js"></script>
-
-    <!-- Login Script -->
-    <script src="login.js"></script>
-
     <!-- Footer with Privacy Policy -->
-    <footer class="footer" style="padding: 2rem 0; background-color: #374151; color: white; text-align: center; font-family: 'Noto Sans KR', sans-serif;">
-        <div class="footer-container" style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
-            <div class="footer-links" style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-                <span class="footer-copy" style="font-size: 0.9rem; opacity: 0.9;">© 2026 ingyu's AI world. All rights reserved.</span>
-                <a href="#" class="footer-link" id="terms-link" style="color: white; text-decoration: none; font-size: 0.9rem; font-weight: 500;">이용약관</a>
-                <a href="#" class="footer-link" id="privacy-link" style="color: white; text-decoration: none; font-size: 0.9rem; font-weight: 500;">개인정보처리방침</a>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <span class="footer-copy">© 2026 ingyu's AI world. All rights reserved.</span>
+                <a href="#" class="footer-link" id="terms-link">이용약관</a>
+                <a href="#" class="footer-link" id="privacy-link">개인정보처리방침</a>
             </div>
             <div class="footer-info">
-                <p class="footer-text" style="font-size: 0.85rem; opacity: 0.8; margin: 0;">개인정보책임자: 백인규 교사 (서울가동초등학교) | 문의: 02-448-5766</p>
+                <p class="footer-text">개인정보책임자: 백인규 교사 (서울가동초등학교) | 문의: 02-448-5766</p>
             </div>
         </div>
     </footer>
 
-    <!-- Terms and Privacy Modals (Need to be added or linked) -->
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-        }
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            position: relative;
-            background: white;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            border-radius: 20px;
-            overflow-y: auto;
-            padding: 2rem;
-            z-index: 1001;
-            color: #333;
-            text-align: left;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2d3748;
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #a0aec0;
-        }
-        .privacy-content h4 {
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #2d3748;
-        }
-        .privacy-content p, .privacy-content li {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #4a5568;
-            margin-bottom: 0.8rem;
-        }
-    </style>
-
     <!-- Terms of Service Modal -->
     <div class="modal" id="terms-modal">
         <div class="modal-backdrop"></div>
-        <div class="modal-content">
+        <div class="modal-content-inner">
             <div class="modal-header">
                 <h3 class="modal-title">이용약관</h3>
                 <button class="modal-close" id="terms-close">×</button>
@@ -271,7 +191,7 @@
     <!-- Privacy Policy Modal -->
     <div class="modal" id="privacy-modal">
         <div class="modal-backdrop"></div>
-        <div class="modal-content">
+        <div class="modal-content-inner">
             <div class="modal-header">
                 <h3 class="modal-title">개인정보처리방침</h3>
                 <button class="modal-close" id="privacy-close">×</button>
@@ -330,6 +250,17 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Login Script -->
+    <script src="login.js"></script>
+
     <script>
         // Footer Modal Logic
         const termsLink = document.getElementById('terms-link');
@@ -339,21 +270,27 @@
         const termsClose = document.getElementById('terms-close');
         const privacyClose = document.getElementById('privacy-close');
 
-        termsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            termsModal.classList.add('active');
-        });
+        if (termsLink) {
+            termsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.add('active');
+            });
+        }
 
-        privacyLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            privacyModal.classList.add('active');
-        });
+        if (privacyLink) {
+            privacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                privacyModal.classList.add('active');
+            });
+        }
 
         [termsClose, privacyClose].forEach(btn => {
-            btn.addEventListener('click', () => {
-                termsModal.classList.remove('active');
-                privacyModal.classList.remove('active');
-            });
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    termsModal.classList.remove('active');
+                    privacyModal.classList.remove('active');
+                });
+            }
         });
 
         window.addEventListener('click', (e) => {

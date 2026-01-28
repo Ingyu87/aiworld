@@ -284,65 +284,6 @@ body {
     color: #718096;
 }
 
-/* Step 4: Advice Cards */
-.advice-container {
-    display: grid;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.advice-card {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.advice-card .card-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-}
-
-.advice-card h3 {
-    font-size: 1.3rem;
-    color: #2d3748;
-    margin-bottom: 15px;
-}
-
-.advice-card p {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: #4a5568;
-}
-
-.empathy-card {
-    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-}
-
-.suggestion-card {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-}
-
-.quote-card {
-    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-}
-
-.quote-card blockquote {
-    font-size: 1.15rem;
-    font-style: italic;
-    line-height: 1.8;
-    color: #2d3748;
-    margin-bottom: 15px;
-}
-
-.quote-card cite {
-    display: block;
-    text-align: right;
-    font-size: 0.95rem;
-    color: #718096;
-    font-style: normal;
-}
-
 /* Buttons */
 .step-actions {
     display: flex;

@@ -123,14 +123,15 @@ function initializeCheckin() {
         reasonNextBtn.disabled = length < 5;
     });
 
-    // Step 3: 다음 버튼
+    // Step 3: 제출 버튼
     reasonNextBtn.addEventListener('click', () => {
         const reason = reasonInput.value.trim();
         if (reason.length < 5) {
             alert('이유를 최소 5자 이상 작성해주세요.');
             return;
         }
-        goToStep(4);
+        checkinData.reason = reason;
+        completeCheckin();
     });
 }
 
@@ -150,9 +151,6 @@ async function goToStep(step) {
         await loadEmotionWords();
     } else if (step === 3) {
         displaySelectedWords();
-    } else if (step === 4) {
-        checkinData.reason = document.getElementById('reason-input').value.trim();
-        await generateAdvice();
     }
 
     // 감정 요약 업데이트
@@ -296,80 +294,6 @@ function displaySelectedWords() {
     `;
 
     summaryEl.innerHTML = html;
-}
-
-// Step 4: AI 조언 생성
-async function generateAdvice() {
-    const loadingEl = document.getElementById('advice-loading');
-    const containerEl = document.getElementById('advice-container');
-
-    loadingEl.style.display = 'block';
-    containerEl.style.display = 'none';
-
-    try {
-        const apiUrl = buildApiUrl('/api/generate-advice');
-        if (!apiUrl) {
-            alert('로컬 파일로 실행 중이라 AI 조언 API를 사용할 수 없습니다. 서버에서 실행해주세요.');
-            goToStep(3);
-            return;
-        }
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                emotion: checkinData.emotion,
-                emotionName: checkinData.emotionName,
-                selectedWords: checkinData.selectedWords,
-                reason: checkinData.reason
-            })
-        });
-
-        if (!response.ok) {
-            let errorDetail = '';
-            try {
-                const errorData = await response.json();
-                errorDetail = errorData.error ? ` (${errorData.error})` : '';
-            } catch (parseError) {
-                errorDetail = '';
-            }
-            throw new Error(`AI 조언 서버 응답 실패: ${response.status}${errorDetail}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success && data.advice) {
-            checkinData.aiAdvice = data.advice;
-            displayAdvice(data.advice);
-        } else {
-            checkinData.aiAdvice = null;
-            showAdviceError(data.error || 'AI 조언을 불러오지 못했어요.');
-        }
-    } catch (error) {
-        console.error('Error generating advice:', error);
-        checkinData.aiAdvice = null;
-        showAdviceError('AI 조언을 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
-    } finally {
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'grid';
-    }
-}
-
-// 조언 표시
-function displayAdvice(advice) {
-    document.getElementById('advice-empathy').textContent = advice.empathy;
-    document.getElementById('advice-suggestion').textContent = advice.suggestion;
-    document.getElementById('advice-quote').textContent = advice.quote;
-    document.getElementById('advice-source').textContent = `- ${advice.quoteSource}`;
-}
-
-function showAdviceError(message) {
-    document.getElementById('advice-empathy').textContent = message;
-    document.getElementById('advice-suggestion').textContent = '';
-    document.getElementById('advice-quote').textContent = '';
-    document.getElementById('advice-source').textContent = '';
 }
 
 // 체크인 완료 및 저장

@@ -65,29 +65,33 @@ JSON 형식으로만 응답:
             generationConfig: {
                 temperature: 0.8,
                 maxOutputTokens: 500,
+                responseMimeType: 'application/json'
             }
         });
 
-        // JSON 파싱
-        let advice;
-        let fallback = false;
-        try {
-            const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                advice = JSON.parse(jsonMatch[0]);
-            } else {
-                advice = JSON.parse(generatedText);
-            }
-        } catch (parseError) {
-            console.error('JSON parse error:', generatedText);
-            advice = buildFallbackAdvice(emotionName);
-            fallback = true;
+        let advice = parseAdviceJson(generatedText);
+
+        if (!advice) {
+            const strictPrompt = `${prompt}\n\n주의: 반드시 유효한 JSON만 반환하고, 코드블록이나 설명을 절대 포함하지 마세요. 모든 키와 문자열은 큰따옴표를 사용하세요.`;
+            const strictText = await generateGeminiText({
+                apiKey: GEMINI_API_KEY,
+                prompt: strictPrompt,
+                generationConfig: {
+                    temperature: 0.6,
+                    maxOutputTokens: 500,
+                    responseMimeType: 'application/json'
+                }
+            });
+            advice = parseAdviceJson(strictText);
+        }
+
+        if (!advice) {
+            throw new Error('Failed to parse AI response');
         }
 
         return res.status(200).json({
             success: true,
-            advice: advice,
-            fallback: fallback
+            advice: advice
         });
 
     } catch (error) {
@@ -99,11 +103,15 @@ JSON 형식으로만 응답:
     }
 }
 
-function buildFallbackAdvice(emotionName) {
-    return {
-        empathy: `${emotionName || '지금'} 감정을 느끼는 건 자연스러운 일이에요. 그 마음을 잘 알아차린 것만으로도 충분히 잘하고 있어요.`,
-        suggestion: '잠깐 깊게 숨을 쉬고, 물 한 잔을 마시면서 마음을 차분히 해보세요.',
-        quote: '오늘의 마음을 이해하는 것이 내일의 힘이 된다.',
-        quoteSource: '마음 다독이는 말'
-    };
+function parseAdviceJson(text) {
+    try {
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+        return JSON.parse(text);
+    } catch (parseError) {
+        console.error('JSON parse error:', text);
+        return null;
+    }
 }

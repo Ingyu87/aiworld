@@ -344,13 +344,13 @@ async function generateAdvice() {
             checkinData.aiAdvice = data.advice;
             displayAdvice(data.advice);
         } else {
-            throw new Error('Failed to generate advice');
+            checkinData.aiAdvice = null;
+            showAdviceError(data.error || 'AI 조언을 불러오지 못했어요.');
         }
     } catch (error) {
         console.error('Error generating advice:', error);
-        alert('AI 선생님과 연결할 수 없어요. 잠시 후 다시 시도해주세요.');
-        // 이전 단계로 돌아가기
-        goToStep(3);
+        checkinData.aiAdvice = null;
+        showAdviceError('AI 조언을 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
     } finally {
         loadingEl.style.display = 'none';
         containerEl.style.display = 'grid';
@@ -363,6 +363,13 @@ function displayAdvice(advice) {
     document.getElementById('advice-suggestion').textContent = advice.suggestion;
     document.getElementById('advice-quote').textContent = advice.quote;
     document.getElementById('advice-source').textContent = `- ${advice.quoteSource}`;
+}
+
+function showAdviceError(message) {
+    document.getElementById('advice-empathy').textContent = message;
+    document.getElementById('advice-suggestion').textContent = '';
+    document.getElementById('advice-quote').textContent = '';
+    document.getElementById('advice-source').textContent = '';
 }
 
 // 체크인 완료 및 저장

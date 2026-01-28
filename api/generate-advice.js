@@ -87,7 +87,10 @@ JSON 형식으로만 응답:
 
         if (!advice) {
             console.error('Failed to parse AI response:', generatedText?.slice(0, 400));
-            throw new Error('Failed to parse AI response');
+            return res.status(200).json({
+                success: false,
+                error: 'Failed to parse AI response'
+            });
         }
 
         return res.status(200).json({
@@ -97,7 +100,7 @@ JSON 형식으로만 응답:
 
     } catch (error) {
         console.error('Error generating advice:', error);
-        return res.status(500).json({
+        return res.status(200).json({
             success: false,
             error: error.message
         });

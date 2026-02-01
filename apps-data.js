@@ -82,6 +82,13 @@ const APPS_DATA = [
         url: "https://learncompass2.vercel.app/"
     },
     {
+        title: "타자왕국",
+        category: "창체",
+        description: "AI와 함께하는 재미있는 한글 타자 연습!",
+        icon: "⌨️",
+        url: "https://taja-eta.vercel.app/"
+    },
+    {
         title: "2학기1단원 글쓰기 활동",
         category: "국어",
         description: "재미있는 글쓰기 활동을 해봐요!",

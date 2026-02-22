@@ -180,7 +180,7 @@ const APPS_DATA = [
         url: "https://gemini.google.com/share/c8afd694f7de"
     },
     {
-        title: "창체 활동",
+        title: "AI 인터렉티브 게임",
         category: "창체",
         description: "AI와 함께 창의적 체험활동을 해요!",
         icon: "🌟",

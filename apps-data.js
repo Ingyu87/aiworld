@@ -171,6 +171,13 @@ const APPS_DATA = [
         description: "시설·전담·학급 시간표를 단계별로 작성하고 엑셀로 저장해요!",
         icon: "📅",
         url: "https://gadong-schedule.vercel.app/"
+    },
+    {
+        title: "학기말 종합의견 생성기",
+        category: "학급운영",
+        description: "학기말 학생 종합의견을 AI로 생성해요!",
+        icon: "✏️",
+        url: "https://gemini.google.com/share/c8afd694f7de"
     }
 ];
 

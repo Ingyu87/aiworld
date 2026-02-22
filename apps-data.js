@@ -178,6 +178,13 @@ const APPS_DATA = [
         description: "학기말 학생 종합의견을 AI로 생성해요!",
         icon: "✏️",
         url: "https://gemini.google.com/share/c8afd694f7de"
+    },
+    {
+        title: "창체 활동",
+        category: "창체",
+        description: "AI와 함께 창의적 체험활동을 해요!",
+        icon: "🌟",
+        url: "https://g.co/gemini/share/9c837a14d717"
     }
 ];
 

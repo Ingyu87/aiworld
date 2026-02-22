@@ -157,6 +157,13 @@ const APPS_DATA = [
         description: "프로젝트 기반 학습을 계획하고 관리해요!",
         icon: "📋",
         url: "https://gspblig.streamlit.app/"
+    },
+    {
+        title: "학급네트워크분석(출처:박권쌤)",
+        category: "학급운영",
+        description: "설문 CSV로 학생 간 관계를 파싱하고, 중심성·3D 네트워크로 시각화해요!",
+        icon: "🕸️",
+        url: "https://class-sna-2.vercel.app/"
     }
 ];
 

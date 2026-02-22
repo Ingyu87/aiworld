@@ -164,6 +164,13 @@ const APPS_DATA = [
         description: "설문 CSV로 학생 간 관계를 파싱하고, 중심성·3D 네트워크로 시각화해요!",
         icon: "🕸️",
         url: "https://class-sna-2.vercel.app/"
+    },
+    {
+        title: "학급시간표 만들기",
+        category: "학급운영",
+        description: "시설·전담·학급 시간표를 단계별로 작성하고 엑셀로 저장해요!",
+        icon: "📅",
+        url: "https://gadong-schedule.vercel.app/"
     }
 ];
 

@@ -185,6 +185,13 @@ const APPS_DATA = [
         description: "AI와 함께 창의적 체험활동을 해요!",
         icon: "🌟",
         url: "https://g.co/gemini/share/9c837a14d717"
+    },
+    {
+        title: "교수학습과정안 초안 작성기",
+        category: "학급운영",
+        description: "2022 개정 교육과정 기반 교수·학습 과정안(약안)을 AI로 빠르게 초안 작성해요!",
+        icon: "📝",
+        url: "https://lessonplan-alpha.vercel.app/"
     }
 ];
 

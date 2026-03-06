@@ -30,7 +30,7 @@ const APPS_DATA = [
         category: "창체",
         description: "나만의 캐릭터로 굿즈를 디자인해요!",
         icon: "🎁",
-        url: "https://gemini.google.com/share/ccb53c2545c8"
+        url: "https://gemini.google.com/share/2f467e2287ae"
     },
     {
         title: "사각형탐험대",

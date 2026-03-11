@@ -23,7 +23,7 @@ const APPS_DATA = [
         category: "창체",
         description: "AI와 함께 나만의 그림책을 만들어요!",
         icon: "📚",
-        url: "https://gemini.google.com/share/05eae3d95c11"
+        url: "https://gemini.google.com/share/21709bf28b55"
     },
     {
         title: "AI 캐릭터 굿즈 만들기",

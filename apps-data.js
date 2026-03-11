@@ -12,11 +12,11 @@
 
 const APPS_DATA = [
     {
-        title: "캐릭터 꾸미기",
+        title: "캐릭터 꾸미기 v2",
         category: "창체",
         description: "나만의 캐릭터를 만들고 꾸며보세요!",
         icon: "🎨",
-        url: "https://gemini.google.com/share/60a0823bd427"
+        url: "https://gemini.google.com/share/6d24caf0aea2"
     },
     {
         title: "AI 그림책 만들기",

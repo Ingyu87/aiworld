@@ -19,6 +19,13 @@ const APPS_DATA = [
         url: "https://service-12363257340.us-west1.run.app/"
     },
     {
+        title: "4학년 1학기 큰수- 우주 미션",
+        category: "수학",
+        description: "4학년 1학기 ‘큰 수’ 단원을 우주 미션으로 해결해요!",
+        icon: "🪐",
+        url: "https://service-12363257340.us-west1.run.app/"
+    },
+    {
         title: "AI 그림책 만들기",
         category: "창체",
         description: "AI와 함께 나만의 그림책을 만들어요!",

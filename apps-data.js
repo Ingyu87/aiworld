@@ -16,7 +16,7 @@ const APPS_DATA = [
         category: "창체",
         description: "나만의 캐릭터를 만들고 꾸며보세요!",
         icon: "🎨",
-        url: "https://service-12363257340.us-west1.run.app"
+        url: "https://service-12363257340.us-west1.run.app/"
     },
     {
         title: "AI 그림책 만들기",

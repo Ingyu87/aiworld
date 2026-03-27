@@ -2,7 +2,7 @@
 
 // 전역 변수
 let emotionData = [];
-let currentPeriod = 'week';
+let currentPeriod = 'month';
 
 function getApiBaseUrl() {
     if (window.API_BASE_URL) {
@@ -350,6 +350,18 @@ function updateEmotionTable() {
     tbody.innerHTML = Object.entries(studentEmotions).map(([userId, emotions]) => {
         const latest = emotions[0]; // 최신 감정
         const count = emotions.length;
+        // 누적 느낌을 주기 위해: 최근 감정 1회가 아니라, 기간 내 선택 단어 빈도를 집계해서 Top 3를 보여준다.
+        const wordCounts = {};
+        emotions.forEach(e => {
+            (e.selectedWords || []).forEach(word => {
+                const key = String(word);
+                wordCounts[key] = (wordCounts[key] || 0) + 1;
+            });
+        });
+        const topWords = Object.entries(wordCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([word]) => word);
 
         return `
             <tr>
@@ -359,9 +371,7 @@ function updateEmotionTable() {
                 </td>
                 <td>
                     <div class="emotion-words">
-                        ${(latest.selectedWords || []).slice(0, 3).map(word =>
-            `<span class="word-badge">${word}</span>`
-        ).join('')}
+                        ${topWords.map(word => `<span class="word-badge">${word}</span>`).join('')}
                     </div>
                 </td>
                 <td>${count}회</td>
@@ -458,29 +468,21 @@ function displayAIAnalysis(analysis) {
     if (!contentEl) return;
 
     const overviewEl = document.getElementById('analysis-overview');
-    const patternsEl = document.getElementById('analysis-patterns');
     const suggestionsEl = document.getElementById('analysis-suggestions');
     const positivesEl = document.getElementById('analysis-positives');
 
     const overviewText = analysis?.overview || '분석 결과가 없습니다.';
-    const patterns = Array.isArray(analysis?.patterns)
-        ? analysis.patterns
-        : (analysis?.patterns ? [String(analysis.patterns)] : []);
     const suggestions = Array.isArray(analysis?.suggestions)
         ? analysis.suggestions
         : (analysis?.suggestions ? [String(analysis.suggestions)] : []);
     const positivesText = analysis?.positives || '';
 
     // 마크업/ID가 달라도 렌더링 실패로 전체 카드가 깨지지 않게 보호
-    if (!overviewEl || !patternsEl || !suggestionsEl || !positivesEl) {
+    if (!overviewEl || !suggestionsEl || !positivesEl) {
         contentEl.innerHTML = `
             <div class="analysis-section">
                 <h4>💡 전반적인 학급 분위기</h4>
                 <p>${overviewText}</p>
-            </div>
-            <div class="analysis-section">
-                <h4>📌 주목할 패턴</h4>
-                <ul>${patterns.map(p => `<li>${p}</li>`).join('')}</ul>
             </div>
             <div class="analysis-section">
                 <h4>✨ 실천 제안</h4>
@@ -496,7 +498,6 @@ function displayAIAnalysis(analysis) {
     }
 
     overviewEl.textContent = overviewText;
-    patternsEl.innerHTML = patterns.map(p => `<li>${p}</li>`).join('');
     suggestionsEl.innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
     positivesEl.textContent = positivesText;
     contentEl.style.display = 'block';
@@ -505,12 +506,66 @@ function displayAIAnalysis(analysis) {
 // 학생 감정 상세 보기
 function viewStudentEmotionDetail(userId, userName) {
     const studentData = emotionData.filter(d => d.userId === userId);
+    const modalEl = document.getElementById('emotion-detail-modal');
+    const closeBtn = document.getElementById('emotion-detail-modal-close');
+    const subtitleEl = document.getElementById('emotion-detail-subtitle');
+    const contentEl = document.getElementById('emotion-detail-content');
 
-    alert(`${userName} 학생의 감정 기록 (${studentData.length}회)\n\n` +
-        studentData.slice(0, 5).map(d =>
-            `${d.date}: ${d.emotionEmoji} ${d.emotionName || ''}\n단어: ${(d.selectedWords || []).join(', ')}\n이유: ${d.reason || '-'}`
-        ).join('\n\n')
-    );
+    // 모달 마크업이 없으면 기존 alert로 폴백
+    if (!modalEl || !closeBtn || !subtitleEl || !contentEl) {
+        alert(`${userName} 학생의 감정 기록 (${studentData.length}회)`);
+        return;
+    }
+
+    const escapeHtml = (s) =>
+        String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+    const maxRows = 20;
+    const rows = studentData.slice(0, maxRows).map(d => {
+        const words = Array.isArray(d.selectedWords) ? d.selectedWords : [];
+        const reason = d.reason || '-';
+        return `
+            <div style="padding: 0.9rem; border-radius: 14px; background: rgba(237, 242, 247, 0.9); margin-bottom: 0.7rem;">
+                <div style="font-weight: 800; margin-bottom: 0.4rem;">
+                    ${escapeHtml(d.date)} · ${escapeHtml(d.emotionEmoji)} ${escapeHtml(d.emotionName || '')}
+                </div>
+                <div style="margin-bottom: 0.4rem;">
+                    <span style="font-weight: 700;">선택 단어:</span>
+                    ${words.slice(0, 12).map(w => `<span class="word-badge" style="margin-right: 0.3rem;">${escapeHtml(w)}</span>`).join('')}
+                </div>
+                <div>
+                    <span style="font-weight: 700;">이유:</span> ${escapeHtml(reason)}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    subtitleEl.textContent = `${userName} 학생의 감정 기록 (${studentData.length}회)`;
+    contentEl.innerHTML = studentData.length > maxRows
+        ? `${rows}<div style="color: var(--text-light); font-weight: 600; margin-top: 0.6rem;">(최근 ${maxRows}개만 표시)</div>`
+        : rows;
+
+    // 이벤트는 중복 등록 방지용으로 최초 1회만
+    if (!modalEl.dataset.bound) {
+        closeBtn.addEventListener('click', () => {
+            modalEl.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        const backdrop = modalEl.querySelector('.modal-backdrop');
+        backdrop && backdrop.addEventListener('click', () => {
+            modalEl.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        modalEl.dataset.bound = 'true';
+    }
+
+    modalEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 // 날짜 포맷

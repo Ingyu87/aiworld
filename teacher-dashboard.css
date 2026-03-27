@@ -450,6 +450,11 @@ td {
     animation: slideUp 0.4s ease;
 }
 
+.modal-content.wide {
+    max-width: 920px;
+    width: 95%;
+}
+
 .modal-header {
     padding: var(--spacing-lg);
     border-bottom: 2px solid var(--cream);
@@ -713,6 +718,21 @@ td {
     height: 4px;
     background: var(--primary-teal);
     border-radius: var(--radius-sm);
+}
+
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.6rem;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--primary-teal);
+    font-size: 0.8rem;
+    font-weight: 800;
+    position: relative;
+    top: -1px;
 }
 
 .tab-content {

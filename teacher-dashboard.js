@@ -90,6 +90,14 @@ async function loadStudents() {
 
         // Update count
         studentCount.textContent = `${students.length}명의 학생`;
+        // 감정 출석부 참여율 계산에 쓰이므로 전역으로도 보관
+        window.allStudents = students;
+
+        // 탭 배지(학생 수) 갱신
+        const tabBadgeEl = document.getElementById('students-tab-badge');
+        if (tabBadgeEl) {
+            tabBadgeEl.textContent = students.length;
+        }
 
         // Update filter dropdown
         studentFilter.innerHTML = '<option value="all">전체 학생</option>';

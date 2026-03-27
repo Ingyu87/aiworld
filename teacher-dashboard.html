@@ -39,7 +39,9 @@
         <div class="dashboard-container">
             <!-- Tab Navigation -->
             <div class="dashboard-tabs">
-                <button class="tab-button active" data-tab="students">학생 관리</button>
+                <button class="tab-button active" data-tab="students">
+                    학생 관리 <span class="tab-badge" id="students-tab-badge">0</span>
+                </button>
                 <button class="tab-button" data-tab="emotions">감정 출석부</button>
                 <button class="tab-button" data-tab="approvals">앱 승인 관리</button>
             </div>
@@ -165,8 +167,8 @@
                         </button>
                         <select class="filter-select" id="emotion-period-filter">
                             <option value="today">오늘</option>
-                            <option value="week" selected>이번 주</option>
-                            <option value="month">이번 달</option>
+                            <option value="week">이번 주</option>
+                            <option value="month" selected>이번 달</option>
                             <option value="quarter">분기별</option>
                         </select>
                     </div>
@@ -189,11 +191,6 @@
                         <div class="analysis-section">
                             <h4>💡 전반적인 학급 분위기</h4>
                             <p id="analysis-overview"></p>
-                        </div>
-
-                        <div class="analysis-section">
-                            <h4>📌 주목할 패턴</h4>
-                            <ul id="analysis-patterns"></ul>
                         </div>
 
                         <div class="analysis-section">
@@ -380,6 +377,21 @@
                     <button type="button" class="secondary-button" id="delete-cancel-btn">취소</button>
                     <button type="button" class="danger-button" id="delete-confirm-btn">삭제</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emotion Detail Modal -->
+    <div class="modal" id="emotion-detail-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h3 class="modal-title" id="emotion-detail-modal-title">학생 감정 상세</h3>
+                <button class="modal-close" id="emotion-detail-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="emotion-detail-subtitle" style="color: var(--text-light); margin-bottom: 1rem;"></div>
+                <div id="emotion-detail-content"></div>
             </div>
         </div>
     </div>

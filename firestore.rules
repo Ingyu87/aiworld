@@ -41,7 +41,8 @@ service cloud.firestore {
     match /usage_logs/{logId} {
       allow read: if isTeacher();
       allow create: if isAuthenticated();
-      allow update, delete: if false; // Logs should not be modified
+      // 교사용 대시보드(학생 삭제/기록 초기화)에서 삭제가 필요함
+      allow update, delete: if isTeacher();
     }
     
     // User agreements - users can read/write their own, teachers can read all
@@ -54,6 +55,8 @@ service cloud.firestore {
     match /emotional_checkins/{checkinId} {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isTeacher());
+      // 교사가 감정 기록 초기화를 수행할 수 있도록 허용
+      allow delete: if isTeacher();
     }
   }
 }

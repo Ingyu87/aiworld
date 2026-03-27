@@ -79,14 +79,29 @@ JSON 형식으로 응답:
 초등학교 교사가 이해하기 쉽고 실천 가능한 내용으로 작성해주세요.
 `;
 
-        const generatedText = await generateGeminiText({
-            apiKey: GEMINI_API_KEY,
-            prompt,
-            generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 1000,
-            }
-        });
+        let generatedText = '';
+        try {
+            generatedText = await generateGeminiText({
+                apiKey: GEMINI_API_KEY,
+                prompt,
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 1000,
+                }
+            });
+        } catch (geminiError) {
+            // API 키 만료/쿼터 초과 등 외부 API 오류 시에도 화면이 깨지지 않도록
+            // 로컬 규칙 기반 분석 결과를 반환한다.
+            console.error('Gemini API unavailable, using fallback:', geminiError);
+            const fallbackAnalysis = buildFallbackAnalysis(emotionData, checkinRate, period);
+            return res.status(200).json({
+                success: true,
+                analysis: fallbackAnalysis,
+                period: period,
+                fallback: true,
+                fallbackReason: geminiError.message || 'Gemini unavailable'
+            });
+        }
 
         let analysis;
         let fallback = false;

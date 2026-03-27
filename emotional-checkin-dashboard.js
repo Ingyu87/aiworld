@@ -36,6 +36,14 @@ async function initEmotionsTab() {
         generateAIAnalysis();
     });
 
+    // AI 분석 생성 버튼(수동 실행)
+    const generateBtn = document.getElementById('btn-generate-ai-analysis');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            generateAIAnalysis();
+        });
+    }
+
     // 감정 기록 초기화 버튼
     const resetEmotionsBtn = document.getElementById('reset-emotions-btn');
     if (resetEmotionsBtn) {
@@ -104,10 +112,7 @@ async function loadEmotionData() {
         updateWordCloud();
         updateEmotionTable();
 
-        // AI 분석 생성
-        if (emotionData.length > 0) {
-            generateAIAnalysis();
-        }
+        // AI 분석은 버튼으로만 수동 생성하도록 유지
 
     } catch (error) {
         console.error('Error loading emotion data:', error);

@@ -187,6 +187,13 @@ const APPS_DATA = [
         url: "https://gemini.google.com/share/c8afd694f7de"
     },
     {
+        title: "가동초 2026 1학기 교과평가 시스템",
+        category: "학급운영",
+        description: "가동초 2026 1학기 교과평가 기반 종합의견을 생성하는 도우미입니다.",
+        icon: "📚",
+        url: "https://gdresults.vercel.app/"
+    },
+    {
         title: "AI 인터렉티브 게임",
         category: "창체",
         description: "AI와 함께 창의적 체험활동을 해요!",

@@ -454,19 +454,52 @@ async function generateAIAnalysis() {
 
 // AI 분석 표시
 function displayAIAnalysis(analysis) {
-    document.getElementById('analysis-overview').textContent = analysis.overview;
+    const contentEl = document.getElementById('ai-analysis-content');
+    if (!contentEl) return;
 
-    document.getElementById('analysis-patterns').innerHTML = analysis.patterns
-        .map(p => `<li>${p}</li>`)
-        .join('');
+    const overviewEl = document.getElementById('analysis-overview');
+    const patternsEl = document.getElementById('analysis-patterns');
+    const suggestionsEl = document.getElementById('analysis-suggestions');
+    const positivesEl = document.getElementById('analysis-positives');
 
-    document.getElementById('analysis-suggestions').innerHTML = analysis.suggestions
-        .map(s => `<li>${s}</li>`)
-        .join('');
+    const overviewText = analysis?.overview || '분석 결과가 없습니다.';
+    const patterns = Array.isArray(analysis?.patterns)
+        ? analysis.patterns
+        : (analysis?.patterns ? [String(analysis.patterns)] : []);
+    const suggestions = Array.isArray(analysis?.suggestions)
+        ? analysis.suggestions
+        : (analysis?.suggestions ? [String(analysis.suggestions)] : []);
+    const positivesText = analysis?.positives || '';
 
-    document.getElementById('analysis-positives').textContent = analysis.positives;
+    // 마크업/ID가 달라도 렌더링 실패로 전체 카드가 깨지지 않게 보호
+    if (!overviewEl || !patternsEl || !suggestionsEl || !positivesEl) {
+        contentEl.innerHTML = `
+            <div class="analysis-section">
+                <h4>💡 전반적인 학급 분위기</h4>
+                <p>${overviewText}</p>
+            </div>
+            <div class="analysis-section">
+                <h4>📌 주목할 패턴</h4>
+                <ul>${patterns.map(p => `<li>${p}</li>`).join('')}</ul>
+            </div>
+            <div class="analysis-section">
+                <h4>✨ 실천 제안</h4>
+                <ul>${suggestions.map(s => `<li>${s}</li>`).join('')}</ul>
+            </div>
+            <div class="analysis-section positive">
+                <h4>👍 긍정적인 점</h4>
+                <p>${positivesText}</p>
+            </div>
+        `;
+        contentEl.style.display = 'block';
+        return;
+    }
 
-    document.getElementById('ai-analysis-content').style.display = 'block';
+    overviewEl.textContent = overviewText;
+    patternsEl.innerHTML = patterns.map(p => `<li>${p}</li>`).join('');
+    suggestionsEl.innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
+    positivesEl.textContent = positivesText;
+    contentEl.style.display = 'block';
 }
 
 // 학생 감정 상세 보기

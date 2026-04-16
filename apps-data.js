@@ -138,6 +138,13 @@ const APPS_DATA = [
         url: "https://gemini.google.com/share/9522cc4ef4b4"
     },
     {
+        title: "4학년 곱셈과 나눗셈rpg",
+        category: "수학",
+        description: "4학년 곱셈·나눗셈을 RPG로 재미있게 연습해요!",
+        icon: "🎮",
+        url: "https://math4rpg.vercel.app/"
+    },
+    {
         title: "행동특성 및 종합의견",
         category: "학급운영",
         description: "학생의 성장을 기록하고 관찰해요!",

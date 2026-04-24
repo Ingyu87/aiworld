@@ -54,6 +54,13 @@ const APPS_DATA = [
         url: "https://ai-ethic.vercel.app/"
     },
     {
+        title: "AI 윤리 탐험대",
+        category: "창체",
+        description: "스토리텔링 어드벤처로 AI 윤리를 배워요!",
+        icon: "🤖",
+        url: "https://ai-ethic2.vercel.app/"
+    },
+    {
         title: "인공지능원리로 익히는 자료와 가능성",
         category: "수학",
         description: "AI 원리로 통계를 재밌게 배워요!",

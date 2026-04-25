@@ -26,6 +26,22 @@ export default async function handler(req, res) {
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+        if (!emotionData || typeof emotionData !== 'object' || Array.isArray(emotionData)) {
+            return res.status(400).json({
+                success: false,
+                error: 'emotionData must be an object map'
+            });
+        }
+
+        if (Object.keys(emotionData).length === 0) {
+            return res.status(200).json({
+                success: true,
+                analysis: buildEmptyDataAnalysis(period),
+                period,
+                fallback: true
+            });
+        }
+
         // 데이터 요약 생성
         const dataSummary = generateDataSummary(emotionData, studentCount, checkinRate, period);
 
@@ -195,5 +211,23 @@ function buildFallbackAnalysis(emotionData, checkinRate, period) {
             '감정 단어를 다양하게 표현할 수 있는 활동을 추가해보세요.'
         ],
         positives: '학생들이 감정을 기록하고 있다는 점 자체가 매우 긍정적입니다.'
+    };
+}
+
+function buildEmptyDataAnalysis(period) {
+    return {
+        overview: `${getPeriodName(period)} 기준으로 아직 수집된 감정 데이터가 없습니다.`,
+        patterns: [
+            '감정 체크인 데이터가 없어 패턴 분석을 진행할 수 없습니다.',
+            '학생들이 감정을 기록하면 자동으로 분석이 갱신됩니다.',
+            '첫 주에는 참여 안내와 체크인 루틴 정착이 중요합니다.'
+        ],
+        suggestions: [
+            '매일 같은 시간에 1분 감정 체크인 시간을 운영해보세요.',
+            '체크인 목적을 학생에게 간단히 안내해 참여 동기를 높여주세요.',
+            '학급 공지나 알림장에 체크인 안내를 함께 제공해보세요.',
+            '일주일 후 다시 분석해 변화를 확인해보세요.'
+        ],
+        positives: '데이터를 모으기 시작하면 학급 분위기를 더 정확하게 이해할 수 있습니다.'
     };
 }

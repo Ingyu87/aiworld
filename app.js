@@ -25,6 +25,7 @@ auth.onAuthStateChanged(async (user) => {
     isInitializing = true;
     if (!user) {
         // Not logged in, redirect to login page
+        isInitializing = false;
         window.location.href = 'login.html';
         return;
     }

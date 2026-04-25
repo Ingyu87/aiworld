@@ -800,96 +800,96 @@ body {
     border-radius: 10px;
 }
 
-/* Guidelines Grid */
-.guidelines-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+/* Core Guide Table */
+.guide-table {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     margin-bottom: 2rem;
 }
 
-.guideline-card {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.guideline-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    border-color: #667eea;
-}
-
-.card-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.guideline-card h4 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 0.75rem;
-}
-
-.guideline-card p {
-    font-size: 0.95rem;
-    color: #4a5568;
-    line-height: 1.6;
-}
-
-/* Remember Section */
-.remember-section {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.remember-section h3 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #667eea;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.remember-cards {
+.guide-table-header {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: 220px 1fr;
+    background: #f3a734;
+    color: #ffffff;
+    font-weight: 700;
 }
 
-.remember-card {
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
+.guide-col-value,
+.guide-col-guide {
+    padding: 0.95rem 1.25rem;
+    font-size: 1rem;
 }
 
-.remember-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(252, 182, 159, 0.4);
+.guide-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-top: 1px solid #f1d7ab;
+    background: #fffdf8;
 }
 
-.remember-icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 0.75rem;
+.guide-value-stack {
+    padding: 1rem;
+    border-right: 1px solid #f1d7ab;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.55rem;
 }
 
-.remember-card p {
+.value-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.value-pill.orange {
+    background: #f08a24;
+}
+
+.value-pill.green {
+    background: #5cae66;
+}
+
+.value-pill.blue {
+    background: #4f86c6;
+}
+
+.value-pill.yellow {
+    background: #d2a52b;
+}
+
+.guide-content-cell {
+    padding: 1rem 1.25rem 1.2rem;
+}
+
+.guide-id {
+    color: #eb8d24;
+    font-weight: 700;
     font-size: 0.95rem;
-    color: #2d3748;
+    margin-bottom: 0.4rem;
+}
+
+.guide-content-cell h4 {
+    font-size: 1.35rem;
+    color: #1f2937;
+    margin: 0 0 0.5rem;
+    line-height: 1.45;
+}
+
+.guide-content-cell p {
+    color: #374151;
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.75;
+    font-size: 0.98rem;
 }
 
 /* Agreement Section */
@@ -947,13 +947,27 @@ body {
         padding: 1rem;
     }
 
-    .guidelines-grid {
+    .guide-table-header,
+    .guide-row {
         grid-template-columns: 1fr;
-        gap: 1rem;
     }
 
-    .remember-cards {
-        grid-template-columns: 1fr;
+    .guide-col-value {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .guide-value-stack {
+        border-right: none;
+        border-bottom: 1px solid #f1d7ab;
+        padding-bottom: 0.8rem;
+    }
+
+    .guide-content-cell h4 {
+        font-size: 1.1rem;
+    }
+
+    .guide-content-cell p {
+        font-size: 0.92rem;
     }
 
     .agree-btn {

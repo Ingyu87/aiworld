@@ -408,6 +408,12 @@ async function generateAIAnalysis() {
     content.style.display = 'none';
 
     try {
+        if (!Array.isArray(emotionData) || emotionData.length === 0) {
+            content.innerHTML = '<p style="text-align: center;">아직 분석할 감정 데이터가 없습니다. 감정 체크인 후 다시 시도해주세요.</p>';
+            content.style.display = 'block';
+            return;
+        }
+
         const apiUrl = buildApiUrl('/api/analyze-class-emotions');
         if (!apiUrl) {
             content.innerHTML = '<p style="text-align: center;">로컬 파일로 실행 중이라 AI 분석 API를 사용할 수 없습니다. 서버에서 실행해주세요.</p>';

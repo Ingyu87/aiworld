@@ -657,6 +657,24 @@ body {
 
     .nav-container {
         gap: var(--spacing-xs);
+        align-items: center;
+    }
+
+    .nav-left {
+        flex: 1;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .nav-left::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-right {
+        flex-shrink: 0;
     }
 
     .nav-item {
@@ -699,6 +717,21 @@ body {
 
     .nav-item {
         padding: var(--spacing-sm);
+        min-width: 48px;
+        min-height: 48px;
+        justify-content: center;
+    }
+
+    .user-badge {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .logout-btn,
+    .dashboard-btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
     }
 }
 

@@ -234,6 +234,13 @@ const APPS_DATA = [
         description: "2022 개정 교육과정 기반 교수·학습 과정안(약안)을 AI로 빠르게 초안 작성해요!",
         icon: "📝",
         url: "https://lessonplan-alpha.vercel.app/"
+    },
+    {
+        title: "학교평가 초안 작성기",
+        category: "학급운영",
+        description: "학교평가 설문 초안을 만들고 문항을 구성해요!",
+        icon: "🏫",
+        url: "https://2026eva.vercel.app/"
     }
 ];
 

@@ -82,6 +82,20 @@ const APPS_DATA = [
         url: "https://4-2-4-app.vercel.app/"
     },
     {
+        title: "따뜻한 말한마디",
+        category: "국어",
+        description: "따뜻한 말을 배우고 실천하는 활동을 해요!",
+        icon: "💬",
+        url: "https://on-yu-54407913420.asia-east1.run.app/"
+    },
+    {
+        title: "우리동네 핫스팟",
+        category: "사회",
+        description: "우리 동네의 특징과 장소를 탐구해요!",
+        icon: "📍",
+        url: "https://service-517547741378.us-west1.run.app"
+    },
+    {
         title: "우리말 탐구 보고서",
         category: "국어",
         description: "AI와 함께 우리말을 탐구해요!",

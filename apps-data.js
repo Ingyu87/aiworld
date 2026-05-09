@@ -75,6 +75,13 @@ const APPS_DATA = [
         url: "https://decimal-3d-app.vercel.app/"
     },
     {
+        title: "4학년 1학기 맞춤법 디펜스 게임",
+        category: "국어",
+        description: "4학년 1학기 맞춤법을 디펜스 게임으로 즐겁게 연습해요!",
+        icon: "🛡️",
+        url: "https://spell-defense-1011208471756.asia-east1.run.app/"
+    },
+    {
         title: "질문으로 독서하기",
         category: "국어",
         description: "AI에게 질문하며 책을 깊이 읽어요!",

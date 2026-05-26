@@ -33,6 +33,13 @@ const APPS_DATA = [
         url: "https://ai-12363257340.us-west1.run.app"
     },
     {
+        title: "생각잇기 프롬프트",
+        category: "창체",
+        description: "생각을 확장하는 프롬프트로 수업 활동을 해봐요!",
+        icon: "💡",
+        url: "https://hitl-chat-gamma.vercel.app/"
+    },
+    {
         title: "AI 캐릭터 굿즈 만들기",
         category: "창체",
         description: "나만의 캐릭터로 굿즈를 디자인해요!",

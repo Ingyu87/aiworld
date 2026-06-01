@@ -40,6 +40,13 @@ const APPS_DATA = [
         url: "https://hitl-chat-gamma.vercel.app/"
     },
     {
+        title: "도화지 바이브 코딩",
+        category: "창체",
+        description: "도화지에서 바이브 코딩으로 창의적으로 코딩해요!",
+        icon: "🖌️",
+        url: "https://gemini.google.com/share/835ee81c2f0b"
+    },
+    {
         title: "AI 캐릭터 굿즈 만들기",
         category: "창체",
         description: "나만의 캐릭터로 굿즈를 디자인해요!",

@@ -44,7 +44,7 @@ const APPS_DATA = [
         category: "창체",
         description: "도화지에서 바이브 코딩으로 창의적으로 코딩해요!",
         icon: "🖌️",
-        url: "https://gemini.google.com/share/835ee81c2f0b"
+        url: "https://gemini.google.com/share/d45278b8f8f8"
     },
     {
         title: "AI 캐릭터 굿즈 만들기",

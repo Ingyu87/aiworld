@@ -110,6 +110,13 @@ const APPS_DATA = [
         url: "https://on-yu-54407913420.asia-east1.run.app/"
     },
     {
+        title: "우리들의 이야기 릴레이",
+        category: "국어",
+        description: "친구들과 함께 실시간으로 이야기를 이어 쓰는 협동 글쓰기예요!",
+        icon: "✏️",
+        url: "https://team-story-maker.vercel.app/"
+    },
+    {
         title: "우리동네 핫스팟",
         category: "사회",
         description: "우리 동네의 특징과 장소를 탐구해요!",

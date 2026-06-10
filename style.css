@@ -112,40 +112,48 @@ body {
     top: 0;
     z-index: 100;
     padding: var(--spacing-sm) 0;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .nav-container {
-    max-width: 1200px;
+    width: max-content;
+    max-width: none;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 0.75rem;
     flex-wrap: nowrap;
-    padding: 0 var(--spacing-md);
+    padding: 0 1rem;
 }
 
 .nav-left {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 0.6rem;
     flex-wrap: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 0.6rem;
+    flex-shrink: 0;
 }
 
 .user-badge {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: 0.55rem 0.8rem;
     background: var(--cream);
     border-radius: var(--radius-sm);
     font-weight: 600;
     color: var(--text-dark);
+    white-space: nowrap;
+    word-break: keep-all;
+    flex-shrink: 0;
 }
 
 .user-icon {
@@ -153,7 +161,7 @@ body {
 }
 
 .logout-btn {
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: 0.5rem 0.8rem;
     background: transparent;
     border: 2px solid var(--primary-teal);
     color: var(--primary-teal);
@@ -162,6 +170,9 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    word-break: keep-all;
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -170,7 +181,7 @@ body {
 }
 
 .dashboard-btn {
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: 0.5rem 0.8rem;
     background: linear-gradient(135deg, var(--primary-pink), var(--primary-teal));
     color: white;
     border-radius: var(--radius-sm);
@@ -181,6 +192,9 @@ body {
     align-items: center;
     gap: var(--spacing-xs);
     transition: all 0.3s ease;
+    white-space: nowrap;
+    word-break: keep-all;
+    flex-shrink: 0;
 }
 
 .dashboard-btn:hover {
@@ -192,17 +206,21 @@ body {
     background: white;
     border: 3px solid transparent;
     border-radius: var(--radius-md);
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: 0.65rem 0.85rem;
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: 0.35rem;
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: var(--font-main);
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-dark);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    word-break: keep-all;
+    flex-shrink: 0;
+    line-height: 1;
 }
 
 .nav-item:hover {
@@ -221,12 +239,17 @@ body {
 }
 
 .nav-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     transition: transform 0.3s ease;
+    flex-shrink: 0;
+    line-height: 1;
 }
 
 .nav-text {
     font-weight: 600;
+    white-space: nowrap;
+    word-break: keep-all;
+    line-height: 1;
 }
 
 /* ===========================
@@ -656,17 +679,14 @@ body {
     }
 
     .nav-container {
-        gap: var(--spacing-xs);
+        gap: 0.5rem;
         align-items: center;
+        margin: 0;
+        padding: 0 0.75rem;
     }
 
     .nav-left {
-        flex: 1;
-        min-width: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        gap: 0.5rem;
     }
 
     .nav-left::-webkit-scrollbar {
@@ -678,12 +698,12 @@ body {
     }
 
     .nav-item {
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: 0.875rem;
+        padding: 0.55rem 0.7rem;
+        font-size: 0.82rem;
     }
 
     .nav-icon {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
     }
 
     .section-title {
@@ -711,14 +731,9 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .nav-text {
-        display: none;
-    }
-
     .nav-item {
-        padding: var(--spacing-sm);
-        min-width: 48px;
-        min-height: 48px;
+        padding: 0.5rem 0.6rem;
+        min-height: 44px;
         justify-content: center;
     }
 

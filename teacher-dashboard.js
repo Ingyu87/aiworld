@@ -1,5 +1,5 @@
 ﻿// ===========================
-// Apps Data (怨듯넻 ?뚯씪?먯꽌 媛?몄삤湲?
+// Apps Data
 // ===========================
 const apps = window.APPS_DATA || [];
 
@@ -86,7 +86,7 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout error:', error);
-        alert('濡쒓렇?꾩썐???ㅽ뙣?덉뒿?덈떎.');
+        alert('로그아웃에 실패했습니다.');
     }
 });
 
@@ -121,18 +121,18 @@ async function loadStudents() {
         });
 
         // Update count
-        studentCount.textContent = `${students.length}紐낆쓽 ?숈깮`;
-        // 媛먯젙 異쒖꽍遺 李몄뿬??怨꾩궛???곗씠誘濡??꾩뿭?쇰줈??蹂닿?
+        studentCount.textContent = `${students.length}명의 학생`;
+        // 감정 출석부 참여율 계산을 위해 전역으로 보관
         window.allStudents = students;
 
-        // ??諛곗?(?숈깮 ?? 媛깆떊
+        // 탭 배지 학생 수 갱신
         const tabBadgeEl = document.getElementById('students-tab-badge');
         if (tabBadgeEl) {
             tabBadgeEl.textContent = students.length;
         }
 
         // Update filter dropdown
-        studentFilter.innerHTML = '<option value="all">?꾩껜 ?숈깮</option>';
+        studentFilter.innerHTML = '<option value="all">전체 학생</option>';
         students.forEach(student => {
             const option = document.createElement('option');
             option.value = student.id;
@@ -158,9 +158,9 @@ async function loadStudents() {
         console.error('Error loading students:', error);
         emptyState.style.display = 'none'; // Hide empty state if showing error
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 2rem;">' +
-            '?숈깮 紐⑸줉??遺덈윭?????놁뒿?덈떎.<br>' +
-            '<small>?ㅽ듃?뚰겕 ?곌껐???뺤씤?섍굅?? ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.<br>' +
-            '?ㅻ쪟 ?댁슜: ' + (error.message || '?????녿뒗 ?ㅻ쪟') + '</small>' +
+            '학생 목록을 불러올 수 없습니다.<br>' +
+            '<small>네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br>' +
+            '오류 내용: ' + (error.message || '알 수 없는 오류') + '</small>' +
             '</td></tr>';
     }
 }
@@ -194,11 +194,11 @@ function createStudentRow(student) {
         <td><div class="student-name">${student.name}</div></td>
         <td>${createdDate}</td>
         <td>${lastLoginStr}</td>
-        <td><span class="badge" style="background: #e3f2fd; color: #1565c0;">${student.loginCount || 0}??/span></td>
+        <td><span class="badge" style="background: #e3f2fd; color: #1565c0;">${student.loginCount || 0}회</span></td>
         <td>
             <div class="action-buttons">
-                <button class="action-btn btn-reset" onclick="editPassword('${student.id}', '${student.name}')">鍮꾨쾲 ?섏젙</button>
-                <button class="action-btn btn-delete" onclick="deleteStudent('${student.id}', '${student.name}')">??젣</button>
+                <button class="action-btn btn-reset" onclick="editPassword('${student.id}', '${student.name}')">비번 수정</button>
+                <button class="action-btn btn-delete" onclick="deleteStudent('${student.id}', '${student.name}')">삭제</button>
             </div>
         </td>
     `;
@@ -238,7 +238,7 @@ async function loadUsageStats() {
 
             // Filter out teacher logs (check both userId and userName)
             if (currentTeacher && data.userId === currentTeacher.uid) return;
-            if (data.userName && data.userName.includes('援먯궗')) return;
+            if (data.userName && data.userName.includes('교사')) return;
 
             const key = `${data.userId}_${data.appName} `;
 
@@ -266,7 +266,7 @@ async function loadUsageStats() {
 
         // Populate app filter
         const uniqueApps = [...new Set(statsArray.map(s => s.appName))];
-        appFilter.innerHTML = '<option value="all">?꾩껜 ??/option>';
+        appFilter.innerHTML = '<option value="all">전체 앱</option>';
         uniqueApps.forEach(appName => {
             const option = document.createElement('option');
             option.value = appName;
@@ -292,7 +292,7 @@ async function loadUsageStats() {
 
     } catch (error) {
         console.error('Error loading usage stats:', error);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">?듦퀎瑜?遺덈윭?ㅻ뒗 ???ㅽ뙣?덉뒿?덈떎.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">통계를 불러오는 데 실패했습니다.</td></tr>';
     }
 }
 
@@ -309,7 +309,7 @@ function createStatsRow(stat) {
         <td><strong>${stat.userName}</strong></td>
         <td>${stat.appName}</td>
         <td><span class="badge badge-grade">${stat.appCategory}</span></td>
-        <td><strong>${stat.count}??/strong></td>
+        <td><strong>${stat.count}회</strong></td>
         <td>${lastAccess}</td>
     `;
 
@@ -366,7 +366,7 @@ function renderChart(statsArray) {
         data: {
             labels: labels,
             datasets: [{
-                label: '???ㅽ뻾 ?잛닔',
+                label: '앱 실행 횟수',
                 data: data,
                 backgroundColor: 'rgba(78, 205, 196, 0.6)',
                 borderColor: 'rgba(78, 205, 196, 1)',
@@ -383,7 +383,7 @@ function renderChart(statsArray) {
                 },
                 title: {
                     display: true,
-                    text: '?멸린 ??TOP 10'
+                    text: '인기 앱 TOP 10'
                 }
             },
             scales: {
@@ -417,8 +417,8 @@ cancelBtn.addEventListener('click', closeModal);
 
 function openAddModal() {
     editingStudentId = null;
-    modalTitle.textContent = '?숈깮 異붽?';
-    submitText.textContent = '異붽?';
+    modalTitle.textContent = '학생 추가';
+    submitText.textContent = '추가';
     studentForm.reset();
 
     // Enable email input
@@ -433,8 +433,8 @@ function openAddModal() {
 
 function openEditModal(studentId, studentData) {
     editingStudentId = studentId;
-    modalTitle.textContent = '?숈깮 ?뺣낫 ?섏젙';
-    submitText.textContent = '?섏젙';
+    modalTitle.textContent = '학생 정보 수정';
+    submitText.textContent = '수정';
 
     // Extract ID from email (remove @ingyu-ai-world.com)
     const displayEmail = studentData.email.replace('@ingyu-ai-world.com', '');
@@ -484,11 +484,11 @@ studentForm.addEventListener('submit', async (e) => {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            alert('?숈깮 ?뺣낫媛 ?섏젙?섏뿀?듬땲??');
+            alert('학생 정보가 수정되었습니다.');
         } else {
             // Create new student
             if (!password || password.length !== 4 || isNaN(password)) {
-                throw new Error('鍮꾨?踰덊샇???レ옄 4?먮━?ъ빞 ?⑸땲??');
+                throw new Error('비밀번호는 숫자 4자리여야 합니다.');
             }
 
             const secureFullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
@@ -499,7 +499,7 @@ studentForm.addEventListener('submit', async (e) => {
                 pin: password
             });
 
-            alert('?숈깮??異붽??섏뿀?듬땲??');
+            alert('학생이 추가되었습니다.');
             closeModal();
             loadStudents();
             return;
@@ -511,14 +511,14 @@ studentForm.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error('Error saving student:', error);
 
-        let errorMessage = '?숈깮 ?뺣낫 ??μ뿉 ?ㅽ뙣?덉뒿?덈떎.';
+        let errorMessage = '학생 정보 저장에 실패했습니다.';
 
         if (error.code === 'auth/email-already-in-use') {
-            errorMessage = '?대? ?ъ슜 以묒씤 ?대찓?쇱엯?덈떎.';
+            errorMessage = '이미 사용 중인 이메일입니다.';
         } else if (error.code === 'auth/invalid-email') {
-            errorMessage = '?щ컮瑜??대찓???뺤떇???꾨떃?덈떎.';
+            errorMessage = '올바른 이메일 형식이 아닙니다.';
         } else if (error.code === 'auth/weak-password') {
-            errorMessage = '鍮꾨?踰덊샇媛 ?덈Т ?쏀빀?덈떎. (理쒖냼 6??';
+            errorMessage = '비밀번호가 너무 약합니다. (최소 6자)';
         } else if (error.message) {
             errorMessage = error.message;
         }
@@ -539,7 +539,7 @@ window.editStudent = async function (studentId) {
         }
     } catch (error) {
         console.error('Error loading student:', error);
-        alert('?숈깮 ?뺣낫瑜?遺덈윭?ㅻ뒗 ???ㅽ뙣?덉뒿?덈떎.');
+        alert('학생 정보를 불러오는 데 실패했습니다.');
     }
 };
 
@@ -547,12 +547,12 @@ window.editStudent = async function (studentId) {
 // Edit Password (formerly Reset Password)
 // ===========================
 window.editPassword = async function (studentId, studentName) {
-    const newPassword = prompt(`${studentName} ?숈깮????鍮꾨?踰덊샇瑜??낅젰?섏꽭??4?먮━): `);
+    const newPassword = prompt(`${studentName} 학생의 새 비밀번호를 입력하세요 (4자리):`);
 
     if (!newPassword) return;
 
     if (newPassword.length !== 4 || isNaN(newPassword)) {
-        alert('鍮꾨?踰덊샇??諛섎뱶???レ옄 4?먮━?ъ빞 ?⑸땲??');
+        alert('비밀번호는 반드시 숫자 4자리여야 합니다.');
         return;
     }
 
@@ -560,13 +560,13 @@ window.editPassword = async function (studentId, studentName) {
         const updateStudentPin = firebaseFns.httpsCallable('updateStudentPin');
         await updateStudentPin({ uid: studentId, pin: newPassword });
 
-        alert(`${studentName} ?숈깮??鍮꾨?踰덊샇媛 蹂寃쎈릺?덉뒿?덈떎.`);
+        alert(`${studentName} 학생의 비밀번호가 변경되었습니다.`);
         loadStudents();
         return;
 
     } catch (error) {
         console.error('Error resetting password:', error);
-        alert('鍮꾨?踰덊샇 ?ъ꽕?뺤뿉 ?ㅽ뙣?덉뒿?덈떎.');
+        alert('비밀번호 변경에 실패했습니다.');
     }
 };
 
@@ -601,7 +601,7 @@ deleteConfirmBtn.addEventListener('click', async () => {
         const deleteStudentAccount = firebaseFns.httpsCallable('deleteStudentAccount');
         await deleteStudentAccount({ uid: deletingStudentId });
 
-        alert('?숈깮????젣?섏뿀?듬땲??');
+        alert('학생이 삭제되었습니다.');
         closeDeleteModal();
         loadStudents();
         loadUsageStats();
@@ -623,7 +623,7 @@ deleteConfirmBtn.addEventListener('click', async () => {
 
         // Note: We don't delete from Auth to avoid Admin SDK errors.
         // Once the Firestore record is gone, the login shim in login.js will deny access.
-        alert('?숈깮???깃났?곸쑝濡???젣?섏뿀?듬땲??');
+        alert('학생이 성공적으로 삭제되었습니다.');
 
         closeDeleteModal();
         loadStudents();
@@ -631,7 +631,7 @@ deleteConfirmBtn.addEventListener('click', async () => {
 
     } catch (error) {
         console.error('Error deleting student:', error);
-        alert('?숈깮 ??젣???ㅽ뙣?덉뒿?덈떎.');
+        alert('학생 삭제에 실패했습니다.');
     }
 });
 
@@ -641,13 +641,13 @@ deleteConfirmBtn.addEventListener('click', async () => {
 const resetUsageBtn = document.getElementById('reset-usage-btn');
 if (resetUsageBtn) {
     resetUsageBtn.addEventListener('click', async () => {
-        if (!confirm('紐⑤뱺 ?숈깮?????ъ슜 湲곕줉??珥덇린?뷀븯?쒓쿋?듬땲源?\n???묒뾽? ?섎룎由????놁뒿?덈떎.')) return;
+        if (!confirm('모든 학생의 사용 기록을 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
 
         try {
             resetUsageBtn.disabled = true;
             const submitText = resetUsageBtn.querySelector('.button-text');
             const originalText = submitText.textContent;
-            submitText.textContent = '珥덇린??以?..';
+            submitText.textContent = '초기화 중...';
 
             const snapshot = await db.collection('usage_logs')
                 .where('teacherId', '==', currentTeacher.uid)
@@ -659,7 +659,7 @@ if (resetUsageBtn) {
             });
 
             await batch.commit();
-            alert('?ъ슜 湲곕줉??珥덇린?붾릺?덉뒿?덈떎.');
+            alert('사용 기록이 초기화되었습니다.');
             
             submitText.textContent = originalText;
             resetUsageBtn.disabled = false;
@@ -669,7 +669,7 @@ if (resetUsageBtn) {
 
         } catch (error) {
             console.error('Error resetting usage stats:', error);
-            alert('湲곕줉 珥덇린?붿뿉 ?ㅽ뙣?덉뒿?덈떎.');
+            alert('기록 초기화에 실패했습니다.');
             resetUsageBtn.disabled = false;
         }
     });
@@ -748,7 +748,7 @@ async function initializeDashboardAppApprovals() {
 async function loadAppApprovalsForDashboard() {
     // Show loading?
     if (!approvalGrid) return;
-    approvalGrid.innerHTML = '<div class="table-loading"><div class="spinner"></div><p>??紐⑸줉??遺덈윭?ㅻ뒗 以?..</p></div>';
+    approvalGrid.innerHTML = '<div class="table-loading"><div class="spinner"></div><p>앱 목록을 불러오는 중...</p></div>';
 
     try {
         const snapshot = await db.collection('class_app_approvals')
@@ -757,7 +757,8 @@ async function loadAppApprovalsForDashboard() {
             .get();
         dashboardAppApprovals = {};
         snapshot.forEach(doc => {
-            dashboardAppApprovals[doc.id] = doc.data().isApproved;
+            const data = doc.data();
+            dashboardAppApprovals[data.appTitle] = data.isApproved;
         });
 
         renderApprovalGrid();
@@ -810,7 +811,7 @@ function createAppApprovalCard(app, isApproved) {
     card.className = `approval-card ${isApproved ? 'approved' : ''}`;
     card.onclick = () => toggleAppApproval(app.title, !isApproved);
 
-    const icon = app.icon || '?벑';
+    const icon = app.icon || '📱';
 
     card.innerHTML = `
         <div class="app-icon">${icon}</div>
@@ -849,7 +850,7 @@ window.toggleAppApproval = async function (appTitle, isApproved) {
         // Revert on error
         dashboardAppApprovals[appTitle] = !isApproved;
         renderApprovalGrid();
-        alert("?곹깭 蹂寃쎌뿉 ?ㅽ뙣?덉뒿?덈떎.");
+        alert('상태 변경에 실패했습니다.');
     }
 };
 
@@ -859,14 +860,14 @@ const unapproveAllBtn = document.getElementById('unapprove-all-btn');
 
 if (approveAllBtn) {
     approveAllBtn.addEventListener('click', async () => {
-        if (!confirm('紐⑤뱺 ?깆쓣 ?뱀씤?섏떆寃좎뒿?덇퉴?')) return;
+        if (!confirm('모든 앱을 승인하시겠습니까?')) return;
         await setAllApprovals(true);
     });
 }
 
 if (unapproveAllBtn) {
     unapproveAllBtn.addEventListener('click', async () => {
-        if (!confirm('紐⑤뱺 ?깆쓣 ?뱀씤 ?댁젣?섏떆寃좎뒿?덇퉴?')) return;
+        if (!confirm('모든 앱을 승인 해제하시겠습니까?')) return;
         await setAllApprovals(false);
     });
 }
@@ -890,11 +891,11 @@ async function setAllApprovals(isApproved) {
 
         // Update UI immediately (Optimistic)
         renderApprovalGrid();
-        // alert(`紐⑤뱺 ?깆씠 ${isApproved ? '?뱀씤' : '誘몄듅??} 泥섎━?섏뿀?듬땲??`);
+        // alert(`모든 앱이 ${isApproved ? '승인' : '미승인'} 처리되었습니다.`);
 
     } catch (error) {
         console.error("Error batch updating approvals:", error);
-        alert("?쇨큵 泥섎━???ㅽ뙣?덉뒿?덈떎.");
+        alert('일괄 처리에 실패했습니다.');
         loadAppApprovalsForDashboard(); // Reload to ensure data consistency
     }
 }

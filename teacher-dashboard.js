@@ -29,6 +29,8 @@ auth.onAuthStateChanged(async (user) => {
             ...userDoc.data()
         };
 
+        await user.getIdToken(true);
+
         if (firebaseFns) {
             try {
                 const createDefaultClassForTeacher = firebaseFns.httpsCallable('createDefaultClassForTeacher');
@@ -707,6 +709,41 @@ tabs.forEach(tab => {
 const approvalGrid = document.getElementById('approvals-grid');
 let dashboardAppApprovals = {};
 
+function getStudentApps() {
+    return apps.filter(app => app.category !== '학급운영');
+}
+
+async function initializeDashboardAppApprovals() {
+    if (!currentTeacher) return;
+
+    try {
+        const batch = db.batch();
+        let needsInit = false;
+
+        for (const app of getStudentApps()) {
+            const appRef = db.collection('app_approvals').doc(app.title);
+            const appDoc = await appRef.get();
+
+            if (!appDoc.exists) {
+                needsInit = true;
+                batch.set(appRef, {
+                    appTitle: app.title,
+                    category: app.category,
+                    isApproved: true,
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedBy: currentTeacher.uid
+                });
+            }
+        }
+
+        if (needsInit) {
+            await batch.commit();
+        }
+    } catch (error) {
+        console.error('Error initializing dashboard approvals:', error);
+    }
+}
+
 async function loadAppApprovalsForDashboard() {
     // Show loading?
     if (!approvalGrid) return;
@@ -715,6 +752,7 @@ async function loadAppApprovalsForDashboard() {
     try {
         const snapshot = await db.collection('class_app_approvals')
             .where('classId', '==', currentTeacher.defaultClassId)
+            .where('teacherId', '==', currentTeacher.uid)
             .get();
         dashboardAppApprovals = {};
         snapshot.forEach(doc => {
@@ -724,7 +762,7 @@ async function loadAppApprovalsForDashboard() {
         renderApprovalGrid();
     } catch (error) {
         console.error("Error loading approvals:", error);
-        approvalGrid.innerHTML = '<p style="color:red; text-align:center;">?곗씠?곕? 遺덈윭?ㅻ뒗 ???ㅽ뙣?덉뒿?덈떎.</p>';
+        approvalGrid.innerHTML = '<p style="color:red; text-align:center;">앱 승인 데이터를 불러오는 데 실패했습니다. 로그아웃 후 다시 로그인하거나 Firebase 보안 규칙 배포 상태를 확인해주세요.</p>';
     }
 }
 
@@ -733,7 +771,7 @@ function renderApprovalGrid() {
     approvalGrid.innerHTML = '';
 
     // Filter out class management apps
-    const studentApps = apps.filter(app => app.category !== '?숆툒?댁쁺');
+    const studentApps = getStudentApps();
 
     studentApps.forEach(app => {
         let isApproved = true;
@@ -814,7 +852,7 @@ if (unapproveAllBtn) {
 
 async function setAllApprovals(isApproved) {
     try {
-        const studentApps = apps.filter(app => app.category !== '?숆툒?댁쁺');
+        const studentApps = getStudentApps();
         const setClassAppApproval = firebaseFns.httpsCallable('setClassAppApproval');
 
         for (const app of studentApps) {

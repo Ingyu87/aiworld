@@ -10,9 +10,13 @@ service cloud.firestore {
     }
 
     function isTeacher() {
-      return isAuthenticated() &&
-        userDoc(request.auth.uid).data.role == 'teacher' &&
-        userDoc(request.auth.uid).data.approved != false;
+      return isAuthenticated() && (
+        request.auth.token.email == 'teacher@ingyu-ai-world.com' ||
+        (
+          userDoc(request.auth.uid).data.role == 'teacher' &&
+          userDoc(request.auth.uid).data.approved != false
+        )
+      );
     }
 
     function isOwner(userId) {
@@ -70,7 +74,7 @@ service cloud.firestore {
     }
 
     match /app_approvals/{appId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isTeacher();
     }
 

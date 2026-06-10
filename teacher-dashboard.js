@@ -104,6 +104,12 @@ auth.onAuthStateChanged(async (user) => {
             return;
         }
 
+        if (userDoc.data().approved === false) {
+            await auth.signOut();
+            window.location.href = 'login.html';
+            return;
+        }
+
         currentTeacher = {
             uid: user.uid,
             ...userDoc.data()

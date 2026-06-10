@@ -96,6 +96,12 @@ auth.onAuthStateChanged(async (user) => {
             return;
         }
 
+        if (userData.role === 'teacher' && userData.approved === false) {
+            await auth.signOut();
+            window.location.href = 'login.html';
+            return;
+        }
+
         currentUser = {
             uid: user.uid,
             ...userData

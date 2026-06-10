@@ -74,10 +74,12 @@
     <div class="container">
         <h1>교사 계정 신청</h1>
         <div class="note">
-            신청 후 관리자가 승인하면 교사 계정과 반 코드가 생성됩니다. 승인 후 안내받은 임시 비밀번호로 로그인해주세요.
+            신청할 이메일과 비밀번호를 직접 정해주세요. 관리자가 승인하면 같은 이메일과 비밀번호로 로그인할 수 있습니다.
         </div>
         <input type="text" id="display-name" placeholder="교사 이름" required>
         <input type="email" id="email" placeholder="교사 이메일" required>
+        <input type="password" id="password" placeholder="비밀번호 (6자리 이상)" required autocomplete="new-password">
+        <input type="password" id="confirm-password" placeholder="비밀번호 확인" required autocomplete="new-password">
         <input type="text" id="school-name" placeholder="학교명 (선택)">
         <button onclick="requestTeacher()">교사 계정 신청하기</button>
         <p style="text-align:center; margin-top: 1rem; font-size: 0.9rem;">
@@ -88,7 +90,9 @@
     <script>
         async function requestTeacher() {
             const displayName = document.getElementById('display-name').value.trim();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
             const schoolName = document.getElementById('school-name').value.trim();
 
             if (!displayName || !email) {
@@ -96,10 +100,36 @@
                 return;
             }
 
+            if (password.length < 6) {
+                alert('비밀번호는 6자리 이상이어야 합니다.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('비밀번호 확인이 일치하지 않습니다.');
+                return;
+            }
+
             try {
-                const normalizedEmail = email.trim().toLowerCase();
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const teacherUid = userCredential.user.uid;
+
+                await db.collection('users').doc(teacherUid).set({
+                    uid: teacherUid,
+                    email,
+                    name: displayName,
+                    displayName,
+                    schoolName,
+                    role: 'teacher',
+                    approved: false,
+                    isAdmin: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
                 await db.collection('teacher_requests').add({
-                    email: normalizedEmail,
+                    teacherUid,
+                    email,
                     displayName,
                     schoolName,
                     status: 'pending',
@@ -107,10 +137,20 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert('교사 신청이 접수되었습니다. 관리자 승인 후 로그인할 수 있습니다.');
+                await auth.signOut();
+                alert('교사 신청이 접수되었습니다. 관리자 승인 후 같은 이메일과 비밀번호로 로그인할 수 있습니다.');
                 window.location.href = 'login.html';
             } catch (error) {
                 console.error(error);
+                if (auth.currentUser) {
+                    await auth.signOut().catch(() => {});
+                }
+
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('이미 사용 중인 이메일입니다. 기존 계정으로 로그인하거나 관리자에게 문의해주세요.');
+                    return;
+                }
+
                 alert('오류 발생: ' + (error.message || '교사 신청에 실패했습니다.'));
             }
         }

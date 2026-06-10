@@ -51,6 +51,10 @@ service cloud.firestore {
         'teacherId',
         'classId',
         'classCodeUsed',
+        'approved',
+        'isAdmin',
+        'defaultClassId',
+        'defaultClassCode',
         'simplePassword',
         'pinHash',
         'pinSalt',
@@ -63,14 +67,31 @@ service cloud.firestore {
       allow read: if isOwner(userId) || isTeacher();
       allow create: if isAuthenticated() && (
         (request.auth.uid == userId && request.resource.data.role == 'student') ||
+        (
+          request.auth.uid == userId &&
+          request.resource.data.uid == userId &&
+          request.resource.data.email == request.auth.token.email &&
+          request.resource.data.role == 'teacher' &&
+          request.resource.data.approved == false &&
+          request.resource.data.isAdmin == false &&
+          request.resource.data.keys().hasOnly([
+            'uid',
+            'email',
+            'name',
+            'displayName',
+            'schoolName',
+            'role',
+            'approved',
+            'isAdmin',
+            'createdAt',
+            'updatedAt'
+          ])
+        ) ||
         (isTeacher() && request.resource.data.role == 'student' && request.resource.data.teacherId == request.auth.uid) ||
         (isAdmin() && request.resource.data.role == 'teacher')
       );
       allow update: if isMyStudent(resource.data) ||
-        (isOwner(userId) && (
-          doesNotChangeSensitiveUserFields() ||
-          (resource.data.role == 'teacher' && request.resource.data.role == 'teacher')
-        )) ||
+        (isOwner(userId) && doesNotChangeSensitiveUserFields()) ||
         isAdmin();
       allow delete: if isMyStudent(resource.data) || isAdmin();
     }

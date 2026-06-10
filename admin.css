@@ -30,6 +30,22 @@
     font-size: 0.9rem;
 }
 
+.admin-section-header {
+    gap: 1rem;
+}
+
+.admin-teacher-header {
+    margin-top: 2.5rem;
+}
+
+.students-table {
+    min-width: 860px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
 @media (max-width: 900px) {
     .admin-password-input {
         width: 100%;

@@ -153,6 +153,11 @@ teacherForm.addEventListener('submit', async (e) => {
             throw new Error('교사 계정이 아닙니다.');
         }
 
+        if (userDoc.data().approved === false) {
+            await auth.signOut();
+            throw new Error('관리자 승인 대기 중인 교사 계정입니다.');
+        }
+
         window.location.href = 'index.html';
     } catch (error) {
         hideLoading();

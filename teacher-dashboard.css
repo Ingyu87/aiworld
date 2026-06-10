@@ -71,12 +71,17 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--spacing-md);
+    min-width: 0;
 }
 
 .header-left {
     display: flex;
     align-items: baseline;
     gap: var(--spacing-md);
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
 }
 
 .header-title {
@@ -87,25 +92,32 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .header-subtitle {
     font-size: 0.9rem;
     color: var(--text-light);
     font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
     flex-wrap: nowrap;
-    /* Prevent stacking */
+    flex: 0 0 auto;
+    min-width: max-content;
 }
 
 /* Ensure link button doesn't look weird */
 .header-right .secondary-button {
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .user-info {
@@ -114,6 +126,8 @@ body {
     padding: var(--spacing-xs) var(--spacing-md);
     background: var(--cream);
     border-radius: var(--radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .logout-button {
@@ -126,6 +140,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .logout-button:hover {
@@ -633,10 +649,20 @@ td {
 }
 
 @media (max-width: 768px) {
+    .dashboard-header {
+        overflow-x: auto;
+    }
+
+    .header-container {
+        width: max-content;
+        min-width: 100%;
+        align-items: center;
+    }
+
     .header-left {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-xs);
+        flex-direction: row;
+        align-items: baseline;
+        gap: var(--spacing-sm);
     }
 
     .section-header {
@@ -667,8 +693,8 @@ td {
 }
 
 @media (max-width: 480px) {
-    .user-info {
-        display: none;
+    .header-title {
+        font-size: 1.25rem;
     }
 
     .logout-button {

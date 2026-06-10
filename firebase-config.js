@@ -19,9 +19,11 @@ firebase.initializeApp(firebaseConfig);
 // Initialize services
 const auth = firebase.auth();
 const db = firebase.firestore();
+const firebaseFns = typeof firebase.functions === 'function' ? firebase.functions() : null;
 
 // Export for use in other files
 window.auth = auth;
 window.db = db;
+window.firebaseFns = firebaseFns;
 
 console.log('Firebase initialized successfully');

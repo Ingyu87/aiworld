@@ -1,62 +1,115 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper function to check if user is a teacher
-    function isTeacher() {
-      return request.auth != null && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
-    }
-    
-    // Helper function to check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
-    
-    // Users collection
-    match /users/{userId} {
-      // Anyone can read user documents (needed for login shim to check passwords)
-      allow read: if true;
-      
-      // Only the user themselves or a teacher can update
-      allow update: if isAuthenticated() && 
-                      (request.auth.uid == userId || isTeacher());
-      
-      // Allow creation if:
-      // 1. User is a teacher (standard management)
-      // 2. User is creating their own document (self-signup/recovery)
-      allow create: if isTeacher() || (isAuthenticated() && request.auth.uid == userId);
-      
-      // Only teachers can delete users
-      allow delete: if isTeacher();
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
     }
-    
-    // App approvals - only teachers can manage
+
+    function isTeacher() {
+      return isAuthenticated() &&
+        userDoc(request.auth.uid).data.role == 'teacher' &&
+        userDoc(request.auth.uid).data.approved != false;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isMyStudent(data) {
+      return isTeacher() && data.teacherId == request.auth.uid;
+    }
+
+    function isMyClass(data) {
+      return isTeacher() && data.teacherId == request.auth.uid;
+    }
+
+    function isMyClassStudent(classId) {
+      return isAuthenticated() &&
+        userDoc(request.auth.uid).data.role == 'student' &&
+        userDoc(request.auth.uid).data.classId == classId;
+    }
+
+    function doesNotChangeSensitiveUserFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'role',
+        'email',
+        'teacherId',
+        'classId',
+        'classCodeUsed',
+        'simplePassword',
+        'pinHash',
+        'pinSalt',
+        'pinHashVersion',
+        'uid'
+      ]);
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isMyStudent(resource.data);
+      allow create: if false;
+      allow update: if isMyStudent(resource.data) || (isOwner(userId) && doesNotChangeSensitiveUserFields());
+      allow delete: if false;
+    }
+
+    match /classes/{classId} {
+      allow read: if isMyClass(resource.data) || isMyClassStudent(classId);
+      allow create, update, delete: if false;
+    }
+
+    match /teacher_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /class_app_approvals/{approvalId} {
+      allow read: if isMyClass(resource.data) || isMyClassStudent(resource.data.classId);
+      allow write: if false;
+    }
+
     match /app_approvals/{appId} {
       allow read: if isAuthenticated();
       allow write: if isTeacher();
     }
-    
-    // Usage logs - anyone authenticated can create, only teachers can read
+
     match /usage_logs/{logId} {
-      allow read: if isTeacher();
-      allow create: if isAuthenticated();
-      // 교사용 대시보드(학생 삭제/기록 초기화)에서 삭제가 필요함
-      allow update, delete: if isTeacher();
+      allow read: if isMyStudent(resource.data);
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.teacherId == userDoc(request.auth.uid).data.teacherId
+        && request.resource.data.classId == userDoc(request.auth.uid).data.classId
+        && request.resource.data.keys().hasOnly([
+          'userId',
+          'userName',
+          'teacherId',
+          'classId',
+          'appName',
+          'appCategory',
+          'clickedAt'
+        ]);
+      allow update: if false;
+      allow delete: if isMyStudent(resource.data);
     }
-    
-    // User agreements - users can read/write their own, teachers can read all
+
     match /user_agreements/{userId} {
-      allow read: if isAuthenticated() && 
-                    (request.auth.uid == userId || isTeacher());
-      allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow read: if isOwner(userId) || isMyStudent(resource.data);
+      allow write: if isOwner(userId)
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.teacherId == userDoc(request.auth.uid).data.teacherId
+        && request.resource.data.classId == userDoc(request.auth.uid).data.classId;
     }
-    // Emotional Check-ins
+
     match /emotional_checkins/{checkinId} {
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isTeacher());
-      // 교사가 감정 기록 초기화를 수행할 수 있도록 허용
-      allow delete: if isTeacher();
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.teacherId == userDoc(request.auth.uid).data.teacherId
+        && request.resource.data.classId == userDoc(request.auth.uid).data.classId;
+      allow read: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isMyStudent(resource.data));
+      allow update: if false;
+      allow delete: if isMyStudent(resource.data);
     }
   }
 }

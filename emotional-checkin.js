@@ -313,6 +313,8 @@ async function completeCheckin() {
         await db.collection('emotional_checkins').add({
             userId: user.uid,
             userName: userData.name || userData.email,
+            teacherId: userData.teacherId || null,
+            classId: userData.classId || null,
             date: today,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
 

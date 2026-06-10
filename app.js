@@ -53,6 +53,17 @@ auth.onAuthStateChanged(async (user) => {
             ...userData
         };
 
+        if (currentUser.role === 'teacher' && (!currentUser.defaultClassId || !currentUser.defaultClassCode) && firebaseFns) {
+            try {
+                const createDefaultClassForTeacher = firebaseFns.httpsCallable('createDefaultClassForTeacher');
+                const classResult = await createDefaultClassForTeacher({});
+                currentUser.defaultClassId = classResult.data.classId;
+                currentUser.defaultClassCode = classResult.data.classCode;
+            } catch (classError) {
+                console.error('Failed to prepare teacher class:', classError);
+            }
+        }
+
         // Update UI with user name
         const userNameEl = document.getElementById('user-name');
         if (userNameEl) {
@@ -279,11 +290,13 @@ function createAppCard(app, index) {
         }
 
         // Track usage if user is logged in
-        if (currentUser && db) {
+        if (currentUser && currentUser.role === 'student' && db) {
             try {
                 await db.collection('usage_logs').add({
                     userId: currentUser.uid,
                     userName: currentUser.name,
+                    teacherId: currentUser.teacherId || null,
+                    classId: currentUser.classId || null,
                     appName: app.title,
                     appCategory: app.category,
                     clickedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -497,6 +510,8 @@ if (aiAgreeBtn) {
             db.collection('user_agreements').doc(currentUser.uid).set({
                 userId: currentUser.uid,
                 userName: currentUser.name,
+                teacherId: currentUser.teacherId || null,
+                classId: currentUser.classId || null,
                 agreedToAISafety: true,
                 lastAgreedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastAgreedDate: today,
@@ -531,7 +546,15 @@ let approvedApps = {};
 // Load app approvals from Firestore
 async function loadAppApprovals() {
     try {
-        const approvalsSnapshot = await db.collection('app_approvals').get();
+        const approvalClassId = currentUser.classId || currentUser.defaultClassId;
+        if (!approvalClassId) {
+            approvedApps = {};
+            return;
+        }
+
+        const approvalsSnapshot = await db.collection('class_app_approvals')
+            .where('classId', '==', approvalClassId)
+            .get();
 
         approvedApps = {};
         approvalsSnapshot.forEach(doc => {
@@ -568,6 +591,11 @@ function filterAppsByApproval(appsToFilter) {
 // Initialize app approvals with default approved status
 async function initializeAppApprovals() {
     try {
+        // Class app approvals are now managed from the teacher dashboard via Cloud Functions.
+        return;
+        const classId = currentUser.defaultClassId || currentUser.classId;
+        if (!classId) return;
+
         const batch = db.batch();
         let needsInit = false;
 
@@ -575,12 +603,14 @@ async function initializeAppApprovals() {
             // Skip 학급운영 apps (teacher-only)
             if (app.category === '학급운영') continue;
 
-            const appRef = db.collection('app_approvals').doc(app.title);
+            const appRef = db.collection('class_app_approvals').doc(`${classId}_${encodeURIComponent(app.title).replace(/%/g, '')}`);
             const appDoc = await appRef.get();
 
             if (!appDoc.exists) {
                 needsInit = true;
                 batch.set(appRef, {
+                    classId,
+                    teacherId: currentUser.uid,
                     appTitle: app.title,
                     category: app.category,
                     isApproved: true, // Default: approved

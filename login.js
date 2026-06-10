@@ -15,22 +15,19 @@ tabButtons.forEach(button => {
     button.addEventListener('click', () => {
         const tab = button.dataset.tab;
 
-        // Update active tab button
         tabButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
 
-        // Update active form
         if (tab === 'student') {
             studentForm.classList.add('active');
             teacherForm.classList.remove('active');
-            hideError(studentError);
-            hideError(teacherError);
         } else {
             teacherForm.classList.add('active');
             studentForm.classList.remove('active');
-            hideError(studentError);
-            hideError(teacherError);
         }
+
+        hideError(studentError);
+        hideError(teacherError);
     });
 });
 
@@ -63,6 +60,11 @@ function hideLoading() {
     }
 }
 
+function normalizeStudentEmail(idOrEmail) {
+    const value = idOrEmail.trim();
+    return value.includes('@') ? value : `${value}@ingyu-ai-world.com`;
+}
+
 // ===========================
 // Student Login
 // ===========================
@@ -71,110 +73,33 @@ studentForm.addEventListener('submit', async (e) => {
     hideError(studentError);
 
     const email = document.getElementById('student-email').value.trim();
-    let password = document.getElementById('student-password').value;
+    const pin = document.getElementById('student-password').value.trim();
 
-    if (!email || !password) {
-        showError(studentError, '아이디와 비밀번호를 입력해주세요.');
+    if (!email || !pin) {
+        showError(studentError, '아이디와 4자리 비밀번호를 입력해주세요.');
         return;
     }
 
-    // Convert ID to email format
-    const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
+    if (!/^\d{4}$/.test(pin)) {
+        showError(studentError, '비밀번호는 숫자 4자리여야 합니다.');
+        return;
+    }
 
     try {
         showLoading();
 
-        // 1. Fetch user document from Firestore by ID (email) first
-        // We'll search by email field which is the fullEmail
-        const usersSnapshot = await db.collection('users').where('email', '==', fullEmail).get();
+        const verifyStudentPin = firebaseFns.httpsCallable('verifyStudentPin');
+        const result = await verifyStudentPin({
+            email: normalizeStudentEmail(email),
+            pin
+        });
 
-        if (usersSnapshot.empty) {
-            console.log('No user found in Firestore by email, trying Auth fallback...');
-            // Fallback: Try signing in to Auth first to see if the account exists
-            try {
-                const internalPassword = "fixed_student_pw_1234";
-                const tempCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
-                const tempUser = tempCredential.user;
-                
-                console.log('Auth login successful, checking Firestore by UID:', tempUser.uid);
-                const userDocByUid = await db.collection('users').doc(tempUser.uid).get();
-                
-                if (userDocByUid.exists) {
-                    const userData = userDocByUid.data();
-                    if (userData.simplePassword === password) {
-                        console.log('Login successful via UID fallback');
-                        window.location.href = 'index.html';
-                        return;
-                    } else {
-                        throw new Error('비밀번호가 올바르지 않습니다.');
-                    }
-                } else {
-                    // Auth exists but Firestore doesn't. This is the "Incomplete Registration" state.
-                    // Let's automatically fix it if the password matches the one they just entered!
-                    // Since we can't verify the old simplePassword, we'll redirect to a recovery flow or 
-                    // just tell them to re-register which will now work thanks to the rules update.
-                    console.error('Auth exists but Firestore document is missing.');
-                    await auth.signOut();
-                    throw new Error('계정 설정이 완료되지 않았습니다. 회원가입 페이지에서 다시 한번 가입해 주세요. (데이터가 자동으로 복구됩니다)');
-                }
-            } catch (authError) {
-                console.error('Auth fallback failed:', authError);
-                if (authError.code === 'auth/wrong-password' || authError.code === 'auth/user-not-found') {
-                    throw new Error('등록되지 않은 학생이거나 비밀번호가 틀렸습니다.');
-                }
-                throw new Error(authError.message || '등록되지 않은 학생입니다.');
-            }
-        }
-
-        const userDoc = usersSnapshot.docs[0];
-        const userData = userDoc.data();
-
-        // 2. Validate against simplified password
-        if (userData.simplePassword !== password) {
-            throw new Error('비밀번호가 올바르지 않습니다.');
-        }
-
-        // 3. Perform "Internal Login" with a fixed password to maintain Auth session
-        // This bypasses the need for Admin SDK to change Auth passwords.
-        const internalPassword = "fixed_student_pw_1234"; // All students use this internally
-        const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
-        const user = userCredential.user;
-
-        // 4. Update last login timestamp and increment login count
-        try {
-            await db.collection('users').doc(user.uid).update({
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                loginCount: firebase.firestore.FieldValue.increment(1)
-            });
-            console.log('Login stats updated successfully for:', user.uid);
-        } catch (updateError) {
-            console.error('Failed to update login stats:', updateError);
-            // Continue anyway - don't block login
-        }
-
-        // Success - redirect to main page (AI safety modal will show first)
-        console.log('Student login successful:', userData);
+        await auth.signInWithCustomToken(result.data.token);
         window.location.href = 'index.html';
-
     } catch (error) {
         hideLoading();
         console.error('Student login error:', error);
-
-        let errorMessage = '로그인에 실패했습니다.';
-
-        if (error.code === 'auth/user-not-found') {
-            errorMessage = '등록되지 않은 이메일입니다.';
-        } else if (error.code === 'auth/wrong-password') {
-            errorMessage = '비밀번호가 올바르지 않습니다.';
-        } else if (error.code === 'auth/invalid-email') {
-            errorMessage = '올바른 이메일 형식이 아닙니다.';
-        } else if (error.code === 'auth/too-many-requests') {
-            errorMessage = '너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.';
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        showError(studentError, errorMessage);
+        showError(studentError, error.message || '로그인에 실패했습니다.');
     }
 });
 
@@ -192,72 +117,24 @@ teacherForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    // Fixed teacher email
     const teacherEmail = 'teacher@ingyu-ai-world.com';
 
     try {
         showLoading();
 
-        // Firebase Authentication
         const userCredential = await auth.signInWithEmailAndPassword(teacherEmail, password);
         const user = userCredential.user;
-
-        // Check user role in Firestore
         const userDoc = await db.collection('users').doc(user.uid).get();
 
-        if (!userDoc.exists) {
-            throw new Error('사용자 정보를 찾을 수 없습니다.');
-        }
-
-        const userData = userDoc.data();
-
-        if (userData.role !== 'teacher') {
+        if (!userDoc.exists || userDoc.data().role !== 'teacher') {
             await auth.signOut();
             throw new Error('교사 계정이 아닙니다.');
         }
 
-        // Success - redirect to main page
-        console.log('Teacher login successful:', userData);
         window.location.href = 'index.html';
-
     } catch (error) {
         hideLoading();
         console.error('Teacher login error:', error);
-
-        let errorMessage = '로그인에 실패했습니다.';
-
-        if (error.code === 'auth/user-not-found') {
-            errorMessage = '교사 계정을 찾을 수 없습니다.';
-        } else if (error.code === 'auth/wrong-password') {
-            errorMessage = '비밀번호가 올바르지 않습니다.';
-        } else if (error.code === 'auth/invalid-email') {
-            errorMessage = '시스템 오류입니다. 관리자에게 문의하세요.';
-        } else if (error.code === 'auth/too-many-requests') {
-            errorMessage = '너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.';
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        showError(teacherError, errorMessage);
+        showError(teacherError, error.message || '로그인에 실패했습니다.');
     }
 });
-
-// ===========================
-// Check if already logged in (Optional - can be removed if causing slowness)
-// ===========================
-// auth.onAuthStateChanged(async (user) => {
-//     if (user) {
-//         try {
-//             const userDoc = await db.collection('users').doc(user.uid).get();
-//             if (userDoc.exists) {
-//                 const userData = userDoc.data();
-//                 // Both teachers and students go to main page
-//                 if (userData.role === 'teacher' || userData.role === 'student') {
-//                     window.location.href = 'index.html';
-//                 }
-//             }
-//         } catch (error) {
-//             console.error('Error checking user status:', error);
-//         }
-//     }
-// });

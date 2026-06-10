@@ -56,7 +56,9 @@ async function initEmotionsTab() {
                 resetEmotionsBtn.innerHTML = '<span>초기화 중...</span>';
 
                 const db = firebase.firestore();
-                const snapshot = await db.collection('emotional_checkins').get();
+                const snapshot = await db.collection('emotional_checkins')
+                    .where('teacherId', '==', currentTeacher.uid)
+                    .get();
                 const batch = db.batch();
 
                 snapshot.forEach(doc => {
@@ -94,6 +96,7 @@ async function loadEmotionData() {
 
         // Firestore에서 감정 체크인 데이터 가져오기
         const snapshot = await db.collection('emotional_checkins')
+            .where('teacherId', '==', currentTeacher.uid)
             .where('date', '>=', startDate)
             .where('date', '<=', endDate)
             .orderBy('date', 'desc')

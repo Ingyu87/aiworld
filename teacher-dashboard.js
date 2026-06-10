@@ -45,7 +45,8 @@ auth.onAuthStateChanged(async (user) => {
             }
         }
 
-        document.getElementById('teacher-name').textContent = currentTeacher.name || '援먯궗';
+        document.getElementById('teacher-name').textContent = currentTeacher.name || '교사';
+        showAdminLink();
         showClassCode();
 
         // Load data
@@ -764,6 +765,26 @@ async function loadAppApprovalsForDashboard() {
         console.error("Error loading approvals:", error);
         approvalGrid.innerHTML = '<p style="color:red; text-align:center;">앱 승인 데이터를 불러오는 데 실패했습니다. 로그아웃 후 다시 로그인하거나 Firebase 보안 규칙 배포 상태를 확인해주세요.</p>';
     }
+}
+
+function showAdminLink() {
+    const headerRight = document.querySelector('.header-right');
+    if (!headerRight || !currentTeacher) return;
+    if (document.getElementById('admin-dashboard-link')) return;
+
+    const isAdmin = currentTeacher.isAdmin === true || (currentTeacher.email || '').toLowerCase() === 'teacher@ingyu-ai-world.com';
+    if (!isAdmin) return;
+
+    const link = document.createElement('a');
+    link.id = 'admin-dashboard-link';
+    link.href = 'admin.html';
+    link.className = 'secondary-button';
+    link.textContent = '관리자';
+    link.style.textDecoration = 'none';
+    link.style.display = 'inline-flex';
+    link.style.alignItems = 'center';
+    link.style.marginRight = '0.75rem';
+    headerRight.insertBefore(link, document.getElementById('teacher-name'));
 }
 
 function renderApprovalGrid() {

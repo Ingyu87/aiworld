@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교사 계정 생성/복구</title>
+    <title>교사 계정 신청</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
     <script src="firebase-config.js"></script>
     <style>
         body {
@@ -71,75 +72,43 @@
 
 <body>
     <div class="container">
-        <h1>👩‍🏫 교사 계정 생성</h1>
+        <h1>교사 계정 신청</h1>
         <div class="note">
-            <strong>주의:</strong> 이미 교사 계정이 있다면, 먼저 Firebase Console [Authentication]에서 기존 계정을 <strong>삭제</strong>한 후
-            진행해주세요.
+            신청 후 관리자가 승인하면 교사 계정과 반 코드가 생성됩니다. 승인 후 안내받은 임시 비밀번호로 로그인해주세요.
         </div>
-        <input type="email" id="email" value="teacher@ingyu-ai-world.com" readonly>
-
-        <div style="position: relative;">
-            <input type="password" id="password" placeholder="새로운 비밀번호 입력" required style="margin-bottom: 5px;">
-            <input type="password" id="confirm-password" placeholder="비밀번호 확인" required>
-            <label style="font-size: 0.8rem; display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" onclick="togglePassword()"> 비밀번호 표시
-            </label>
-        </div>
-
-        <button onclick="createTeacher()">교사 계정 생성하기</button>
+        <input type="text" id="display-name" placeholder="교사 이름" required>
+        <input type="email" id="email" placeholder="교사 이메일" required>
+        <input type="text" id="school-name" placeholder="학교명 (선택)">
+        <button onclick="requestTeacher()">교사 계정 신청하기</button>
+        <p style="text-align:center; margin-top: 1rem; font-size: 0.9rem;">
+            <a href="login.html" style="color:#4ECDC4; text-decoration:none; font-weight:bold;">로그인으로 돌아가기</a>
+        </p>
     </div>
 
     <script>
-        function togglePassword() {
-            const pwd = document.getElementById('password');
-            const confirm = document.getElementById('confirm-password');
-            if (pwd.type === 'password') {
-                pwd.type = 'text';
-                confirm.type = 'text';
-            } else {
-                pwd.type = 'password';
-                confirm.type = 'password';
-            }
-        }
-
-        async function createTeacher() {
+        async function requestTeacher() {
+            const displayName = document.getElementById('display-name').value.trim();
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
+            const schoolName = document.getElementById('school-name').value.trim();
 
-            if (!password) {
-                alert('비밀번호를 입력해주세요.');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
+            if (!displayName || !email) {
+                alert('교사 이름과 이메일을 입력해주세요.');
                 return;
             }
 
             try {
-                // 1. Create Auth User
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-
-                // 2. Create Firestore Doc
-                await db.collection('users').doc(user.uid).set({
-                    email: email,
-                    name: '선생님',
-                    role: 'teacher',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                const requestTeacherSignup = firebaseFns.httpsCallable('requestTeacherSignup');
+                await requestTeacherSignup({
+                    email,
+                    displayName,
+                    schoolName
                 });
 
-                alert('교사 계정이 성공적으로 생성되었습니다! 로그인 페이지로 이동합니다.');
+                alert('교사 신청이 접수되었습니다. 관리자 승인 후 로그인할 수 있습니다.');
                 window.location.href = 'login.html';
-
             } catch (error) {
                 console.error(error);
-                if (error.code === 'auth/email-already-in-use') {
-                    alert('이미 존재하는 계정입니다. Firebase Console에서 기존 계정을 삭제하고 다시 시도하세요.');
-                } else {
-                    alert('오류 발생: ' + error.message);
-                }
+                alert('오류 발생: ' + (error.message || '교사 신청에 실패했습니다.'));
             }
         }
     </script>

@@ -1,0 +1,42 @@
+.admin-header-link {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.admin-password-input {
+    width: 10rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    font: inherit;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.admin-small-button {
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.admin-muted {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .admin-password-input {
+        width: 100%;
+    }
+
+    .admin-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

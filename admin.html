@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - Ingyu's AI World</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Quicksand:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="teacher-dashboard.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-left">
+                <h1 class="header-title">Ingyu's AI World</h1>
+                <span class="header-subtitle">관리자 페이지</span>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="secondary-button admin-header-link">웹앱</a>
+                <a href="teacher-dashboard.html" class="secondary-button admin-header-link">교사 대시보드</a>
+                <span class="user-info" id="admin-name">관리자</span>
+                <button class="logout-button" id="logout-btn">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">교사 신청 관리</h2>
+                    <p class="section-subtitle" id="request-summary">승인 대기 중인 교사 계정을 확인합니다.</p>
+                </div>
+                <button class="secondary-button" id="refresh-btn">새로고침</button>
+            </div>
+
+            <div class="table-container">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>교사</th>
+                            <th>이메일</th>
+                            <th>학교</th>
+                            <th>신청일</th>
+                            <th>임시 비밀번호</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-tbody">
+                        <tr>
+                            <td colspan="6">
+                                <div class="table-loading">
+                                    <div class="spinner"></div>
+                                    <p>신청 목록을 불러오는 중...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="empty-state" id="empty-state" style="display:none;">
+                    <div class="empty-icon">✓</div>
+                    <p class="empty-text">승인 대기 중인 신청이 없습니다</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

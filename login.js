@@ -65,6 +65,12 @@ function normalizeStudentEmail(idOrEmail) {
     return value.includes('@') ? value : `${value}@ingyu-ai-world.com`;
 }
 
+function normalizeTeacherEmail(idOrEmail) {
+    const value = idOrEmail.trim().toLowerCase();
+    if (value === 'teacher') return 'teacher@ingyu-ai-world.com';
+    return value;
+}
+
 // ===========================
 // Student Login
 // ===========================
@@ -110,14 +116,15 @@ teacherForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideError(teacherError);
 
+    const emailInput = document.getElementById('teacher-email').value.trim();
     const password = document.getElementById('teacher-password').value;
 
-    if (!password) {
-        showError(teacherError, '비밀번호를 입력해주세요.');
+    if (!emailInput || !password) {
+        showError(teacherError, '교사 이메일과 비밀번호를 입력해주세요.');
         return;
     }
 
-    const teacherEmail = 'teacher@ingyu-ai-world.com';
+    const teacherEmail = normalizeTeacherEmail(emailInput);
 
     try {
         showLoading();

@@ -390,6 +390,23 @@ exports.requestTeacherSignup = functions.https.onCall(async (data) => {
     throw new functions.https.HttpsError('invalid-argument', '교사 이름과 이메일이 필요합니다.');
   }
 
+  const existingAuthUser = await admin.auth().getUserByEmail(email).catch((error) => {
+    if (error.code === 'auth/user-not-found') return null;
+    throw error;
+  });
+  if (existingAuthUser) {
+    throw new functions.https.HttpsError('already-exists', '이미 등록된 교사 이메일입니다.');
+  }
+
+  const existingPending = await db.collection('teacher_requests')
+    .where('email', '==', email)
+    .where('status', '==', 'pending')
+    .limit(1)
+    .get();
+  if (!existingPending.empty) {
+    throw new functions.https.HttpsError('already-exists', '이미 승인 대기 중인 신청입니다.');
+  }
+
   const requestRef = await db.collection('teacher_requests').add({
     email,
     displayName,
@@ -399,6 +416,33 @@ exports.requestTeacherSignup = functions.https.onCall(async (data) => {
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
   return { requestId: requestRef.id };
+});
+
+exports.listTeacherRequests = functions.https.onCall(async (data, context) => {
+  await assertAdmin(context);
+  const status = String(data && data.status || 'pending').trim();
+  const snapshot = await db.collection('teacher_requests')
+    .where('status', '==', status)
+    .orderBy('createdAt', 'desc')
+    .limit(100)
+    .get();
+
+  return {
+    requests: snapshot.docs.map((doc) => {
+      const request = doc.data();
+      return {
+        id: doc.id,
+        email: request.email || '',
+        displayName: request.displayName || '',
+        schoolName: request.schoolName || '',
+        status: request.status || '',
+        classCode: request.classCode || '',
+        teacherUid: request.teacherUid || '',
+        createdAt: request.createdAt ? request.createdAt.toMillis() : null,
+        updatedAt: request.updatedAt ? request.updatedAt.toMillis() : null
+      };
+    })
+  };
 });
 
 exports.approveTeacher = functions.https.onCall(async (data, context) => {
@@ -449,6 +493,28 @@ exports.approveTeacher = functions.https.onCall(async (data, context) => {
   });
 
   return { teacherUid: userRecord.uid, classId: classInfo.id, classCode: classInfo.classCode };
+});
+
+exports.rejectTeacherRequest = functions.https.onCall(async (data, context) => {
+  await assertAdmin(context);
+  const requestId = String(data && data.requestId || '').trim();
+  if (!requestId) {
+    throw new functions.https.HttpsError('invalid-argument', '요청 ID가 필요합니다.');
+  }
+
+  const requestRef = db.collection('teacher_requests').doc(requestId);
+  const requestDoc = await requestRef.get();
+  if (!requestDoc.exists || requestDoc.get('status') !== 'pending') {
+    throw new functions.https.HttpsError('not-found', '승인 대기 중인 교사 요청을 찾을 수 없습니다.');
+  }
+
+  await requestRef.update({
+    status: 'rejected',
+    rejectedBy: context.auth.uid,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  return { ok: true };
 });
 
 exports.migrateExistingStudentsToDefaultClass = functions.https.onCall(async (data, context) => {

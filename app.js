@@ -90,6 +90,21 @@ auth.onAuthStateChanged(async (user) => {
 
                 navRight.insertBefore(dashboardBtn, document.getElementById('user-badge'));
             }
+
+            const isAdmin = currentUser.isAdmin === true || (currentUser.email || '').toLowerCase() === 'teacher@ingyu-ai-world.com';
+            if (navRight && isAdmin && !document.getElementById('admin-btn')) {
+                const adminBtn = document.createElement('a');
+                adminBtn.href = 'admin.html';
+                adminBtn.className = 'dashboard-btn';
+                adminBtn.id = 'admin-btn';
+                adminBtn.innerHTML = '<span class="icon">🛡️</span> 관리자';
+                adminBtn.style.marginRight = '10px';
+                adminBtn.style.textDecoration = 'none';
+                adminBtn.style.color = '#2c3e50';
+                adminBtn.style.fontWeight = 'bold';
+
+                navRight.insertBefore(adminBtn, document.getElementById('user-badge'));
+            }
         }
 
         // ===========================

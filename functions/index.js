@@ -517,6 +517,111 @@ exports.rejectTeacherRequest = functions.https.onCall(async (data, context) => {
   return { ok: true };
 });
 
+exports.resetTeacherPassword = functions.https.onCall(async (data, context) => {
+  await assertAdmin(context);
+
+  const teacherUid = String(data && data.teacherUid || '').trim();
+  const newPassword = String(data && data.newPassword || '').trim();
+  if (!teacherUid || newPassword.length < 6) {
+    throw new functions.https.HttpsError('invalid-argument', '교사 UID와 6자리 이상 새 비밀번호가 필요합니다.');
+  }
+  if (teacherUid === context.auth.uid) {
+    throw new functions.https.HttpsError('failed-precondition', '현재 로그인한 관리자 계정의 비밀번호는 여기서 초기화할 수 없습니다.');
+  }
+
+  const teacherRef = db.collection('users').doc(teacherUid);
+  const teacherDoc = await teacherRef.get();
+  if (!teacherDoc.exists || teacherDoc.get('role') !== 'teacher') {
+    throw new functions.https.HttpsError('not-found', '교사 계정을 찾을 수 없습니다.');
+  }
+
+  await admin.auth().updateUser(teacherUid, { password: newPassword });
+  await teacherRef.set({
+    passwordResetAt: admin.firestore.FieldValue.serverTimestamp(),
+    passwordResetBy: context.auth.uid,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  return { ok: true };
+});
+
+async function deleteCollectionByQuery(query, batchSize = 400) {
+  let deleted = 0;
+  while (true) {
+    const snapshot = await query.limit(batchSize).get();
+    if (snapshot.empty) break;
+
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    deleted += snapshot.size;
+
+    if (snapshot.size < batchSize) break;
+  }
+  return deleted;
+}
+
+async function deleteStudentAndData(uid) {
+  await Promise.all([
+    deleteCollectionByQuery(db.collection('usage_logs').where('userId', '==', uid)),
+    deleteCollectionByQuery(db.collection('emotional_checkins').where('userId', '==', uid))
+  ]);
+  await db.collection('user_agreements').doc(uid).delete().catch(() => {});
+  await db.collection('users').doc(uid).delete();
+  await admin.auth().deleteUser(uid).catch((error) => {
+    if (error.code !== 'auth/user-not-found') throw error;
+  });
+}
+
+exports.deleteTeacherAccount = functions.https.onCall(async (data, context) => {
+  await assertAdmin(context);
+
+  const teacherUid = String(data && data.teacherUid || '').trim();
+  const confirmDeleteStudents = data && data.confirmDeleteStudents === true;
+  if (!teacherUid) {
+    throw new functions.https.HttpsError('invalid-argument', '교사 UID가 필요합니다.');
+  }
+  if (teacherUid === context.auth.uid) {
+    throw new functions.https.HttpsError('failed-precondition', '현재 로그인한 관리자 계정은 삭제할 수 없습니다.');
+  }
+
+  const teacherRef = db.collection('users').doc(teacherUid);
+  const teacherDoc = await teacherRef.get();
+  if (!teacherDoc.exists || teacherDoc.get('role') !== 'teacher') {
+    throw new functions.https.HttpsError('not-found', '교사 계정을 찾을 수 없습니다.');
+  }
+
+  const studentsSnapshot = await db.collection('users')
+    .where('role', '==', 'student')
+    .where('teacherId', '==', teacherUid)
+    .get();
+  if (!studentsSnapshot.empty && !confirmDeleteStudents) {
+    throw new functions.https.HttpsError('failed-precondition', `이 교사에게 연결된 학생 ${studentsSnapshot.size}명이 있습니다.`);
+  }
+
+  for (const studentDoc of studentsSnapshot.docs) {
+    await deleteStudentAndData(studentDoc.id);
+  }
+
+  const classesSnapshot = await db.collection('classes').where('teacherId', '==', teacherUid).get();
+  for (const classDoc of classesSnapshot.docs) {
+    await deleteCollectionByQuery(db.collection('class_app_approvals').where('classId', '==', classDoc.id));
+    await classDoc.ref.delete();
+  }
+
+  await deleteCollectionByQuery(db.collection('teacher_requests').where('teacherUid', '==', teacherUid));
+  await teacherRef.delete();
+  await admin.auth().deleteUser(teacherUid).catch((error) => {
+    if (error.code !== 'auth/user-not-found') throw error;
+  });
+
+  return {
+    ok: true,
+    deletedStudents: studentsSnapshot.size,
+    deletedClasses: classesSnapshot.size
+  };
+});
+
 exports.migrateExistingStudentsToDefaultClass = functions.https.onCall(async (data, context) => {
   const teacherDoc = await assertTeacher(context);
   const classInfo = await ensureDefaultClassForTeacher(context.auth.uid, teacherDoc.data());

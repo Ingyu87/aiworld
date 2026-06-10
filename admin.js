@@ -8,6 +8,7 @@ const exportTeachersBtn = document.getElementById('export-teachers-btn');
 const refreshBtn = document.getElementById('refresh-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const adminName = document.getElementById('admin-name');
+const callableFunctions = firebase.app().functions('us-central1');
 
 let currentAdmin = null;
 let teacherRows = [];
@@ -214,7 +215,8 @@ async function loadTeachers() {
                 <td>${formatDate(teacher.createdAt)}</td>
                 <td>
                     <div class="admin-actions">
-                        <button class="secondary-button admin-small-button" onclick="sendTeacherPasswordReset('${escapeHtml(teacher.email)}')">비번 재설정 메일</button>
+                        <button class="secondary-button admin-small-button" onclick="resetTeacherPassword('${escapeHtml(teacher.uid)}', '${escapeHtml(teacher.email)}')" ${teacher.uid === currentAdmin.uid ? 'disabled' : ''}>비번 초기화</button>
+                        <button class="danger-button admin-small-button" onclick="deleteTeacherAccount('${escapeHtml(teacher.uid)}', '${escapeHtml(teacher.displayName || teacher.email)}')" ${teacher.uid === currentAdmin.uid ? 'disabled' : ''}>삭제</button>
                     </div>
                 </td>
             </tr>
@@ -313,20 +315,50 @@ window.rejectRequest = async function (requestId) {
     }
 };
 
-window.sendTeacherPasswordReset = async function (email) {
-    if (!email) {
-        alert('교사 이메일이 없습니다.');
+window.resetTeacherPassword = async function (teacherUid, email) {
+    const newPassword = prompt(`${email} 계정의 새 비밀번호를 입력하세요.\n6자리 이상으로 설정해야 합니다.`);
+    if (newPassword === null) return;
+
+    const trimmedPassword = newPassword.trim();
+    if (trimmedPassword.length < 6) {
+        alert('새 비밀번호는 6자리 이상이어야 합니다.');
         return;
     }
 
-    if (!confirm(`${email} 주소로 비밀번호 재설정 메일을 보내시겠습니까?`)) return;
+    if (!confirm(`${email} 계정의 비밀번호를 새 비밀번호로 초기화하시겠습니까?`)) return;
 
     try {
-        await auth.sendPasswordResetEmail(email);
-        alert('비밀번호 재설정 메일을 보냈습니다.');
+        const resetPassword = callableFunctions.httpsCallable('resetTeacherPassword');
+        await resetPassword({ teacherUid, newPassword: trimmedPassword });
+        alert('교사 비밀번호를 초기화했습니다.');
     } catch (error) {
         console.error('Password reset error:', error);
-        alert(error.message || '비밀번호 재설정 메일 발송에 실패했습니다.');
+        alert(error.message || '비밀번호 초기화에 실패했습니다.');
+    }
+};
+
+window.deleteTeacherAccount = async function (teacherUid, label) {
+    const firstConfirm = confirm(`${label} 교사 계정을 삭제하시겠습니까?\n연결된 학생과 학급 데이터도 함께 삭제될 수 있습니다.`);
+    if (!firstConfirm) return;
+
+    const typed = prompt('정말 삭제하려면 DELETE 를 입력하세요.');
+    if (typed !== 'DELETE') {
+        alert('삭제를 취소했습니다.');
+        return;
+    }
+
+    try {
+        const deleteTeacher = callableFunctions.httpsCallable('deleteTeacherAccount');
+        const result = await deleteTeacher({
+            teacherUid,
+            confirmDeleteStudents: true
+        });
+        const data = result.data || {};
+        alert(`교사 계정을 삭제했습니다.\n삭제된 학생: ${data.deletedStudents || 0}명\n삭제된 학급: ${data.deletedClasses || 0}개`);
+        await loadAdminData();
+    } catch (error) {
+        console.error('Delete teacher error:', error);
+        alert(error.message || '교사 계정 삭제에 실패했습니다.');
     }
 };
 

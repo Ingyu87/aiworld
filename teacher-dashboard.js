@@ -8,6 +8,86 @@ const apps = window.APPS_DATA || [];
 // ===========================
 let currentTeacher = null;
 
+function normalizeCodeSeed(value) {
+    return String(value || 'CLASS')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 5) || 'CLASS';
+}
+
+function generateClassCode(name) {
+    const seed = normalizeCodeSeed(name);
+    const suffix = Math.random().toString(16).slice(2, 8).toUpperCase();
+    return `${seed}-${suffix}`;
+}
+
+function appApprovalDocId(classId, appTitle) {
+    return `${classId}_${encodeURIComponent(appTitle).replace(/[^A-Za-z0-9_-]/g, '')}`;
+}
+
+async function ensureTeacherClass() {
+    if (!currentTeacher) return;
+
+    if (currentTeacher.defaultClassId) {
+        const classDoc = await db.collection('classes').doc(currentTeacher.defaultClassId).get();
+        if (classDoc.exists) {
+            const classData = classDoc.data();
+            currentTeacher.defaultClassCode = currentTeacher.defaultClassCode || classData.classCode;
+            return;
+        }
+    }
+
+    const classRef = db.collection('classes').doc();
+    const classCode = generateClassCode(currentTeacher.name || currentTeacher.displayName || 'CLASS');
+    const classData = {
+        teacherId: currentTeacher.uid,
+        className: `${currentTeacher.name || currentTeacher.displayName || '교사'} 반`,
+        classCode,
+        isActive: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    const batch = db.batch();
+    batch.set(classRef, classData);
+    batch.set(db.collection('users').doc(currentTeacher.uid), {
+        defaultClassId: classRef.id,
+        defaultClassCode: classCode,
+        approved: true,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    await batch.commit();
+
+    currentTeacher.defaultClassId = classRef.id;
+    currentTeacher.defaultClassCode = classCode;
+}
+
+async function migrateStudentsToTeacherClass() {
+    if (!currentTeacher || !currentTeacher.defaultClassId) return;
+
+    const snapshot = await db.collection('users')
+        .where('role', '==', 'student')
+        .get();
+    const batch = db.batch();
+    let hasUpdates = false;
+
+    snapshot.forEach(doc => {
+        const student = doc.data();
+        if (student.teacherId && student.classId) return;
+        hasUpdates = true;
+        batch.update(doc.ref, {
+            teacherId: currentTeacher.uid,
+            classId: currentTeacher.defaultClassId,
+            classCodeUsed: currentTeacher.defaultClassCode,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    });
+
+    if (hasUpdates) {
+        await batch.commit();
+    }
+}
+
 auth.onAuthStateChanged(async (user) => {
     if (!user) {
         // Not logged in, redirect to login page
@@ -31,18 +111,11 @@ auth.onAuthStateChanged(async (user) => {
 
         await user.getIdToken(true);
 
-        if (firebaseFns) {
-            try {
-                const createDefaultClassForTeacher = firebaseFns.httpsCallable('createDefaultClassForTeacher');
-                const classResult = await createDefaultClassForTeacher({});
-                currentTeacher.defaultClassId = classResult.data.classId;
-                currentTeacher.defaultClassCode = classResult.data.classCode;
-
-                const migrateExistingStudents = firebaseFns.httpsCallable('migrateExistingStudentsToDefaultClass');
-                await migrateExistingStudents({});
-            } catch (classError) {
-                console.error('Error preparing teacher class:', classError);
-            }
+        try {
+            await ensureTeacherClass();
+            await migrateStudentsToTeacherClass();
+        } catch (classError) {
+            console.error('Error preparing teacher class:', classError);
         }
 
         document.getElementById('teacher-name').textContent = currentTeacher.name || '교사';
@@ -491,12 +564,28 @@ studentForm.addEventListener('submit', async (e) => {
                 throw new Error('비밀번호는 숫자 4자리여야 합니다.');
             }
 
-            const secureFullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
-            const createStudentByTeacher = firebaseFns.httpsCallable('createStudentByTeacher');
-            await createStudentByTeacher({
-                email: secureFullEmail,
+            const fullEmail = email.includes('@') ? email : `${email}@ingyu-ai-world.com`;
+            const internalPassword = "fixed_student_pw_1234";
+            const secondaryAppName = `Secondary-${Date.now()}`;
+            const secondaryApp = firebase.initializeApp(firebaseConfig, secondaryAppName);
+            const secondaryAuth = secondaryApp.auth();
+
+            const userCredential = await secondaryAuth.createUserWithEmailAndPassword(fullEmail, internalPassword);
+            const uid = userCredential.user.uid;
+            await secondaryAuth.signOut();
+            await secondaryApp.delete();
+
+            await db.collection('users').doc(uid).set({
+                uid,
+                email: fullEmail,
                 name,
-                pin: password
+                role: 'student',
+                teacherId: currentTeacher.uid,
+                classId: currentTeacher.defaultClassId,
+                classCodeUsed: currentTeacher.defaultClassCode,
+                simplePassword: password,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
             alert('학생이 추가되었습니다.');
@@ -557,8 +646,13 @@ window.editPassword = async function (studentId, studentName) {
     }
 
     try {
-        const updateStudentPin = firebaseFns.httpsCallable('updateStudentPin');
-        await updateStudentPin({ uid: studentId, pin: newPassword });
+        await db.collection('users').doc(studentId).update({
+            simplePassword: newPassword,
+            pinSalt: firebase.firestore.FieldValue.delete(),
+            pinHash: firebase.firestore.FieldValue.delete(),
+            pinHashVersion: firebase.firestore.FieldValue.delete(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
         alert(`${studentName} 학생의 비밀번호가 변경되었습니다.`);
         loadStudents();
@@ -598,15 +692,6 @@ deleteConfirmBtn.addEventListener('click', async () => {
     if (!deletingStudentId) return;
 
     try {
-        const deleteStudentAccount = firebaseFns.httpsCallable('deleteStudentAccount');
-        await deleteStudentAccount({ uid: deletingStudentId });
-
-        alert('학생이 삭제되었습니다.');
-        closeDeleteModal();
-        loadStudents();
-        loadUsageStats();
-        return;
-
         // Delete from Firestore
         await db.collection('users').doc(deletingStudentId).delete();
 
@@ -614,9 +699,15 @@ deleteConfirmBtn.addEventListener('click', async () => {
         const logsSnapshot = await db.collection('usage_logs')
             .where('userId', '==', deletingStudentId)
             .get();
+        const emotionsSnapshot = await db.collection('emotional_checkins')
+            .where('userId', '==', deletingStudentId)
+            .get();
 
         const batch = db.batch();
         logsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        emotionsSnapshot.forEach(doc => {
             batch.delete(doc.ref);
         });
         await batch.commit();
@@ -837,13 +928,17 @@ window.toggleAppApproval = async function (appTitle, isApproved) {
         dashboardAppApprovals[appTitle] = isApproved;
         renderApprovalGrid();
 
-        const setClassAppApproval = firebaseFns.httpsCallable('setClassAppApproval');
-        await setClassAppApproval({
-            classId: currentTeacher.defaultClassId,
-            appTitle: appTitle,
-            category: app.category,
-            isApproved: isApproved
-        });
+        await db.collection('class_app_approvals')
+            .doc(appApprovalDocId(currentTeacher.defaultClassId, appTitle))
+            .set({
+                classId: currentTeacher.defaultClassId,
+                teacherId: currentTeacher.uid,
+                appTitle,
+                category: app.category,
+                isApproved,
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: currentTeacher.uid
+            }, { merge: true });
 
     } catch (error) {
         console.error("Error toggling approval:", error);
@@ -875,15 +970,19 @@ if (unapproveAllBtn) {
 async function setAllApprovals(isApproved) {
     try {
         const studentApps = getStudentApps();
-        const setClassAppApproval = firebaseFns.httpsCallable('setClassAppApproval');
+        const batch = db.batch();
 
         for (const app of studentApps) {
-            await setClassAppApproval({
+            const ref = db.collection('class_app_approvals').doc(appApprovalDocId(currentTeacher.defaultClassId, app.title));
+            batch.set(ref, {
                 classId: currentTeacher.defaultClassId,
+                teacherId: currentTeacher.uid,
                 appTitle: app.title,
                 category: app.category,
-                isApproved: isApproved
-            });
+                isApproved: isApproved,
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: currentTeacher.uid
+            }, { merge: true });
 
             // Update local state
             dashboardAppApprovals[app.title] = isApproved;
@@ -891,6 +990,7 @@ async function setAllApprovals(isApproved) {
 
         // Update UI immediately (Optimistic)
         renderApprovalGrid();
+        await batch.commit();
         // alert(`모든 앱이 ${isApproved ? '승인' : '미승인'} 처리되었습니다.`);
 
     } catch (error) {

@@ -94,13 +94,28 @@ studentForm.addEventListener('submit', async (e) => {
     try {
         showLoading();
 
-        const verifyStudentPin = firebaseFns.httpsCallable('verifyStudentPin');
-        const result = await verifyStudentPin({
-            email: normalizeStudentEmail(email),
-            pin
+        const fullEmail = normalizeStudentEmail(email);
+        const internalPassword = "fixed_student_pw_1234";
+        const userCredential = await auth.signInWithEmailAndPassword(fullEmail, internalPassword);
+        const user = userCredential.user;
+        const userDoc = await db.collection('users').doc(user.uid).get();
+
+        if (!userDoc.exists || userDoc.data().role !== 'student') {
+            await auth.signOut();
+            throw new Error('학생 계정을 찾을 수 없습니다.');
+        }
+
+        const userData = userDoc.data();
+        if (userData.simplePassword !== pin) {
+            await auth.signOut();
+            throw new Error('비밀번호가 올바르지 않습니다.');
+        }
+
+        await db.collection('users').doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            loginCount: firebase.firestore.FieldValue.increment(1)
         });
 
-        await auth.signInWithCustomToken(result.data.token);
         window.location.href = 'index.html';
     } catch (error) {
         hideLoading();

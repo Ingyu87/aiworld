@@ -9,6 +9,54 @@ const apps = window.APPS_DATA || [];
 let currentUser = null;
 let isInitializing = false; // 초기화 중복 방지 플래그
 
+function normalizeCodeSeed(value) {
+    return String(value || 'CLASS')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 5) || 'CLASS';
+}
+
+function generateClassCode(name) {
+    const seed = normalizeCodeSeed(name);
+    const suffix = Math.random().toString(16).slice(2, 8).toUpperCase();
+    return `${seed}-${suffix}`;
+}
+
+async function ensureTeacherClassForCurrentUser() {
+    if (!currentUser || currentUser.role !== 'teacher') return;
+
+    if (currentUser.defaultClassId) {
+        const classDoc = await db.collection('classes').doc(currentUser.defaultClassId).get();
+        if (classDoc.exists) {
+            const classData = classDoc.data();
+            currentUser.defaultClassCode = currentUser.defaultClassCode || classData.classCode;
+            return;
+        }
+    }
+
+    const classRef = db.collection('classes').doc();
+    const classCode = generateClassCode(currentUser.name || currentUser.displayName || 'CLASS');
+    const batch = db.batch();
+    batch.set(classRef, {
+        teacherId: currentUser.uid,
+        className: `${currentUser.name || currentUser.displayName || '교사'} 반`,
+        classCode,
+        isActive: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    batch.set(db.collection('users').doc(currentUser.uid), {
+        defaultClassId: classRef.id,
+        defaultClassCode: classCode,
+        approved: true,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    await batch.commit();
+
+    currentUser.defaultClassId = classRef.id;
+    currentUser.defaultClassCode = classCode;
+}
+
 // Check authentication status
 auth.onAuthStateChanged(async (user) => {
     // 중복 초기화 방지
@@ -53,12 +101,9 @@ auth.onAuthStateChanged(async (user) => {
             ...userData
         };
 
-        if (currentUser.role === 'teacher' && (!currentUser.defaultClassId || !currentUser.defaultClassCode) && firebaseFns) {
+        if (currentUser.role === 'teacher' && (!currentUser.defaultClassId || !currentUser.defaultClassCode)) {
             try {
-                const createDefaultClassForTeacher = firebaseFns.httpsCallable('createDefaultClassForTeacher');
-                const classResult = await createDefaultClassForTeacher({});
-                currentUser.defaultClassId = classResult.data.classId;
-                currentUser.defaultClassCode = classResult.data.classCode;
+                await ensureTeacherClassForCurrentUser();
             } catch (classError) {
                 console.error('Failed to prepare teacher class:', classError);
             }

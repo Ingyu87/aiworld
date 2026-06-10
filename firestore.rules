@@ -19,6 +19,13 @@ service cloud.firestore {
       );
     }
 
+    function isAdmin() {
+      return isTeacher() && (
+        request.auth.token.email == 'teacher@ingyu-ai-world.com' ||
+        userDoc(request.auth.uid).data.isAdmin == true
+      );
+    }
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
@@ -53,24 +60,36 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId) || isMyStudent(resource.data);
-      allow create: if false;
-      allow update: if isMyStudent(resource.data) || (isOwner(userId) && doesNotChangeSensitiveUserFields());
-      allow delete: if false;
+      allow read: if isOwner(userId) || isTeacher();
+      allow create: if isAuthenticated() && (
+        (request.auth.uid == userId && request.resource.data.role == 'student') ||
+        (isTeacher() && request.resource.data.role == 'student' && request.resource.data.teacherId == request.auth.uid) ||
+        (isAdmin() && request.resource.data.role == 'teacher')
+      );
+      allow update: if isMyStudent(resource.data) ||
+        (isOwner(userId) && (
+          doesNotChangeSensitiveUserFields() ||
+          (resource.data.role == 'teacher' && request.resource.data.role == 'teacher')
+        )) ||
+        isAdmin();
+      allow delete: if isMyStudent(resource.data) || isAdmin();
     }
 
     match /classes/{classId} {
-      allow read: if isMyClass(resource.data) || isMyClassStudent(classId);
-      allow create, update, delete: if false;
+      allow read: if true;
+      allow create: if (isTeacher() && request.resource.data.teacherId == request.auth.uid) || isAdmin();
+      allow update, delete: if isMyClass(resource.data) || isAdmin();
     }
 
     match /teacher_requests/{requestId} {
-      allow read, write: if false;
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
 
     match /class_app_approvals/{approvalId} {
       allow read: if isMyClass(resource.data) || isMyClassStudent(resource.data.classId);
-      allow write: if false;
+      allow create: if isTeacher() && request.resource.data.teacherId == request.auth.uid;
+      allow update, delete: if isMyClass(resource.data) || isAdmin();
     }
 
     match /app_approvals/{appId} {

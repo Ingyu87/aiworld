@@ -59,6 +59,19 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+function normalizeCodeSeed(value) {
+    return String(value || 'CLASS')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 5) || 'CLASS';
+}
+
+function generateClassCode(name) {
+    const seed = normalizeCodeSeed(name);
+    const suffix = Math.random().toString(16).slice(2, 8).toUpperCase();
+    return `${seed}-${suffix}`;
+}
+
 async function loadTeacherRequests() {
     if (!currentAdmin) return;
 
@@ -75,9 +88,22 @@ async function loadTeacherRequests() {
     emptyState.style.display = 'none';
 
     try {
-        const listTeacherRequests = firebaseFns.httpsCallable('listTeacherRequests');
-        const result = await listTeacherRequests({ status: 'pending' });
-        const requests = result.data.requests || [];
+        const snapshot = await db.collection('teacher_requests')
+            .where('status', '==', 'pending')
+            .orderBy('createdAt', 'desc')
+            .limit(100)
+            .get();
+        const requests = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                email: data.email || '',
+                displayName: data.displayName || '',
+                schoolName: data.schoolName || '',
+                status: data.status || '',
+                createdAt: data.createdAt ? data.createdAt.toMillis() : null
+            };
+        });
 
         requestSummary.textContent = `승인 대기 ${requests.length}건`;
 
@@ -124,9 +150,57 @@ window.approveRequest = async function (requestId) {
     }
 
     try {
-        const approveTeacher = firebaseFns.httpsCallable('approveTeacher');
-        const result = await approveTeacher({ requestId, temporaryPassword });
-        alert(`교사 계정이 승인되었습니다.\n반 코드: ${result.data.classCode}`);
+        const requestRef = db.collection('teacher_requests').doc(requestId);
+        const requestDoc = await requestRef.get();
+        if (!requestDoc.exists || requestDoc.data().status !== 'pending') {
+            throw new Error('승인 대기 중인 신청을 찾을 수 없습니다.');
+        }
+
+        const request = requestDoc.data();
+        const secondaryAppName = `TeacherApproval-${Date.now()}`;
+        const secondaryApp = firebase.initializeApp(firebaseConfig, secondaryAppName);
+        const secondaryAuth = secondaryApp.auth();
+        const userCredential = await secondaryAuth.createUserWithEmailAndPassword(request.email, temporaryPassword);
+        const teacherUid = userCredential.user.uid;
+        await secondaryAuth.signOut();
+        await secondaryApp.delete();
+
+        const classRef = db.collection('classes').doc();
+        const classCode = generateClassCode(request.displayName);
+        const batch = db.batch();
+        batch.set(db.collection('users').doc(teacherUid), {
+            uid: teacherUid,
+            email: request.email,
+            name: request.displayName,
+            displayName: request.displayName,
+            schoolName: request.schoolName || '',
+            role: 'teacher',
+            approved: true,
+            isAdmin: false,
+            defaultClassId: classRef.id,
+            defaultClassCode: classCode,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        batch.set(classRef, {
+            teacherId: teacherUid,
+            className: `${request.displayName} 반`,
+            classCode,
+            isActive: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        batch.update(requestRef, {
+            status: 'approved',
+            approvedBy: currentAdmin.uid,
+            teacherUid,
+            classId: classRef.id,
+            classCode,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await batch.commit();
+
+        alert(`교사 계정이 승인되었습니다.\n반 코드: ${classCode}`);
         await loadTeacherRequests();
     } catch (error) {
         console.error('Approve teacher error:', error);
@@ -138,8 +212,11 @@ window.rejectRequest = async function (requestId) {
     if (!confirm('이 교사 신청을 거절하시겠습니까?')) return;
 
     try {
-        const rejectTeacherRequest = firebaseFns.httpsCallable('rejectTeacherRequest');
-        await rejectTeacherRequest({ requestId });
+        await db.collection('teacher_requests').doc(requestId).update({
+            status: 'rejected',
+            rejectedBy: currentAdmin.uid,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
         await loadTeacherRequests();
     } catch (error) {
         console.error('Reject teacher error:', error);

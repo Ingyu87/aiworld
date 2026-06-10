@@ -92,13 +92,37 @@ signupForm.addEventListener('submit', async (e) => {
     try {
         showLoading();
 
-        const signupStudent = firebaseFns.httpsCallable('signupStudent');
-        await signupStudent({
-            email: normalizeStudentEmail(emailInput),
+        const classSnapshot = await db.collection('classes')
+            .where('classCode', '==', classCode)
+            .where('isActive', '==', true)
+            .limit(1)
+            .get();
+
+        if (classSnapshot.empty) {
+            throw new Error('유효한 반 코드를 찾을 수 없습니다.');
+        }
+
+        const classDoc = classSnapshot.docs[0];
+        const classData = classDoc.data();
+        const fullEmail = normalizeStudentEmail(emailInput);
+        const internalPassword = "fixed_student_pw_1234";
+        const userCredential = await auth.createUserWithEmailAndPassword(fullEmail, internalPassword);
+        const uid = userCredential.user.uid;
+
+        await db.collection('users').doc(uid).set({
+            uid,
+            email: fullEmail,
             name: emailInput,
-            classCode,
-            pin
+            role: 'student',
+            teacherId: classData.teacherId,
+            classId: classDoc.id,
+            classCodeUsed: classCode,
+            simplePassword: pin,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        await auth.signOut();
 
         alert('회원가입이 완료되었습니다. 로그인해주세요.');
         window.location.href = 'login.html';
